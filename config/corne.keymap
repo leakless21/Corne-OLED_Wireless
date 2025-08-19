@@ -206,7 +206,7 @@
             bindings = <
 &kp ESC  &kp F1      &kp F2      &kp F3      &kp F4               &kp F5        &kp F6      &kp F7               &kp F8      &kp F9      &kp F10     &kp F11
 &trans   &kp N1      &kp N2      &kp N3      &bhm LCTRL NUMBER_4  &kp N5        &kp N6      &bhm RCTRL NUMBER_7  &kp N8      &kp N9      &kp N0      &ext_power EP_TOG
-&trans   &kp LS(N1)  &kp LS(N2)  &kp LS(N3)  &kp LS(N4)           &kp LS(N5)    &kp LS(N6)  &kp LS(N7)           &kp LS(N8)  &kp LS(N9)  &kp LS(N0)  &trans
+&trans   &kp LS(N1)  &kp LS(N2)  &kp LS(N3)  &kp LS(N4)           &kp LS(N5)    &kp LS(N6)  &kp LS(N7)           &kp LS(N8)  &kp LS(N9)  &kp LS(N0)  &bootloader
                                  &trans      &kp UNDER            &trans        &trans      &trans               &trans
             >;
         };
