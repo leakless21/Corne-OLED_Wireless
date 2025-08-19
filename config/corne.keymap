@@ -13,6 +13,13 @@
 #include <dt-bindings/zmk/ext_power.h>
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/pointing.h>
+#include "zmk-helpers/helper.h"
+
+// Source desired key-position labels
+#include "zmk-helpers/key-labels/glove80.h"
+
+// Source unicode-chars for desired languages
+#include "zmk-helpers/unicode-chars/german.dtsi"
 
 &sk {
     release-after-ms = <1000>;
