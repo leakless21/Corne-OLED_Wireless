@@ -61,6 +61,7 @@
         BASE {
             label = "BASE";
             display-name = "BASE";
+
             // -----------------------------------------------------------------------------------------
             // |  TAB |  Q  |  W  |  E  |  R  |  T  |   |  Y  |  U   |  I  |  O  |  P  | BSPC |
             // | CTRL |  A  |  S  |  D  |  F  |  G  |   |  H  |  J   |  K  |  L  |  ;  |  '   |
@@ -70,19 +71,8 @@
             bindings = <
 &kp ESCAPE  &kp Q         &kp W            &kp F         &kp P              &kp B        &kp J        &kp L               &kp U         &kp Y             &kp COMMA         &kp BACKSPACE
 &kp TAB     &bhm LMETA A  &bhm LEFT_ALT R  &bhm LCTRL S  &bhm LEFT_SHIFT T  &kp G        &kp M        &bhm RIGHT_SHIFT N  &bhm RCTRL E  &bhm RIGHT_ALT I  &bhm RIGHT_GUI O  &kp SEMICOLON
-&sk LSHFT   &lt 3 Z       &kp X            &kp C         &kp D              &lt 4 V      &lt 7 K      &kp H               &kp COMMA     &kp DOT           &lt 3 SLASH       &kp RIGHT_SHIFT
-                                           &kp LCTRL     &lt 6 SPACE        &lt 2 TAB    &lt 6 ENTER  &lt 6 BACKSPACE     &kp RCTRL
-            >;
-        };
-
-        MOUSE {
-            label = "MOUSE";
-            display-name = "MOUSE";
-            bindings = <
-&trans  &trans    &trans    &trans     &trans          &trans    &kp K_REDO  &kp K_PASTE     &kp K_COPY      &kp K_CUT     &kp K_UNDO       &trans
-&trans  &kp LGUI  &kp LALT  &kp LCTRL  &kp LEFT_SHIFT  &trans    &mkp MB5    &kp LEFT        &kp DOWN_ARROW  &kp UP_ARROW  &kp RIGHT        &kp K_CMENU
-&trans  &trans    &trans    &trans     &trans          &trans    &mkp MB4    &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_UP  &mmv MOVE_RIGHT  &trans
-                            &trans     &trans          &trans    &mkp MB2    &mkp MB1        &mkp MCLK
+&sk LSHFT   &lt 4 Z       &kp X            &kp C         &kp D              &lt 4 V      &lt 7 K      &kp H               &kp COMMA     &kp DOT           &lt 3 SLASH       &kp RIGHT_SHIFT
+                                           &kp LCTRL     &lt 1 SPACE        &lt 2 TAB    &lt 6 ENTER  &lt 5 BACKSPACE     &kp RCTRL
             >;
         };
 
@@ -94,6 +84,17 @@
 &trans       &kp LGUI  &kp LALT  &kp LCTRL  &kp LEFT_SHIFT  &to 8     &kp CAPS    &kp LEFT       &kp DOWN_ARROW  &kp UP_ARROW  &kp RIGHT   &kp K_CMENU
 &bootloader  &trans    &trans    &trans     &trans          &trans    &kp INSERT  &kp HOME       &kp PAGE_DOWN   &kp PAGE_UP   &kp END     &trans
                                  &trans     &trans          &trans    &kp ENTER   &kp BACKSPACE  &kp DELETE
+            >;
+        };
+
+        MOUSE {
+            label = "MOUSE";
+            display-name = "MOUSE";
+            bindings = <
+&trans  &trans    &trans    &trans     &trans          &trans    &kp K_REDO  &kp K_PASTE     &kp K_COPY      &kp K_CUT     &kp K_UNDO       &trans
+&trans  &kp LGUI  &kp LALT  &kp LCTRL  &kp LEFT_SHIFT  &trans    &mkp MB5    &kp LEFT        &kp DOWN_ARROW  &kp UP_ARROW  &kp RIGHT        &kp K_CMENU
+&trans  &trans    &trans    &trans     &trans          &trans    &mkp MB4    &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_UP  &mmv MOVE_RIGHT  &trans
+                            &trans     &trans          &trans    &mkp MB2    &mkp MB1        &mkp MCLK
             >;
         };
 
@@ -119,7 +120,7 @@
             >;
         };
 
-        num_layer {
+        NUM {
             label = "NUM";
             display-name = "NUM";
             bindings = <
