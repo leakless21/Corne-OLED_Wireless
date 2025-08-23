@@ -38,132 +38,20 @@
 };
 
 &lt {
-    tapping-term-ms = <200>; // default 200
-    flavor = "balanced"; // or hold-preferred or tap-preferred
-    quick-tap-ms = <150>;
+    tapping-term-ms = <220>; // default 200
+    flavor = "tap-preferred"; // or hold-preferred or tap-preferred
+    quick-tap-ms = <180>;
 };
 
 / {
-    combos {
-        compatible = "zmk,combos";
-
-        caps_word {
-            bindings = <&caps_word>;
-            key-positions = <17 18>;
-            layers = <0>;
-        };
-
-        esc {
-            bindings = <&kp TAB>;
-            key-positions = <1 2>;
-            layers = <0>;
-        };
-
-        vol_up {
-            bindings = <&kp C_VOLUME_UP>;
-            key-positions = <11 23>;
-            layers = <0>;
-        };
-
-        combo_vol_down {
-            bindings = <&kp C_VOLUME_DOWN>;
-            key-positions = <23 35>;
-            layers = <0>;
-        };
-
-        combo_CAPS_LOCK {
-            bindings = <&kp CAPSLOCK>;
-            key-positions = <5 6>;
-            layers = <0>;
-        };
-
-        combo_Delete {
-            bindings = <&kp DELETE>;
-            key-positions = <10 9>;
-            layers = <0>;
-        };
-
-        combo_underscore {
-            bindings = <&kp UNDER>;
-            key-positions = <7 8>;
-            layers = <0>;
-        };
-
-        combo_dash {
-            bindings = <&kp MINUS>;
-            key-positions = <4 3>;
-            layers = <0>;
-        };
-
-        combo_em-dash {
-            bindings = <&emdsh>;
-            key-positions = <2 3 4>;
-            layers = <0>;
-        };
-
-        combo_f19 {
-            bindings = <&kp F19>;
-            key-positions = <1 4 7 10>;
-            layers = <0>;
-        };
-
-        combo_single-quote {
-            bindings = <&kp SINGLE_QUOTE>;
-            key-positions = <7 19>;
-            layers = <0>;
-        };
-
-        combo_double-quote {
-            bindings = <&kp AT_SIGN>;
-            key-positions = <8 20>;
-            layers = <0>;
-        };
-    };
-
-    macros {
-        arrow_func: arrow_func {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            bindings = <&kp EQUAL &kp GT>, <&macro_press>;
-
-            label = "ARROW_FUNC";
-        };
-
-        emdsh: emdsh {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            bindings =
-                <&kp SPACE &kp MINUS &kp MINUS &kp SPACE>,
-                <&macro_press>;
-
-            label = "EMDSH";
-        };
-    };
-
     behaviors {
         bhm: balanced_homerow_mods {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
-            tapping-term-ms = <200>;    // <---[[moderate duration]]
-            quick-tap-ms = <0>;
-            flavor = "balanced";
+            tapping-term-ms = <220>;    // <---[[moderate duration]]
+            quick-tap-ms = <180>;
+            flavor = "tap-preferred";
             bindings = <&kp>, <&kp>;
-        };
-
-        arrow_func_tap: arrow_func_tap {
-            compatible = "zmk,behavior-tap-dance";
-            label = "ARROW_FUNC_TAP";
-            #binding-cells = <0>;
-            bindings = <&kp GREATER_THAN>, <&arrow_func>;
-        };
-
-        underspace: underspace {
-            compatible = "zmk,behavior-mod-morph";
-            label = "UNDERSPACE";
-            bindings = <&lt 1 SPACE>, <&kp UNDER>;
-
-            #binding-cells = <0>;
-            mods = <(MOD_RSFT)>;
         };
     };
 
@@ -171,6 +59,8 @@
         compatible = "zmk,keymap";
 
         BASE {
+            label = "BASE";
+            display-name = "BASE";
             // -----------------------------------------------------------------------------------------
             // |  TAB |  Q  |  W  |  E  |  R  |  T  |   |  Y  |  U   |  I  |  O  |  P  | BSPC |
             // | CTRL |  A  |  S  |  D  |  F  |  G  |   |  H  |  J   |  K  |  L  |  ;  |  '   |
@@ -186,6 +76,8 @@
         };
 
         MOUSE {
+            label = "MOUSE";
+            display-name = "MOUSE";
             bindings = <
 &trans  &trans    &trans    &trans     &trans          &trans    &kp K_REDO  &kp K_PASTE     &kp K_COPY      &kp K_CUT     &kp K_UNDO       &trans
 &trans  &kp LGUI  &kp LALT  &kp LCTRL  &kp LEFT_SHIFT  &trans    &mkp MB5    &kp LEFT        &kp DOWN_ARROW  &kp UP_ARROW  &kp RIGHT        &kp K_CMENU
@@ -195,6 +87,8 @@
         };
 
         NAVIGATION {
+            label = "NAV";
+            display-name = "NAV";
             bindings = <
 &trans       &trans    &trans    &trans     &trans          &trans    &kp K_REDO  &kp K_PASTE    &kp K_COPY      &kp K_CUT     &kp K_UNDO  &trans
 &trans       &kp LGUI  &kp LALT  &kp LCTRL  &kp LEFT_SHIFT  &to 8     &kp CAPS    &kp LEFT       &kp DOWN_ARROW  &kp UP_ARROW  &kp RIGHT   &kp K_CMENU
@@ -204,6 +98,8 @@
         };
 
         BUTTON {
+            label = "BUTTON";
+            display-name = "BUTTON";
             bindings = <
 &trans  &kp K_UNDO  &kp K_CUT  &kp K_COPY  &kp K_PASTE     &kp K_REDO    &kp K_REDO  &kp K_PASTE      &kp K_COPY  &kp K_CUT      &kp K_UNDO  &trans
 &trans  &kp LGUI    &kp LALT   &kp LCTRL   &kp LEFT_SHIFT  &trans        &trans      &kp RIGHT_SHIFT  &kp RCTRL   &kp RIGHT_ALT  &kp RGUI    &trans
@@ -213,6 +109,8 @@
         };
 
         MEDIA {
+            label = "MEDIA";
+            display-name = "MEDIA";
             bindings = <
 &trans  &trans    &trans    &trans     &trans          &trans               &kp K_REDO    &kp K_PASTE       &kp K_COPY         &kp K_CUT        &kp K_UNDO    &trans
 &trans  &kp LGUI  &kp LALT  &kp LCTRL  &kp LEFT_SHIFT  &ext_power EP_TOG    &bt BT_CLR    &kp K_PREV        &kp K_VOLUME_DOWN  &kp K_VOLUME_UP  &kp K_NEXT    &trans
@@ -222,6 +120,8 @@
         };
 
         num_layer {
+            label = "NUM";
+            display-name = "NUM";
             bindings = <
 &trans          &kp LEFT_BRACKET  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp RIGHT_BRACKET    &trans  &trans           &trans             &trans         &trans         &trans
 &trans          &kp SEMICOLON     &kp NUMBER_4  &kp NUMBER_5  &kp NUMBER_6  &kp EQUAL            &trans  &kp RIGHT_SHIFT  &kp RIGHT_CONTROL  &kp RIGHT_ALT  &kp RIGHT_GUI  &trans
@@ -231,6 +131,8 @@
         };
 
         SYM {
+            label = "SYM";
+            display-name = "SYM";
             bindings = <
 &trans  &kp GRAVE  &kp AMPERSAND    &kp ASTERISK   &kp LEFT_PARENTHESIS  &kp RIGHT_PARENTHESIS    &kp LEFT_BRACE  &kp RIGHT_BRACE  &kp LEFT_BRACKET  &kp RIGHT_BRACKET  &trans         &trans
 &trans  &kp COLON  &kp DOLLAR       &kp PERCENT    &kp CARET             &kp EQUAL                &kp SLASH       &kp RIGHT_SHIFT  &kp RCTRL         &kp RIGHT_ALT      &kp RIGHT_GUI  &trans
@@ -240,6 +142,8 @@
         };
 
         FUN {
+            label = "FUNC";
+            display-name = "FUNC";
             bindings = <
 &trans  &kp F12  &kp F7  &kp F8              &kp F9     &kp PRINTSCREEN    &kp LEFT_BRACE  &kp RIGHT_BRACE  &kp LEFT_BRACKET  &kp RIGHT_BRACKET  &trans         &trans
 &trans  &kp F11  &kp F4  &kp F5              &kp F6     &kp SCROLLLOCK     &kp SLASH       &kp RIGHT_SHIFT  &kp RCTRL         &kp RIGHT_ALT      &kp RIGHT_GUI  &trans
@@ -249,6 +153,8 @@
         };
 
         QWERTY {
+            label = "GAME";
+            display-name = "GAME";
             bindings = <
 &kp ESCAPE      &kp GRAVE     &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp NUMBER_4    &trans        &trans  &trans  &trans  &trans  &trans
 &kp TAB         &kp NUMBER_5  &kp Q         &kp W         &kp E         &kp R           &trans        &trans  &trans  &trans  &trans  &trans
@@ -257,6 +163,4 @@
             >;
         };
     };
-
-    conditional_layers { compatible = "zmk,conditional-layers"; };
 };
