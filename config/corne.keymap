@@ -91,10 +91,10 @@
             label = "MOUSE";
             display-name = "MOUSE";
             bindings = <
-&trans  &trans    &trans    &trans     &trans          &trans    &kp K_REDO  &kp K_PASTE     &kp K_COPY      &kp K_CUT     &kp K_UNDO       &trans
-&trans  &kp LGUI  &kp LALT  &kp LCTRL  &kp LEFT_SHIFT  &trans    &mkp MB5    &kp LEFT        &kp DOWN_ARROW  &kp UP_ARROW  &kp RIGHT        &kp K_CMENU
-&trans  &trans    &trans    &trans     &trans          &trans    &mkp MB4    &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_UP  &mmv MOVE_RIGHT  &trans
-                            &trans     &trans          &trans    &mkp MB2    &mkp MB1        &mkp MCLK
+&trans  &msc SCRL_LEFT  &msc SCRL_DOWN  &msc SCRL_UP  &msc SCRL_RIGHT  &trans    &kp K_REDO  &kp K_PASTE     &kp K_COPY      &kp K_CUT     &kp K_UNDO       &msc SCRL_UP
+&trans  &kp LGUI        &kp LALT        &kp LCTRL     &kp LEFT_SHIFT   &trans    &mkp MB5    &kp LEFT        &kp DOWN_ARROW  &kp UP_ARROW  &kp RIGHT        &msc SCRL_DOWN
+&trans  &trans          &trans          &trans        &trans           &trans    &mkp MB4    &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_UP  &mmv MOVE_RIGHT  &kp K_CONTEXT_MENU
+                                        &trans        &trans           &trans    &mkp MB2    &mkp MB1        &mkp MCLK
             >;
         };
 
