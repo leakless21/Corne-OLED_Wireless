@@ -126,8 +126,8 @@
             bindings = <
 &trans          &kp LEFT_BRACKET  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp RIGHT_BRACKET    &trans  &trans           &trans             &trans         &trans         &trans
 &trans          &kp SEMICOLON     &kp NUMBER_4  &kp NUMBER_5  &kp NUMBER_6  &kp EQUAL            &trans  &kp RIGHT_SHIFT  &kp RIGHT_CONTROL  &kp RIGHT_ALT  &kp RIGHT_GUI  &trans
-&kp LEFT_SHIFT  &kp NUMBER_1      &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp BACKSLASH        &trans  &trans           &trans             &trans         &trans         &bootloader
-                                                &kp PERIOD    &kp UNDER     &kp MINUS            &trans  &trans           &trans
+&kp LEFT_SHIFT  &kp GRAVE         &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp BACKSLASH        &trans  &trans           &trans             &trans         &trans         &bootloader
+                                                &kp PERIOD    &kp NUMBER_0  &kp MINUS            &trans  &trans           &trans
             >;
         };
 
