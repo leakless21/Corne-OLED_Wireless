@@ -125,7 +125,7 @@ HOST is engaged by holding a **combo** on the BASE layer: the outer `ESC`
 80 ms timeout (`host_combo`, `&mo L_HOST`). While HOST is active, the BASE
 physical H/J/K/L positions emit `Option+H/J/K/L` (`LA(H)`, `LA(J)`, `LA(K)`,
 `LA(L)`) and the top rows emit `F13`–`F20` for the AeroSpace bridge (see
-[docs/macos-aerospace.md](docs/macos-aerospace.md)).
+[docs/macos-aerospace.md](macos-aerospace.md)).
 
 ---
 
@@ -345,6 +345,6 @@ binding macros, so they do not obscure the actual key bindings in this keymap.
 The HOST layer (7) is **implemented in firmware** and bridges to macOS
 AeroSpace. It emits `F13`–`F20` and `Option+H/J/K/L` from the BASE physical
 H/J/K/L positions; AeroSpace binds those keys directly (see
-[docs/macos-aerospace.md](docs/macos-aerospace.md)). No `Alt-1`-style
+[docs/macos-aerospace.md](macos-aerospace.md)). No `Alt-1`-style
 intermediate mapping is used on the Corne side — the keyboard sends the F-keys
 and AeroSpace binds them directly.

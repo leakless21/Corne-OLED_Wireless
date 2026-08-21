@@ -1,21 +1,47 @@
-Firmware artifacts are `.uf2` files (not `.urf2`). Download them from the
-GitHub Actions run after a build.
+# Corne ZMK Firmware
 
-https://nickcoutsos.github.io/keymap-editor/
+ZMK firmware configuration for a Corne split keyboard on **nice\_nano\_v2**
+controllers with **nice\_oled** displays. The GitHub Actions workflow builds
+`.uf2` firmware images that you flash over USB.
 
----
+## Quick Start
 
-## Corne keymap & layers guide
+1. Fork / clone this repo.
+2. Edit `config/corne.keymap` (see [docs/setup.md](docs/setup.md) for a full
+   walkthrough, including how to flash, recover, and re-pair Bluetooth).
+3. Push — GitHub Actions builds `corne-left.uf2`, `corne-right.uf2`, and
+   `settings-reset.uf2`, then merges them into a single downloadable
+   `firmware` archive (`.zip`) on the Actions run.
+4. Download the archive, extract the `.uf2` files, flash both halves
+   (see guide), and start typing.
 
-This repository is a **ZMK firmware** project for the Corne keyboard. For the
-keymap/layers reference (the 10 layers, home-row mods, sticky/layer-tap
-behaviors, pointing, OLED/ZMK Studio settings, build artifacts, and safe flash
-guidance), see [docs/corne-keymaps.md](docs/corne-keymaps.md).
+## Prerequisites
 
-## macOS AeroSpace setup
+- **Hardware:** Corne split keyboard with two nice\_nano\_v2 controllers and
+  nice\_oled displays.
+- **GitHub account** (to run the Actions workflow and download artifacts).
+- **USB-C cable** for each half during flashing.
+- **Bluetooth-capable host** (macOS, Linux, Windows, etc.) for wireless use
+  after the initial flash. macOS is specifically required for the AeroSpace
+  tiling-window-manager guide.
 
-This repository is a ZMK firmware project for the Corne keyboard. For the macOS
-AeroSpace tiling-window-manager user guide (workspace layout, bindings, app
-routing, the implemented Corne HOST/F13–F20 integration, install/Accessibility,
-backup/rollback, and troubleshooting), see
-[docs/macos-aerospace.md](docs/macos-aerospace.md).
+## Documentation
+
+| Guide | What it covers |
+|-------|---------------|
+| [docs/setup.md](docs/setup.md) | End-to-end setup: editing the keymap, GitHub Actions builds, first flash, recovery / settings-reset, Bluetooth re-pairing, ZMK Studio caveats. |
+| [docs/corne-keymaps.md](docs/corne-keymaps.md) | Keymap & layers reference: all 10 layers, home-row mods, sticky keys, layer-taps, pointing, OLED/ZMK Studio settings. |
+| [docs/macos-aerospace.md](docs/macos-aerospace.md) | macOS AeroSpace tiling-window-manager guide: the Corne HOST/F13–F20 bridge, workspace bindings, app routing, install, and troubleshooting. |
+
+## Notes
+
+- Firmware artifacts are **`.uf2`** files (not `.urf2`). The GitHub Actions
+  workflow builds them individually, then the upstream reusable workflow merges
+  them into a single `firmware` archive for download.
+- The keymap editor (visual) is available at
+  <https://nickcoutsos.github.io/keymap-editor/>.
+- The boards (`nice_nano_v2`, shields `corne_left`/`corne_right`) are
+  **upstream** ZMK targets. This repo only contains the keymap, config, and
+  build definitions.
+- Local builds are **not** covered by this guide. Use the GitHub Actions
+  workflow instead.

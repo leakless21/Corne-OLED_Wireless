@@ -9,7 +9,7 @@ tiling-window-manager setup used alongside this repository, including the
 > `~/.config/aerospace/aerospace.toml` config (see [Config location](#3-config-location-backup--rollback)),
 > **not** in this repository. Editing that file is the only way to change AeroSpace
 > behavior; `config/corne.keymap` is the firmware side of the bridge and is edited
-> separately (see [docs/corne-keymaps.md](docs/corne-keymaps.md)).
+> separately (see [docs/corne-keymaps.md](corne-keymaps.md)).
 
 ---
 
@@ -32,7 +32,7 @@ tiling-window-manager setup used alongside this repository, including the
 - This guide does **not** ship or modify AeroSpace itself. Install it separately
   (see below).
 - It does **not** modify ZMK firmware or the Corne keymap. Firmware changes are a
-  separate workflow (see the README and [docs/corne-keymaps.md](docs/corne-keymaps.md)).
+  separate workflow (see the README and [docs/corne-keymaps.md](corne-keymaps.md)).
 - It does **not** prescribe a specific AeroSpace release. Always follow the
   [official AeroSpace documentation](https://nikitabobko.github.io/AeroSpace/guide)
   for the version you have installed.
@@ -214,7 +214,7 @@ Behavior notes:
 ## 7. Corne HOST bridge (implemented): `F13`–`F20` direct bindings
 
 The Corne **HOST** layer (firmware side, see
-[docs/corne-keymaps.md](docs/corne-keymaps.md)) emits `F13`–`F20` and
+[docs/corne-keymaps.md](corne-keymaps.md)) emits `F13`–`F20` and
 `Option+H/J/K/L`. AeroSpace binds those keys **directly** — there is **no
 `Alt-1`-style intermediate** on the Corne side. The keyboard sends the F-key;
 AeroSpace acts on it.
@@ -366,7 +366,7 @@ Alfred). Always prefer `--dry-run` before a real reload.
 **Corne HOST keys (F13–F20) do nothing in AeroSpace**
 
 - Confirm the keyboard is on the HOST layer (hold BASE outer `ESC` + `BACKSPACE`
-  to engage it — see [docs/corne-keymaps.md](docs/corne-keymaps.md)).
+  to engage it — see [docs/corne-keymaps.md](corne-keymaps.md)).
 - Confirm the `f13`–`f20` / `shift-f13`–`shift-f17` bindings are present in
   `~/.config/aerospace/aerospace.toml` and pass `aerospace reload-config --dry-run`.
 - Some macOS apps swallow F-keys; verify with a known-good app first.
