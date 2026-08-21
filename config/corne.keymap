@@ -26,7 +26,7 @@
 #define L_HOST 7
 #define L_GAME 8
 #define L_ADJUST 9
-#define L_GAME_NUM 10
+#define L_GAME_AUX 10
 
 &sk {
     release-after-ms = <1000>;
@@ -87,6 +87,17 @@
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
             flavor = "balanced";
+            tapping-term-ms = <200>;
+            bindings = <&mo>, <&kp>;
+        };
+        /*
+         * Dedicated GAME Esc/AUX hold-tap for fast left-hand chord resolution
+         * during gaming (e.g. hold Esc + Q/W/E/R/T for 1-5).
+         */
+        game_aux_lt: game_aux_lt {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "hold-preferred";
             tapping-term-ms = <200>;
             bindings = <&mo>, <&kp>;
         };
@@ -239,15 +250,18 @@
         GAME {
             label = "GAME";
             display-name = "GAME";
-            /* Plain tap-only QWERTY with momentary GAME_NUM on RH1; no BASE layer-taps. */
+            /*
+             * Plain tap-only QWERTY for gaming with hold-tap Esc/AUX on LT5,
+             * momentary GAME_AUX on RH1, and protected BASE exit on GAME_AUX RH2.
+             */
             bindings = <
-                &kp ESCAPE       &kp Q              &kp W              &kp E              &kp R              &kp T
+                &game_aux_lt L_GAME_AUX ESCAPE &kp Q              &kp W              &kp E              &kp R              &kp T
                 &kp Y            &kp U              &kp I              &kp O              &kp P              &kp BACKSPACE
                 &kp TAB          &kp A              &kp S              &kp D              &kp F              &kp G
                 &kp H            &kp J              &kp K              &kp L              &kp SEMICOLON      &kp ENTER
                 &kp LEFT_SHIFT   &kp Z              &kp X              &kp C              &kp V              &kp B
                 &kp N            &kp M              &kp COMMA           &kp DOT            &kp SLASH          &kp RIGHT_SHIFT
-                &kp LCTRL        &kp SPACE          &kp LALT            &kp ENTER         &mo L_GAME_NUM     &to L_BASE
+                &kp LCTRL        &kp SPACE          &kp LALT            &kp ENTER         &mo L_GAME_AUX     &trans
             >;
         };
 
@@ -268,21 +282,22 @@
                 &none             &none               &none               &none               &none               &none
             >;
         };
-        GAME_NUM {
-            label = "GAME_NUM";
-            display-name = "GAME_NUM";
+        GAME_AUX {
+            label = "GAME_AUX";
+            display-name = "GAME_AUX";
             /*
-             * Momentary number row over GAME. Top alpha row maps to 1-0;
-             * all other positions intentionally fall through (&trans) to GAME.
+             * Auxiliary gaming layer over GAME. Numbers 1-0 on top row,
+             * F1-F10 on home row, common gaming punctuation on bottom row.
+             * Deliberate exit to BASE on RH2; other positions fall through (&trans) to GAME.
              */
             bindings = <
                 &trans           &kp NUMBER_1       &kp NUMBER_2        &kp NUMBER_3        &kp NUMBER_4        &kp NUMBER_5
                 &kp NUMBER_6     &kp NUMBER_7       &kp NUMBER_8        &kp NUMBER_9        &kp NUMBER_0        &trans
+                &trans           &kp F1             &kp F2              &kp F3              &kp F4              &kp F5
+                &kp F6           &kp F7             &kp F8              &kp F9              &kp F10             &trans
+                &trans           &kp GRAVE          &kp MINUS           &kp EQUAL           &kp LEFT_BRACKET    &kp RIGHT_BRACKET
                 &trans           &trans             &trans              &trans              &trans              &trans
-                &trans           &trans             &trans              &trans              &trans              &trans
-                &trans           &trans             &trans              &trans              &trans              &trans
-                &trans           &trans             &trans              &trans              &trans              &trans
-                &trans           &trans             &trans              &trans              &trans              &trans
+                &trans           &trans             &trans              &trans              &trans              &to L_BASE
             >;
         };
     };
