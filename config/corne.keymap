@@ -26,6 +26,7 @@
 #define L_HOST 7
 #define L_GAME 8
 #define L_ADJUST 9
+#define L_GAME_NUM 10
 
 &sk {
     release-after-ms = <1000>;
@@ -238,7 +239,7 @@
         GAME {
             label = "GAME";
             display-name = "GAME";
-            /* Plain tap-only QWERTY; no inherited BASE layer-taps. */
+            /* Plain tap-only QWERTY with momentary GAME_NUM on RH1; no BASE layer-taps. */
             bindings = <
                 &kp ESCAPE       &kp Q              &kp W              &kp E              &kp R              &kp T
                 &kp Y            &kp U              &kp I              &kp O              &kp P              &kp BACKSPACE
@@ -246,7 +247,7 @@
                 &kp H            &kp J              &kp K              &kp L              &kp SEMICOLON      &kp ENTER
                 &kp LEFT_SHIFT   &kp Z              &kp X              &kp C              &kp V              &kp B
                 &kp N            &kp M              &kp COMMA           &kp DOT            &kp SLASH          &kp RIGHT_SHIFT
-                &kp LCTRL        &kp LALT           &kp SPACE            &kp ENTER         &kp RCTRL          &to L_BASE
+                &kp LCTRL        &kp SPACE          &kp LALT            &kp ENTER         &mo L_GAME_NUM     &to L_BASE
             >;
         };
 
@@ -265,6 +266,23 @@
                 &none             &none               &none               &none               &none               &none
                 &none             &none               &none               &none               &none               &none
                 &none             &none               &none               &none               &none               &none
+            >;
+        };
+        GAME_NUM {
+            label = "GAME_NUM";
+            display-name = "GAME_NUM";
+            /*
+             * Momentary number row over GAME. Top alpha row maps to 1-0;
+             * all other positions intentionally fall through (&trans) to GAME.
+             */
+            bindings = <
+                &trans           &kp NUMBER_1       &kp NUMBER_2        &kp NUMBER_3        &kp NUMBER_4        &kp NUMBER_5
+                &kp NUMBER_6     &kp NUMBER_7       &kp NUMBER_8        &kp NUMBER_9        &kp NUMBER_0        &trans
+                &trans           &trans             &trans              &trans              &trans              &trans
+                &trans           &trans             &trans              &trans              &trans              &trans
+                &trans           &trans             &trans              &trans              &trans              &trans
+                &trans           &trans             &trans              &trans              &trans              &trans
+                &trans           &trans             &trans              &trans              &trans              &trans
             >;
         };
     };
