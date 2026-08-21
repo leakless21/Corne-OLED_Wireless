@@ -386,8 +386,8 @@ Alfred). Always prefer `--dry-run` before a real reload.
 
 **Corne HOST keys do nothing in AeroSpace**
 
-- Confirm the keyboard is on the HOST layer (hold BASE outer `ESC` +
-  `BACKSPACE` to engage it — see [docs/corne-keymaps.md](corne-keymaps.md)).
+- Confirm the keyboard is on the HOST layer (hold the BASE `Tab` thumb
+  `LH0` to engage it — see [docs/corne-keymaps.md](corne-keymaps.md)).
 - Confirm the semantic bindings (`f13`–`f20`, `shift-f13`–`shift-f18`,
   `ctrl-f13`–`ctrl-f16`, and `ctrl-shift-f13`–`ctrl-shift-f16`) are present in
   `~/.config/aerospace/aerospace.toml`.

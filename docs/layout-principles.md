@@ -30,42 +30,68 @@ left:  LT4 LT3 LT2 LT1 LT0 | right: RT0 RT1 RT2 RT3 RT4
 The outer sixth positions (`LT5`, `RT5`, and their row equivalents) are extras;
 they MUST NOT shift a five-column family sideways.
 
+## Functional thumb priority & frequency
+
+The left-thumb cluster follows strict usage-frequency hierarchy:
+
+```text
+Left-thumb functional priority:
+NAV > HOST > MOUSE
+
+MEDIA is lower-frequency and uses the Corne's sixth-column extra key (LM5).
+```
+
+BASE thumb roles:
+
+```text
+LH2 (left outer):   tap Esc        hold MOUSE
+LH1 (left middle):  tap Space      hold NAV
+LH0 (left inner):   tap Tab        hold HOST
+
+RH0 (right inner):  tap Enter      hold SYM
+RH1 (right middle): tap Backspace  hold NUM
+RH2 (right outer):  tap Delete     hold FUN
+```
 ## Shared semantic invariants
 
 - BASE remains Colemak-DH with bilateral home-row modifiers.
+- Outer-left home position (`LM5`) is a direct momentary hold for MEDIA (`&mo L_MEDIA`).
 - Physical `A R S T` positions (`LM4`–`LM1`) mean `Cmd Alt Ctrl Shift` on
   functional layers that expose left modifiers.
 - Physical `N E I O` positions (`RM1`–`RM4`) mean `Shift Ctrl Alt Cmd` on
   functional layers that expose right modifiers.
-- Physical `N E I O` positions mean `← ↓ ↑ →` on directional layers.
-- The same columns on the bottom row are the secondary directional bank.
+- Physical `N E I O` positions mean `← ↓ ↑ →` on directional layers (NAV, MOUSE, HOST).
+- The same columns on the bottom row (`RB1`–`RB4`) are the aligned secondary directional bank.
 - A left-thumb-held layer places its main actions on the right hand and its
   modifiers on the left. A right-thumb-held layer does the inverse.
+- HOST preserves spatial semantics: home row (`LM4`–`LM0`) visits workspaces; top
+  row (`LT4`–`LT0`) mirrors it one row above to move the focused window there.
 - NUM, SYM, and FUN share one left-hand physical grid. SYM is NUM's shifted
   counterpart; FUN is its function-key counterpart.
 - NAV, MOUSE, and MEDIA share one right-hand navigation geometry.
 - Thumb bindings on functional layers are explicit single actions. They MUST
   NOT use transparent fall-through when that would inherit BASE layer-taps.
 - Unused positions are `&none`. `&trans` is reserved for intentional fall-through
-  documented beside the binding.
+  documented beside the binding (e.g. GAME_NUM falling through to GAME).
 - HOST emits semantic high-function-key signals. Host configuration decides
   whether those signals mean AeroSpace, GlazeWM, or another window manager.
-- ADJUST is the only layer for destructive or device-management actions.
-
+- ADJUST is the only layer for destructive or device-management actions; Bluetooth
+  profiles occupy the five-column core (`LM4`–`LM0`).
 ## Layer grammar
 
 | Layer | Left-hand role | Right-hand role | Explicit thumb role |
 | --- | --- | --- | --- |
-| BASE | Colemak-DH and HRMs | Colemak-DH and HRMs | Six layer-taps |
-| NAV | Cmd/Alt/Ctrl/Shift | Clipboard, cursor, line/page navigation | Esc/Space/Tab and Enter/Bspc/Delete |
-| MOUSE | Cmd/Alt/Ctrl/Shift | Clipboard, pointer, scroll, buttons | Right/left/middle click |
-| MEDIA | Cmd/Alt/Ctrl/Shift | Prev, volume, next | Stop/play/mute |
+| BASE | Colemak-DH and HRMs; LM5 holds MEDIA | Colemak-DH and HRMs | Six layer-taps (MOUSE, NAV, HOST, SYM, NUM, FUN) |
+| NAV | Cmd/Alt/Ctrl/Shift | Caps Lock, clipboard, cursor, line/page | Esc/Space/Tab and Enter/Bspc/Delete |
+| MOUSE | Cmd/Alt/Ctrl/Shift | MB4 (Back), MB5 (Fwd), clipboard, pointer, scroll | Right/left/middle click |
+| MEDIA | Cmd/Alt/Ctrl/Shift | Prev, volume, next | Stop/play/pause/mute (right thumbs only) |
 | NUM | Numpad geometry | Shift/Ctrl/Alt/Cmd | `.`, `0`, `-` |
 | SYM | Shifted NUM geometry | Shift/Ctrl/Alt/Cmd | `(`, `)`, `_` |
 | FUN | F-key geometry | Shift/Ctrl/Alt/Cmd | App, Space, Tab |
-| HOST | Workspace and move-to-workspace signals | Directional and window signals | Resize entry/exit and context actions |
-| GAME | Plain tap-only QWERTY | Plain tap-only QWERTY | Ctrl/Alt/Space and Enter/RCtrl/Base |
-| ADJUST | Device administration | Device administration | Device administration |
+| HOST | Workspace focus (home) & move (top) | Directional focus (home) & move (bottom) | Fullscreen, Previous WS, Float (right thumbs) |
+| GAME | Plain tap-only QWERTY | Plain tap-only QWERTY | Ctrl/Space/Alt and Enter/GAME_NUM/Base |
+| GAME_NUM | Numbers 1–5 (top row) | Numbers 6–0 (top row) | Fall-through to GAME (`&trans`) |
+| ADJUST | Bluetooth in core (`LM4`–`LM0`), power/reset | Output/power/reset/GAME entry | None |
 
 ## HOST protocol
 

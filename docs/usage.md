@@ -26,36 +26,47 @@ actions:
 - **Hold** (past the 220 ms tapping term) activates the named layer for as
   long as the key is held.
 
-The thumb layer-tap mappings, sourced from `config/corne.keymap` BASE:
-
 | Thumb key | Tap sends | Hold activates |
 |-----------|-----------|----------------|
-| Left outer thumb | `ESCAPE` | MEDIA layer |
-| Left middle thumb | `SPACE` | NAV layer |
-| Left inner thumb | `TAB` | MOUSE layer |
-| Right inner thumb | `ENTER` | SYM layer |
-| Right middle thumb | `BACKSPACE` | NUM layer |
-| Right outer thumb | `DELETE` | FUN layer |
+| Left outer thumb (`LH2`) | `ESCAPE` | MOUSE layer (`&lt`) |
+| Left middle thumb (`LH1`) | `SPACE` | NAV layer (`&lt`) |
+| Left inner thumb (`LH0`) | `TAB` | HOST layer (`&host_lt`, 200 ms balanced) |
+| Right inner thumb (`RH0`) | `ENTER` | SYM layer (`&lt`) |
+| Right middle thumb (`RH1`) | `BACKSPACE` | NUM layer (`&lt`) |
+| Right outer thumb (`RH2`) | `DELETE` | FUN layer (`&lt`) |
 
-Each layer is **momentary** — it deactivates when you release the thumb key.
+Each thumb layer is **momentary** — it deactivates when you release the thumb key.
+In addition, the outer-left home position (`LM5`) is a direct momentary hold for
+the **MEDIA** layer (`&mo L_MEDIA`).
 
 ### Layer table
 
 | Layer | How to reach | What it provides |
 |-------|-------------|------------------|
-| **NAV** | Hold left-space thumb | macOS Cmd clipboard chords, arrows, text navigation, line/page movement, and explicit editing thumbs. |
-| **MOUSE** | Hold left-tab thumb | NAV-aligned clipboard, pointer movement, wheel movement, left modifiers, and right-thumb clicks. |
-| **MEDIA** | Hold left-escape thumb | NAV-aligned previous/volume/next controls with stop/play/mute thumbs. |
-| **NUM** | Hold right-backspace thumb | Standard spatial numpad and punctuation on the left; Shift/Ctrl/Alt/Cmd on the right. |
-| **SYM** | Hold right-enter thumb | Shifted NUM geometry with `(`, `)`, and `_` on the left thumbs. |
-| **FUN** | Hold right-delete thumb | NUM-aligned F1–F12 grid with mirrored modifiers and App/Space/Tab thumbs. |
-| **HOST** | Hold BASE outer ESC + BACKSPACE combo | Host-agnostic F13–F20 workspace signals and Ctrl+F directional focus/move signals. See [docs/macos-aerospace.md](macos-aerospace.md). |
-| **GAME** | Hold NAV + NUM, then press GAME in ADJUST | Full plain tap-only QWERTY for gaming. Exit via right outer `&to L_BASE`. |
-| **ADJUST** | Hold NAV + NUM simultaneously | Five Bluetooth profiles, output/power state, mirrored reset/bootloader, and deliberate GAME entry. |
-
+| **NAV** | Hold left-space thumb (`LH1`) | macOS Cmd clipboard chords, Caps Lock, arrows, text navigation, line/page movement, and explicit editing thumbs. |
+| **HOST** | Hold left-tab thumb (`LH0`) | Host-agnostic F13–F20 workspace signals (home row), move-to-workspace (top row), directional focus/move, and context thumbs. See [docs/macos-aerospace.md](macos-aerospace.md). |
+| **MOUSE** | Hold left-escape thumb (`LH2`) | NAV-aligned clipboard, pointer movement, wheel movement, left modifiers, and MB4 (Back) / MB5 (Forward) side buttons. |
+| **MEDIA** | Hold outer-left home key (`LM5`) | NAV-aligned previous/volume/next controls with right-thumb stop/play/mute controls. |
+| **NUM** | Hold right-backspace thumb (`RH1`) | Standard spatial numpad and punctuation on the left; Shift/Ctrl/Alt/Cmd on the right. |
+| **SYM** | Hold right-enter thumb (`RH0`) | Shifted NUM geometry with `(`, `)`, and `_` on the left thumbs. |
+| **FUN** | Hold right-delete thumb (`RH2`) | NUM-aligned F1–F12 grid with mirrored modifiers and App/Space/Tab thumbs. |
+| **GAME** | Hold NAV + NUM, then press GAME in ADJUST | Full plain tap-only QWERTY for gaming; hold RH1 for numbers. Exit via right outer `&to L_BASE`. |
+| **GAME_NUM** | Hold right-middle thumb (`RH1`) while in GAME | Momentary top-row numbers 1–0 over tap-only QWERTY. |
+| **ADJUST** | Hold NAV + NUM simultaneously | Five Bluetooth profiles in core (`LM4`–`LM0`), output/power state, mirrored reset/bootloader, and deliberate GAME entry. |
 > **Verify, don't assume.** Exact positions live in `config/corne.keymap`;
 > shared physical rules are recorded in [layout-principles.md](layout-principles.md).
 
+### Daily HOST & AeroSpace workflow
+
+HOST is entered directly by holding the **Tab thumb (`LH0`)**. Its controls are
+organized strictly by usage frequency:
+
+1. **Visit workspace (most frequent)**: Hold `Tab` + press home-row key (`A`/`R`/`S`/`T`/`G` columns → `WEB`, `DEV`, `COMMS`, `RUN`, `AUX`).
+2. **Focus adjacent window**: Hold `Tab` + press right home direction (`N`/`E`/`I`/`O` columns → Focus `←`, `↓`, `↑`, `→`).
+3. **Previous workspace**: Hold `Tab` + tap right middle thumb (`RH1` → Previous WS).
+4. **Move window to workspace**: Hold `Tab` + press top-row key (`Q`/`W`/`F`/`P`/`B` columns → Move to `WEB`, `DEV`, `COMMS`, `RUN`, `AUX` and follow).
+5. **Move window directionally**: Hold `Tab` + press right bottom direction (`K`/`H`/`,`/`.` columns → Move `←`, `↓`, `↑`, `→`).
+6. **Context actions**: Hold `Tab` + right inner thumb `RH0` (Fullscreen), right outer thumb `RH2` (Float/tile), right top `RT1` (Resize mode), or `RT5` (Esc).
 
 ---
 
@@ -159,14 +170,17 @@ After flashing a firmware change, run through this compact checklist:
 - [ ] **NUM/SYM/FUN** — confirm the 7-8-9 / 4-5-6 / 1-2-3 geometry, shifted
   symbols, F-grid, and explicit thumb taps.
 - [ ] **NAV/MOUSE/MEDIA** — confirm directions occupy the same N/E/I/O
-  columns, pointer/wheel behavior, clipboard repeat, and transport thumbs.
+  columns; NAV has Caps Lock at RM0 and Insert/Home/PgDn/PgUp/End at RB0–RB4;
+  MOUSE has MB4 (Back) at RM0 and MB5 (Forward) at RM5; MEDIA is engaged via
+  holding LM5 with transport controls on right thumbs only.
 - [ ] **Bluetooth profile switching** — on ADJUST, cycle `BT_SEL 0`–`BT_SEL 4`
-  or use `BT_NXT`/`BT_PRV`; confirm the expected host reconnects.
-- [ ] **HOST / AeroSpace** — hold the BASE outer ESC + BACKSPACE combo, then
-  test workspace F13–F17, Shift-F13–F17, Ctrl-F13–F16, Ctrl-Shift-F13–F16,
-  and Shift-F18 resize entry.
-- [ ] **GAME** — enter from ADJUST and confirm full QWERTY, including Z/X/C/V/B
-  and N/M/comma/period/slash. Exit via right outer `&to L_BASE`.
+  in the five-column core (`LM4`–`LM0`) or use `BT_NXT`/`BT_PRV`; confirm host reconnects.
+- [ ] **HOST / AeroSpace** — hold the left `Tab` thumb (`LH0`), then test
+  home-row workspace focus (F13–F17), top-row move-to-workspace (Shift-F13–F17),
+  right-home focus (Ctrl-F13–F16), right-bottom move (Ctrl-Shift-F13–F16),
+  right-thumb Previous WS (F18), Fullscreen (F19), Float (F20), and Resize (Shift-F18).
+- [ ] **GAME & GAME_NUM** — enter GAME from ADJUST; confirm full QWERTY with
+  Space on LH1; hold RH1 to test numbers 1–0 on top alpha row; exit via right outer `&to L_BASE`.
 - [ ] **OLED and power** — confirm the status screen renders on both halves,
   blanks after idle, and wakes; characterize deep-sleep reconnect behavior.
 - [ ] **Recovery path** — confirm left/right ADJUST bootloader/reset bindings

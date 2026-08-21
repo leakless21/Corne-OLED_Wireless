@@ -22,26 +22,26 @@
 
 ---
 
-## 2. The 10 layers
+## 2. The 11 layers
 
-The keymap defines exactly **ten** layers. ZMK layers are **0-indexed**, and the
+The keymap defines exactly **eleven** layers. ZMK layers are **0-indexed**, and the
 indices below are **named constants** in `config/corne.keymap`
-(`L_BASE`, `L_NAV`, … `L_ADJUST`). The `&lt N` / `&to N` numbers in the keymap
+(`L_BASE`, `L_NAV`, … `L_GAME_NUM`). The `&lt N` / `&mo N` / `&to N` numbers in the keymap
 refer to these indices:
 
 | Index | Layer name (`label` / `display-name`) | Purpose |
 |-------|----------------------------------------|---------|
-| 0 | `BASE` | Primary Colemak-DH layer with bilateral home-row modifiers and six thumb layer-taps. |
-| 1 | `NAV` | macOS Cmd clipboard, cursor navigation, line/page navigation, and explicit editing thumbs. |
-| 2 | `MOUSE` | NAV-aligned pointer movement and scrolling, left modifiers, clipboard, and thumb buttons. |
-| 3 | `MEDIA` | NAV-aligned previous/volume/next controls with transport thumbs. |
+| 0 | `BASE` | Primary Colemak-DH layer with bilateral home-row modifiers, LM5 momentary MEDIA, and six thumb layer-taps. |
+| 1 | `NAV` | macOS Cmd clipboard, Caps Lock, cursor navigation, line/page navigation, and explicit editing thumbs. |
+| 2 | `MOUSE` | NAV-aligned pointer movement and scrolling, left modifiers, clipboard, MB4/MB5 side buttons, and thumb clicks. |
+| 3 | `MEDIA` | NAV-aligned previous/volume/next controls with right-thumb stop/play/mute controls. |
 | 4 | `NUM` | Standard spatial numpad and punctuation on the left, mirrored modifiers on the right. |
 | 5 | `SYM` | Shifted NUM geometry with direct programming symbols on the thumbs. |
 | 6 | `FUN` | NUM-aligned F-key grid with mirrored modifiers and App/Space/Tab thumbs. |
-| 7 | `HOST` | Host-agnostic F13–F20 workspace protocol and Ctrl+F directional signals. |
+| 7 | `HOST` | Host-agnostic F13–F20 workspace protocol, move-to-workspace, and Ctrl+F directional signals. |
 | 8 | `GAME` | Full plain tap-only QWERTY for gaming; entered from ADJUST and exited explicitly. |
 | 9 | `ADJUST` | Conditional device administration plus the deliberate GAME entry. |
-
+| 10 | `GAME_NUM` | Momentary top-row numbers (1–0) over GAME, falling through to tap-only QWERTY. |
 > **`BUTTON` is gone.** The previous `BUTTON` layer (index 3) was removed in
 > the earlier migration; `MEDIA` now occupies index 3 and the remaining layer
 > numbers are persisted in ZMK state. If a device still has stale Studio
@@ -66,10 +66,9 @@ The administrative bindings follow current upstream ZMK semantics:
   than hidden-state toggles. See
   <https://zmk.dev/docs/keymaps/behaviors/outputs> and
   <https://zmk.dev/docs/keymaps/behaviors/power>.
-- The HOST combo uses `slow-release`, so its momentary layer remains active
-  until both combo keys are released. See
-  <https://zmk.dev/docs/keymaps/combos>.
-
+- HOST uses a dedicated `host_lt` hold-tap behavior (200 ms balanced, no
+  quick-tap or require-prior-idle) on the left `TAB` thumb (`LH0`), allowing
+  immediate, reliable activation after typing.
 ---
 
 ## 3. Base layer layout & layer-switch behavior
@@ -81,15 +80,15 @@ actual bindings (not a template comment) are:
 
 ```
 Top row:     ESC  Q  W  F  P  B | J  L  U  Y  SQT  BSPC
-Home row:    TAB  A  R  S  T  G | M  N  E  I  O  ;
+Home row:    MED  A  R  S  T  G | M  N  E  I  O  ;
 Bottom row:  LSH  Z  X  C  D  V | K  H  ,  .  /  RSH
-Thumbs:           ESC MED  SPACE NAV  TAB MOUSE | ENT SYM  BSPC NUM  DEL FUN
+Thumbs:           ESC MOUSE SPACE NAV TAB HOST | ENT SYM  BSPC NUM  DEL FUN
 ```
 
-- **Colemak-DH** base letters. The **outer** keys — `ESC` (top-left), `TAB`
-  (home-row left), the sticky `LSH` (bottom-left), and `BACKSPACE` (top-right),
-  `;` (home-row right), `RSH` (bottom-right) — remain plain keys.
-- **Home-row letters** (`A R S T` / `N E I O`) are **hold-tap modifiers** — see
+- **Colemak-DH** base letters. The **outer** keys — `ESC` (top-left), the
+  momentary `MED` hold (`LM5`, home-row left), the sticky `LSH` (bottom-left),
+  `BACKSPACE` (top-right), `;` (home-row right), and `RSH` (bottom-right) —
+  provide direct actions.
   §4. The bare letters are the *tap* action.
 - **`Z`, `V`, `K`, `/`** are **plain alpha/punctuation** (`&kp`) — not
   layer-taps. (Earlier revisions made these layer-taps; the current keymap does
@@ -101,25 +100,21 @@ Thumbs:           ESC MED  SPACE NAV  TAB MOUSE | ENT SYM  BSPC NUM  DEL FUN
 Layer-taps (`&lt`) are **momentary**: the target layer is active only while the
 key is held. The BASE-layer layer-taps map to these layers:
 
-| Key (tap → hold) | `&lt` target | Layer engaged (while held) |
-|------------------|--------------|----------------------------|
-| `ESC` (thumb) | `&lt 3`* | MEDIA (3) |
-| `SPACE` (thumb) | `&lt 1` | NAV (1) |
-| `TAB` (thumb) | `&lt 2` | MOUSE (2) |
-| `ENTER` (thumb) | `&lt 5` | SYM (5) |
-| `BACKSPACE` (thumb) | `&lt 4` | NUM (4) |
-| `DELETE` (thumb) | `&lt 6` | FUN (6) |
+| Key (tap → hold) | Behavior | Target layer | Layer engaged (while held) |
+|------------------|----------|--------------|----------------------------|
+| `ESC` (LH2 thumb) | `&lt` | `L_MOUSE` (2) | MOUSE |
+| `SPACE` (LH1 thumb) | `&lt` | `L_NAV` (1) | NAV |
+| `TAB` (LH0 thumb) | `&host_lt` | `L_HOST` (7) | HOST |
+| `ENTER` (RH0 thumb) | `&lt` | `L_SYM` (5) | SYM |
+| `BACKSPACE` (RH1 thumb) | `&lt` | `L_NUM` (4) | NUM |
+| `DELETE` (RH2 thumb) | `&lt` | `L_FUN` (6) | FUN |
+| `LM5` (outer home) | `&mo` | `L_MEDIA` (3) | MEDIA |
 
-*The MEDIA thumb target is `L_MEDIA` (3); the table uses the numeric index for
-clarity.*
+The **HOST** layer (7) is engaged directly by holding the `TAB` thumb (`LH0`).
 
-The **HOST** layer (7) is reached from BASE by the outer-key combo described in
-§3.3. It is momentary.
-
-The **GAME** layer (8) is a persistent `&to` switch, but it is deliberately
-entered from ADJUST rather than from an ordinary NAV key. Its QWERTY bindings
-are plain tap actions; the right outer thumb is the explicit `&to L_BASE` exit.
-
+The **GAME** layer (8) is a persistent `&to` switch entered from ADJUST.
+Holding `RH1` while on GAME momentarily activates **GAME_NUM** (10) for numbers
+1–0 on the top alpha row. Exit GAME via the right outer thumb `&to L_BASE`.
 The **ADJUST** layer (9) is conditional: it activates automatically when both
 NAV (1) and NUM (4) are held simultaneously.
 
@@ -129,28 +124,26 @@ thumbs, so a held Backspace or other editor key cannot inherit a BASE
 layer-tap unexpectedly.
 
 
-### 3.3 HOST activation combo and physical grammar
+### 3.3 HOST thumb activation & physical grammar
 
-HOST is engaged by holding a BASE combo on the outer top positions:
-`LT5` (outer left Escape) together with `RT5` (outer right Backspace), within an
-80 ms timeout. `slow-release` keeps HOST active until both trigger keys are
-released.
+HOST is engaged directly by holding the left inner thumb (`LH0`, `Tab`). There
+is no combo; thumb hold is the single canonical activation path.
 
-The layer follows the shared physical contract in
-[layout-principles.md](layout-principles.md):
+The layer organizes controls by usage frequency:
 
-| HOST group | Physical positions | Emitted binding |
-|------------|--------------------|-----------------|
-| Workspace focus | left top core | `F13`–`F17` |
-| Move + follow | left home core | `Shift-F13`–`Shift-F17` |
-| Context/mode | right top core | `Shift-F18`, `F18`, `F19`, `F20` |
-| Focus windows | right home core | `Ctrl+F13`–`Ctrl+F16` |
-| Move windows | right bottom core | `Ctrl+Shift+F13`–`Ctrl+Shift+F16` |
+| HOST group | Physical positions | Emitted binding | Action |
+|------------|--------------------|-----------------|--------|
+| Workspace focus | left home core (`LM4`–`LM0`) | `F13`–`F17` | Visit WEB / DEV / COMMS / RUN / AUX |
+| Move to workspace | left top core (`LT4`–`LT0`) | `Shift-F13`–`Shift-F17` | Move window to workspace + follow |
+| Window focus | right home core (`RM1`–`RM4`) | `Ctrl+F13`–`Ctrl+F16` | Focus Left / Down / Up / Right |
+| Window move | right bottom core (`RB1`–`RB4`) | `Ctrl+Shift+F13`–`Ctrl+Shift+F16` | Move window Left / Down / Up / Right |
+| Resize mode | right top (`RT1`) | `Shift+F18` | Enter resize mode |
+| Esc | right top (`RT5`) | `ESCAPE` | Dismiss mode / escape |
+| Context actions | right thumbs (`RH0`–`RH2`) | `F19`, `F18`, `F20` | Fullscreen (`RH0`), Previous WS (`RH1`), Float (`RH2`) |
 
 The firmware emits semantic protocol keys. AeroSpace, GlazeWM, or another host
 adapter assigns their meaning. The macOS adapter also keeps ordinary
 Option+H/J/K/L for the laptop keyboard.
-
 ---
 
 ## 4. Home-row modifiers (two side-aware balanced behaviors)
@@ -239,6 +232,24 @@ The global layer-tap behavior is tuned as follows:
 layer `N`. See §3.2 for the BASE-layer mapping. `tap-preferred` means a tap is
 favored when the timing is ambiguous.
 
+### 6.1 HOST hold-tap (`&host_lt`)
+
+HOST uses a dedicated hold-tap behavior rather than generic `&lt`:
+
+```devicetree
+host_lt: host_lt {
+    compatible = "zmk,behavior-hold-tap";
+    #binding-cells = <2>;
+    flavor = "balanced";
+    tapping-term-ms = <200>;
+    bindings = <&mo>, <&kp>;
+};
+```
+
+- **`tapping-term-ms = <200>`** with **`flavor = "balanced"`** allows fast,
+  reliable layer entry.
+- **No `quick-tap-ms` or `require-prior-idle-ms`** is set, so HOST can be entered
+  immediately after typing without timing lockouts.
 ---
 
 ## 7. Pointing features
@@ -250,7 +261,7 @@ Pointing is enabled (`CONFIG_ZMK_POINTING=y`) and used by the MOUSE layer:
 - **Clipboard** is duplicated in the right top row, matching NAV.
 - **Pointer movement** occupies the right-hand home-row direction positions.
 - **Mouse wheel** occupies the matching right-hand bottom-row positions.
-- **MB5/MB4** occupy the right-hand home-row outer positions.
+- **MB4/MB5** occupy the right-hand home-row positions (`RM0` = MB4 Back, `RM5` = MB5 Forward).
 - **Right/left/middle click** occupy the three right thumbs. `MB3` is the
   middle button; the redundant `MCLK` binding is removed.
 - Mouse move is tuned with `acceleration-exponent = <1>`,

@@ -32,7 +32,7 @@ controllers with **nice\_oled** displays. The GitHub Actions workflow builds
 |-------|---------------|
 | [docs/setup.md](docs/setup.md) | Initial setup: first flash, least-destructive Studio recovery, full settings reset, and Bluetooth re-pairing. |
 | [docs/usage.md](docs/usage.md) | Daily use, semantic HOST controls, development workflow, and physical smoke-test checklist. |
-| [docs/corne-keymaps.md](docs/corne-keymaps.md) | Keymap reference: all 10 layers, geometry, home-row mods, pointing, OLED/Studio settings, and diagram workflow. |
+| [docs/corne-keymaps.md](docs/corne-keymaps.md) | Keymap reference: all 11 layers, geometry, home-row mods, pointing, OLED/Studio settings, and diagram workflow. |
 | [docs/layout-principles.md](docs/layout-principles.md) | Physical layout contract: shared modifier/direction columns, layer-family geometry, thumb rules, and HOST protocol. |
 | [docs/macos-aerospace.md](docs/macos-aerospace.md) | macOS AeroSpace setup: semantic HOST protocol, workspace bindings, app routing, validation, and troubleshooting. |
 | `dotfiles/aerospace.toml` | Repository-tracked AeroSpace adapter for the firmware HOST protocol. |
