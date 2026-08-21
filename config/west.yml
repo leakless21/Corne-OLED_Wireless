@@ -2,9 +2,9 @@ manifest:
   remotes:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
-    # support nice_oled and nice_epaper
-    - name: mctechnology17
-      url-base: https://github.com/mctechnology17
+    # LVGL 9-compatible community fork; remove when upstream merges its migration.
+    - name: chyuuu
+      url-base: https://github.com/chyuuu
     - name: urob
       url-base: https://github.com/urob
   projects:
@@ -14,8 +14,8 @@ manifest:
       import: app/west.yml
     # support nice_oled and nice_epaper
     - name: zmk-nice-oled
-      remote: mctechnology17
-      revision: 46f824abb2bd41f1287c5c68abd14122af6042a3
+      remote: chyuuu
+      revision: d730da13b8eb6f9506d55d3043c6fd9f4a501923
     - name: zmk-helpers
       remote: urob
       revision: 95edb8f15ef1d1bd8332810555f8cf5837fbdd27

@@ -15,7 +15,7 @@
 - `config/west.yml` pins the **zmk** project from `github.com/zmkfirmware` and two
   helpers, all at **immutable revision SHAs** (do not replace these with `main`):
   - `zmk` (remote `zmkfirmware`) — revision `6e2ef41e022d555b10f116e395832913f71717b3`.
-  - `zmk-nice-oled` (remote `mctechnology17`) — revision `46f824abb2bd41f1287c5c68abd14122af6042a3` — OLED display support.
+  - `zmk-nice-oled` (remote `chyuuu`) — revision `d730da13b8eb6f9506d55d3043c6fd9f4a501923` — LVGL 9-compatible OLED display support.
   - `zmk-helpers` (remote `urob`) — revision `95edb8f15ef1d1bd8332810555f8cf5837fbdd27` — key-label and unicode helpers used for visualization/editor labels.
 - The board target is **`nice_nano@2.0.0//zmk`** (see `build.yaml`), a common wireless
   Corne controller.
