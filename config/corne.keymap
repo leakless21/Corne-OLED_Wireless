@@ -77,18 +77,22 @@
             hold-trigger-on-release;
             bindings = <&kp>, <&kp>;
         };
+        /*
+         * Dedicated HOST thumb layer-tap. Deliberately no quick-tap or
+         * require-prior-idle: HOST must engage reliably immediately after
+         * ordinary typing.
+         */
+        host_lt {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "balanced";
+            tapping-term-ms = <200>;
+            bindings = <&mo>, <&kp>;
+        };
     };
 
     combos {
         compatible = "zmk,combos";
-
-        host_combo {
-            timeout-ms = <80>;
-            key-positions = <LT5 RT5>;
-            layers = <L_BASE>;
-            slow-release;
-            bindings = <&mo L_HOST>;
-        };
     };
 
     conditional_layers {
@@ -114,7 +118,7 @@
                 &kp M            &hmr RIGHT_SHIFT N &hmr RCTRL E        &hmr RIGHT_ALT I    &hmr RIGHT_GUI O   &kp SEMICOLON
                 &sk LSHFT        &kp Z              &kp X              &kp C              &kp D              &kp V
                 &kp K            &kp H              &kp COMMA           &kp DOT            &kp SLASH          &kp RIGHT_SHIFT
-                &lt L_MEDIA ESCAPE &lt L_NAV SPACE   &lt L_MOUSE TAB    &lt L_SYM ENTER     &lt L_NUM BACKSPACE &lt L_FUN DELETE
+                &lt L_MOUSE ESCAPE &lt L_NAV SPACE   &host_lt L_HOST TAB &lt L_SYM ENTER     &lt L_NUM BACKSPACE &lt L_FUN DELETE
             >;
         };
 
