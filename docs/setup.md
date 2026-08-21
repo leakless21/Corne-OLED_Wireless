@@ -19,7 +19,7 @@ syntax and built automatically via GitHub Actions.
 
 | File | Purpose |
 |------|---------|
-| `config/corne.keymap` | The keymap: all 10 layers, home-row mods, layer-taps, pointing, and combos. |
+| `config/corne.keymap` | The keymap: all 11 layers, home-row mods, layer-taps, host_lt, and pointing. |
 | `config/corne.conf` | Kconfig toggles: OLED display, explicit idle/deep-sleep policy, ZMK Studio, pointing. |
 | `build.yaml` | GitHub Actions build matrix: board + shield combinations and artifact names. |
 | `config/west.yml` | West manifest: pins ZMK, nice\_oled, and helper modules at fixed revision SHAs. |
