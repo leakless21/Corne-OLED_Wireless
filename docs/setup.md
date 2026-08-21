@@ -17,15 +17,15 @@ This repository is a **ZMK firmware** project for the Corne split keyboard.
 It is **not** QMK. The firmware is configured in ZMK's Devicetree/behavior
 syntax and built automatically via GitHub Actions.
 
-Key files:
-
 | File | Purpose |
 |------|---------|
 | `config/corne.keymap` | The keymap: all 10 layers, home-row mods, layer-taps, pointing, and combos. |
-| `config/corne.conf` | Kconfig toggles: OLED display, sleep, ZMK Studio, pointing. |
+| `config/corne.conf` | Kconfig toggles: OLED display, explicit idle/deep-sleep policy, ZMK Studio, pointing. |
 | `build.yaml` | GitHub Actions build matrix: board + shield combinations and artifact names. |
 | `config/west.yml` | West manifest: pins ZMK, nice\_oled, and helper modules at fixed revision SHAs. |
 | `.github/workflows/build.yml` | The Actions workflow — delegates to the upstream ZMK build workflow. |
+| `dotfiles/aerospace.toml` | Canonical macOS AeroSpace configuration for the HOST/F13–F20 bridge. |
+| `.github/workflows/draw-keymap.yml` | Regenerates the committed keymap-drawer YAML/SVG reference when the keymap changes. |
 
 For the full keymap/layers reference, see
 [docs/corne-keymaps.md](corne-keymaps.md).
@@ -126,11 +126,12 @@ be assembled or connected to the other half during flashing.
 2. **Put the nice\_nano\_v2 into bootloader mode.** There are a few ways:
    - **Quickly double-press the reset button** on the nice\_nano\_v2 board. The
      board enters its UF2 bootloader.
-   - **For a bare controller** (no reset button wired to a key): briefly short
-     the RST pin to GND twice in quick succession.
-   - **Use the firmware:** if the board already has a working keymap, hold the
-     ADJUST layer (NAV + NUM held simultaneously) and press the key mapped to
-     `&bootloader` (top row, second position). Then release.
+   - **For a bare controller** (no reset button wired to a key): briefly short the
+     RST pin to GND twice in quick succession.
+   - **Use the firmware:** hold ADJUST (NAV + NUM) and press the left-half
+     `&bootloader` binding to flash the left controller, or the mirrored
+     right-half `&bootloader` binding to flash the right controller. Reset and
+     bootloader behaviors are source-specific on split keyboards.
 
 3. **A removable USB drive appears** on your computer. The drive is typically
    named `NICENANO`, though the name can vary depending on the bootloader
@@ -203,25 +204,27 @@ the keyboard with your computer.
 
 ### Pairing procedure
 
-1. **Put the keyboard into pairing mode.** On the ADJUST layer (hold NAV +
-   NUM), press the key mapped to `&bt BT_CLR` to clear existing bonds, then
-   press `&bt BT_SEL 0` to start advertising on profile 0.
-
+1. **Select a profile.** On ADJUST (hold NAV + NUM), press `BT_SEL 0` for a
+   first host, or select another unused profile (`BT_SEL 1` through `BT_SEL 4`).
+   Selecting an unpaired profile starts advertising for a new pairing.
 2. **On your computer**, open Bluetooth settings and look for the keyboard
    (it will appear as something like "ZMK" or "Corne"). Select it to pair.
-
 3. **Verify** by typing — the keyboard should now work over Bluetooth.
 
 ### Switching between paired devices
 
-The ADJUST layer has bindings for `&bt BT_SEL 0` through `&bt BT_SEL 3`,
-allowing you to switch between four paired devices. Hold NAV + NUM and press
-the corresponding key.
+ADJUST exposes five default Bluetooth profiles: `BT_SEL 0` through `BT_SEL 4`.
+`BT_NXT` and `BT_PRV` cycle through them. Hold NAV + NUM and press the
+corresponding binding.
 
-### Clearing all bonds
+### Clearing a bond
 
-Hold NAV + NUM and press `&bt BT_CLR`. This removes all stored pairings,
-forcing a fresh pairing on the next connection attempt.
+`BT_CLR` clears **only the currently selected profile**. After clearing a
+profile, forget/remove the keyboard from that host before pairing again; the
+host may retain the old security key and repeatedly fail authentication.
+`BT_CLR_ALL` clears every profile and is intentionally not bound in this
+keymap. Use the `settings-reset` recovery artifact when a full clean slate is
+needed.
 
 ---
 

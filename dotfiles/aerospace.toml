@@ -1,0 +1,74 @@
+# Canonical macOS AeroSpace configuration for the Corne HOST layer.
+# Install this file at ~/.config/aerospace/aerospace.toml; see docs/macos-aerospace.md.
+
+config-version = 2
+start-at-login = true
+persistent-workspaces = ["WEB", "DEV", "COMMS", "RUN", "AUX"]
+
+key-mapping.preset = "qwerty"
+# Hard-purpose applications are routed; contextual apps stay where opened.
+on-window-detected = [
+    {
+        if = 'test %{app-bundle-id} = dev.zed.Zed || test %{app-bundle-id} = com.mitchellh.ghostty',
+        run = ['move-node-to-workspace DEV'],
+    },
+    {
+        if = 'test %{app-bundle-id} = app.zen-browser.zen',
+        run = ['move-node-to-workspace WEB'],
+    },
+    {
+        if = 'test %{app-bundle-id} = dev.vencord.vesktop',
+        run = ['move-node-to-workspace COMMS'],
+    },
+]
+
+[mode.main.binding]
+# Laptop keyboard: ordinary QWERTY macOS semantics remain unchanged.
+alt-1 = 'workspace WEB'
+alt-2 = 'workspace DEV'
+alt-3 = 'workspace COMMS'
+alt-4 = 'workspace RUN'
+alt-5 = 'workspace AUX'
+
+alt-shift-1 = 'move-node-to-workspace WEB; workspace WEB'
+alt-shift-2 = 'move-node-to-workspace DEV; workspace DEV'
+alt-shift-3 = 'move-node-to-workspace COMMS; workspace COMMS'
+alt-shift-4 = 'move-node-to-workspace RUN; workspace RUN'
+alt-shift-5 = 'move-node-to-workspace AUX; workspace AUX'
+
+# Corne HOST F13-F20 bridge.
+f13 = 'workspace WEB'
+f14 = 'workspace DEV'
+f15 = 'workspace COMMS'
+f16 = 'workspace RUN'
+f17 = 'workspace AUX'
+shift-f13 = 'move-node-to-workspace WEB; workspace WEB'
+shift-f14 = 'move-node-to-workspace DEV; workspace DEV'
+shift-f15 = 'move-node-to-workspace COMMS; workspace COMMS'
+shift-f16 = 'move-node-to-workspace RUN; workspace RUN'
+shift-f17 = 'move-node-to-workspace AUX; workspace AUX'
+f18 = 'workspace-back-and-forth'
+f19 = 'fullscreen'
+f20 = 'layout floating tiling'
+
+# Corne HOST right-hand spatial clusters and laptop fallbacks.
+alt-h = 'focus left'
+alt-j = 'focus down'
+alt-k = 'focus up'
+alt-l = 'focus right'
+alt-shift-h = 'move left'
+alt-shift-j = 'move down'
+alt-shift-k = 'move up'
+alt-shift-l = 'move right'
+alt-r = 'mode resize'
+alt-f = 'fullscreen'
+alt-shift-space = 'layout floating tiling'
+alt-tab = 'workspace-back-and-forth'
+
+[mode.resize.binding]
+h = 'resize width -50'
+j = 'resize height +50'
+k = 'resize height -50'
+l = 'resize width +50'
+enter = 'mode main'
+esc = 'mode main'

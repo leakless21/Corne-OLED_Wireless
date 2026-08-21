@@ -1,0 +1,6 @@
+# keymap-drawer v0.23.0 configuration.
+# The workflow fetches ZMK modules from config/west.yml before parsing.
+draw_config:
+  n_columns: 2
+  shrink_wide_legends: 8
+  footer_text: "Generated from config/corne.keymap"

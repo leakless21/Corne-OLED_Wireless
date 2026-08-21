@@ -43,15 +43,15 @@ Each layer is **momentary** — it deactivates when you release the thumb key.
 
 | Layer | How to reach | What it provides |
 |-------|-------------|------------------|
-| **NAV** | Hold left-space thumb | macOS Cmd clipboard chords (Cmd+C/V/X/Z), arrows, Home/End/PgUp/PgDn, Caps Lock. Also contains `&to L_GAME` to switch to GAME layer. |
-| **MOUSE** | Hold left-tab thumb | Pointer control: mouse movement, scroll (up/down/left/right), mouse buttons 1-5 and middle-click. Pointing is enabled via `CONFIG_ZMK_POINTING=y`. |
+| **NAV** | Hold left-space thumb | macOS Cmd clipboard chords (Cmd+C/V/X/Z), arrows, text navigation, Caps Lock. Also contains `&to L_GAME` to switch to GAME. |
+| **MOUSE** | Hold left-tab thumb | Left-hand GUI/Alt/Ctrl/Shift modifiers; right-hand scroll, mouse buttons, and pointer movement. |
 | **MEDIA** | Hold left-escape thumb | Volume up/down, play/pause, next/prev track, stop, mute. |
-| **NUM** | Hold right-backspace thumb | Numpad digits 0-9, brackets, minus, period, grave, backslash, equal. |
+| **NUM** | Hold right-backspace thumb | Numpad digits and punctuation on the left, with right-hand GUI/Alt/Ctrl/Shift modifiers. |
 | **SYM** | Hold right-enter thumb | Symbols: ampersand, asterisk, braces, brackets, parentheses, dollar, percent, caret, at, hash, pipe, tilde, exclamation, colon, slash, backslash, less/greater than. |
-| **FUN** | Hold right-delete thumb | Function keys F1-F12. |
-| **HOST** | Hold BASE outer ESC + BACKSPACE combo (80 ms timeout) | AeroSpace bridge: emits F13-F20 and Option+H/J/K/L for macOS workspace switching. See [docs/macos-aerospace.md](macos-aerospace.md). |
+| **FUN** | Hold right-delete thumb | F1–F12 on the left, with right-hand GUI/Alt/Ctrl/Shift modifiers. |
+| **HOST** | Hold BASE outer ESC + BACKSPACE combo (80 ms timeout; slow release) | AeroSpace bridge: F13–F20, Shift-F13–F17, and spatial Option+H/J/K/L focus/move controls. See [docs/macos-aerospace.md](macos-aerospace.md). |
 | **GAME** | From NAV, press `&to L_GAME` | Tap-only QWERTY for gaming. Exit via right-thumb `&to L_BASE`. |
-| **ADJUST** | Hold NAV + NUM simultaneously (conditional layer) | Bluetooth profile select (0-3), clear bonds, output toggle, external power toggle, bootloader, reset. Destructive actions kept out of daily layers. |
+| **ADJUST** | Hold NAV + NUM simultaneously (conditional layer) | Five Bluetooth profiles, next/previous profile, selected-profile clear, explicit USB/BLE output, explicit external-power ON/OFF, mirrored reset/bootloader. |
 
 > **Verify, don't assume.** The exact key positions for every layer live in
 > `config/corne.keymap`. This table summarizes intent; always open that file
@@ -63,21 +63,22 @@ Each layer is **momentary** — it deactivates when you release the thumb key.
 
 ### Pairing profile selection
 
-The ADJUST layer provides `&bt BT_SEL 0` through `&bt BT_SEL 3` — four
-Bluetooth profiles. Hold NAV + NUM and press the corresponding key to switch
-to a profile. The keyboard can remember four paired hosts.
+ZMK provides five Bluetooth profiles by default. ADJUST exposes `BT_SEL 0`
+through `BT_SEL 4`; `BT_NXT` and `BT_PRV` cycle through the profiles. Hold NAV +
+NUM and press the corresponding binding to switch hosts or begin pairing on an
+unused profile.
 
 ### Clearing bonds
 
-Hold NAV + NUM and press `&bt BT_CLR`. This removes all stored Bluetooth
-pairings from the keyboard's settings. You will need to re-pair with your
-host device after clearing.
+`BT_CLR` removes the bond only from the currently selected profile. After using
+it, forget/remove the keyboard from that host before pairing again; otherwise
+the host may retain the old security key and fail authentication. `BT_CLR_ALL`
+clears every profile but is intentionally not bound in this keymap.
 
 ### Re-pairing
 
-After clearing bonds or on first setup, put the keyboard into pairing mode
-(see [docs/setup.md section 7](setup.md#7-bluetooth-re-pairing) for the
-first-time pairing procedure and recovery steps).
+After clearing a bond or after first setup, use the pairing procedure in
+[docs/setup.md section 7](setup.md#7-bluetooth-re-pairing).
 
 ---
 
@@ -150,41 +151,40 @@ use GitHub Actions instead.
 After flashing a firmware change, run through this compact checklist:
 
 - [ ] **Base typing** — type a few sentences on the BASE layer. Confirm
-  Colemak-DH letters, punctuation, and outer modifiers (Shift, Ctrl, etc.)
-  work as expected.
-- [ ] **Each changed layer-tap** — for every thumb key you modified, test
-  both the tap (quick press) and hold (press and hold past 220 ms) actions.
-- [ ] **Bluetooth profile switching** — on ADJUST (hold NAV + NUM), cycle
-  through `BT_SEL 0`-`BT_SEL 3` and confirm the keyboard reconnects to the
-  expected host on each profile.
-- [ ] **HOST / AeroSpace** (if applicable) — hold the BASE outer ESC +
-  BACKSPACE combo to enter HOST, then press F13-F20 and confirm AeroSpace
-  responds. See [docs/macos-aerospace.md](macos-aerospace.md).
-- [ ] **GAME** (if applicable) — from NAV, press `&to L_GAME`. Confirm
-  QWERTY layout is active. Exit via the right-thumb `&to L_BASE`.
-- [ ] **OLED** — confirm the status screen renders on both halves (layer
-  name, battery indicator).
-- [ ] **Recovery path** — if anything is wrong, you can flash
-  `settings-reset.uf2` to erase persisted settings, then re-flash the normal
-  firmware and re-pair Bluetooth. See
-  [docs/setup.md section 6](setup.md#6-recovery--settings-reset).
+  Colemak-DH letters, punctuation, and outer modifiers work as expected.
+- [ ] **Each changed layer-tap** — for every thumb key you modified, test both
+  the tap (quick press) and hold (press and hold past 220 ms) actions.
+- [ ] **Bluetooth profile switching** — on ADJUST (hold NAV + NUM), cycle through
+  `BT_SEL 0`–`BT_SEL 4` or use `BT_NXT`/`BT_PRV`; confirm the expected host
+  reconnects.
+- [ ] **HOST / AeroSpace** — hold the BASE outer ESC + BACKSPACE combo, then
+  test F13–F20, Shift-F13–F17, and both spatial H/J/K/L clusters.
+- [ ] **GAME** (if applicable) — from NAV, press `&to L_GAME`. Confirm QWERTY
+  layout is active. Exit via the right-thumb `&to L_BASE`.
+- [ ] **OLED and power** — confirm the status screen renders on both halves,
+  blanks after idle, and wakes; characterize deep-sleep reconnect behavior.
+- [ ] **Recovery path** — confirm the left and right ADJUST bootloader/reset
+  bindings affect the intended half; keep double-reset and settings-reset as
+  fallbacks.
 
 ---
 
 ## 6. AeroSpace-only workflow note
 
-Changes to the AeroSpace configuration (`~/.config/aerospace/aerospace.toml`)
-are **entirely separate** from firmware. Editing that file does **not** require
-a firmware rebuild or flash.
+The canonical AeroSpace configuration is tracked at
+`dotfiles/aerospace.toml`. Install it at
+`~/.config/aerospace/aerospace.toml` by copying or symlinking it; see
+[docs/macos-aerospace.md](macos-aerospace.md). Editing that config does **not**
+require a firmware rebuild or flash.
 
-- Edit `~/.config/aerospace/aerospace.toml` directly.
 - Validate with `aerospace reload-config --dry-run`, then apply with
   `aerospace reload-config`.
-- The Corne HOST layer (F13-F20, Option+H/J/K/L) bridges to AeroSpace
-  automatically — no firmware changes needed when adjusting bindings.
+- The Corne HOST layer emits F13–F20, Shift-F13–F17, and Option+H/J/K/L.
+  AeroSpace maps those signals directly; no Colemak remapping is needed on the
+  MacBook keyboard.
 
-See [docs/macos-aerospace.md](macos-aerospace.md) for the full AeroSpace
-guide, including installation, workspace layout, and troubleshooting.
+See [docs/macos-aerospace.md](macos-aerospace.md) for installation,
+workspace layout, routing, and troubleshooting.
 
 ---
 
@@ -196,4 +196,4 @@ guide, including installation, workspace layout, and troubleshooting.
 | Layer renumber or state mismatch | Flash `settings-reset` on both halves, re-flash the normal images, then re-pair Bluetooth. | [docs/setup.md section 6](setup.md#6-recovery--settings-reset) |
 | Bluetooth failure or won't pair | Flash `settings-reset` on both halves, re-flash normal firmware, then re-pair. | [docs/setup.md section 7](setup.md#7-bluetooth-re-pairing) |
 | Studio edits caused divergence | Flash `settings-reset` to clear on-device overrides, re-flash normal firmware. | [docs/setup.md section 8](setup.md#8-zmk-studio-caveats) |
-| AeroSpace bindings not working | Edit `~/.config/aerospace/aerospace.toml`, reload config. No firmware change needed. | [docs/macos-aerospace.md](macos-aerospace.md) |
+| AeroSpace bindings not working | Validate or edit `dotfiles/aerospace.toml`, install/reload the user config. No firmware change needed. | [docs/macos-aerospace.md](macos-aerospace.md) |

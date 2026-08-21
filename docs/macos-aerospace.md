@@ -5,11 +5,11 @@ tiling-window-manager setup used alongside this repository, including the
 **implemented** Corne HOST/F13–F20 integration.
 
 > **Repository context.** This repository is a **ZMK firmware** project for a Corne
-> keyboard. The AeroSpace configuration described here lives in your user
-> `~/.config/aerospace/aerospace.toml` config (see [Config location](#3-config-location-backup--rollback)),
-> **not** in this repository. Editing that file is the only way to change AeroSpace
-> behavior; `config/corne.keymap` is the firmware side of the bridge and is edited
-> separately (see [docs/corne-keymaps.md](corne-keymaps.md)).
+> keyboard. The canonical AeroSpace configuration is tracked at
+> `dotfiles/aerospace.toml`; install it at your user config path
+> `~/.config/aerospace/aerospace.toml` by symlink or copy (see
+> [Config location](#3-config-location-installation-backup--rollback)). Firmware and
+> window-manager changes remain separate workflows.
 
 ---
 
@@ -17,25 +17,22 @@ tiling-window-manager setup used alongside this repository, including the
 
 **In scope**
 
-- Documenting the installed AeroSpace configuration: workspace layout, key bindings
-  (including the implemented `f13`–`f20` / `shift-f13`–`shift-f17` bindings), and
-  per-app routing.
-- The Corne HOST bridge: how `F13`–`F20` emitted by the keyboard map to AeroSpace
-  workspaces/actions.
+- Documenting the canonical AeroSpace configuration: workspace layout, key
+  bindings (including F13–F20 / Shift-F13–F17), and per-app routing.
+- The Corne HOST bridge: how F13–F20 and Option+H/J/K/L emitted by the keyboard
+  map to AeroSpace workspaces and window actions.
 - Installation prerequisites (including the macOS Accessibility permission).
-- Where the config lives, how to back it up, and how to roll back.
-- Useful CLI commands for inspection and safe reloads.
-- Troubleshooting and a rollback procedure.
+- How to install, validate, back up, and roll back the repository-tracked config.
+- Useful CLI commands and troubleshooting.
 
 **Non-goals**
 
-- This guide does **not** ship or modify AeroSpace itself. Install it separately
-  (see below).
-- It does **not** modify ZMK firmware or the Corne keymap. Firmware changes are a
+- This guide does not ship or modify AeroSpace itself. Install it separately
+  from the [official AeroSpace documentation](https://nikitabobko.github.io/AeroSpace/guide).
+- It does not modify ZMK firmware or the Corne keymap. Firmware changes are a
   separate workflow (see the README and [docs/corne-keymaps.md](corne-keymaps.md)).
-- It does **not** prescribe a specific AeroSpace release. Always follow the
-  [official AeroSpace documentation](https://nikitabobko.github.io/AeroSpace/guide)
-  for the version you have installed.
+- It does not prescribe a specific AeroSpace release. Follow the official
+  documentation for the version you have installed.
 
 ---
 
@@ -62,40 +59,61 @@ tiling-window-manager setup used alongside this repository, including the
 
 ---
 
-## 3. Config location, backup & rollback
+## 3. Config location, installation, backup & rollback
 
-> **External config path caveat.** AeroSpace reads its config from
-> `~/.config/aerospace/aerospace.toml` on your user account — this file is
-> **outside this repository** and is not tracked by Git here. Edits must be made
-> to that external path; changes to any file inside this repo will **not** affect
-> AeroSpace. Keep that external file backed up separately from the firmware repo.
+The canonical config is tracked in this repository at
+`dotfiles/aerospace.toml`. AeroSpace reads the installed user config from
+`~/.config/aerospace/aerospace.toml` (use `aerospace config --config-path` to
+print the exact path).
 
-- **Config file:** `~/.config/aerospace/aerospace.toml`
-  (use `aerospace config --config-path` to print the exact path AeroSpace uses).
-- **Backup before editing:**
+AeroSpace also recognizes `~/.aerospace.toml` and
+`${XDG_CONFIG_HOME}/aerospace/aerospace.toml` (defaulting to
+`~/.config/aerospace/aerospace.toml`). Keep one active location to avoid
+ambiguity. See the official
+[configuration guide](https://nikitabobko.github.io/AeroSpace/guide#config-location).
 
-  ```sh
-  cp ~/.config/aerospace/aerospace.toml \
-     ~/.config/aerospace/aerospace.toml.bak.$(date +%Y%m%d-%H%M%S)
-  ```
+### Install from a fresh clone
 
-- **Validate without applying** (see [Commands](#7-useful-commands)):
+From the repository root, back up any existing config and symlink the canonical
+file:
 
-  ```sh
-  aerospace reload-config --dry-run
-  ```
+```sh
+mkdir -p ~/.config/aerospace
+if [ -e ~/.config/aerospace/aerospace.toml ] || [ -L ~/.config/aerospace/aerospace.toml ]; then
+  cp -a ~/.config/aerospace/aerospace.toml \
+    ~/.config/aerospace/aerospace.toml.bak.$(date +%Y%m%d-%H%M%S)
+fi
+ln -sfn "$(pwd)/dotfiles/aerospace.toml" \
+  ~/.config/aerospace/aerospace.toml
+```
 
-- **Rollback:**
+If you prefer a copy rather than a symlink:
 
-  ```sh
-  cp ~/.config/aerospace/aerospace.toml.bak.<timestamp> \
-     ~/.config/aerospace/aerospace.toml
-  aerospace reload-config
-  ```
+```sh
+cp dotfiles/aerospace.toml ~/.config/aerospace/aerospace.toml
+```
 
-  If AeroSpace fails to parse a broken config it keeps the last good in-memory
-  config, so a bad edit will not usually "brick" your session — but always keep a
-  known-good backup.
+Copies must be refreshed manually after repository changes; symlinks track the
+canonical file automatically.
+
+### Validate and roll back
+
+Validate without applying:
+
+```sh
+aerospace reload-config --dry-run
+```
+
+Restore a backup and apply it:
+
+```sh
+cp ~/.config/aerospace/aerospace.toml.bak.<timestamp> \
+  ~/.config/aerospace/aerospace.toml
+aerospace reload-config
+```
+
+If AeroSpace rejects a broken config, it keeps the last good in-memory config,
+but always preserve a known-good backup before editing.
 
 ---
 
@@ -211,20 +229,15 @@ Behavior notes:
 
 ---
 
-## 7. Corne HOST bridge (implemented): `F13`–`F20` direct bindings
+## 7. Corne HOST bridge: direct F13–F20 and spatial bindings
 
-The Corne **HOST** layer (firmware side, see
-[docs/corne-keymaps.md](corne-keymaps.md)) emits `F13`–`F20` and
-`Option+H/J/K/L`. AeroSpace binds those keys **directly** — there is **no
-`Alt-1`-style intermediate** on the Corne side. The keyboard sends the F-key;
-AeroSpace acts on it.
-
-The installed `aerospace.toml` includes these **additional** bindings layered on
-top of the Alt bindings above (so both the laptop keyboard and the Corne drive
-the same workspaces):
+The Corne **HOST** layer emits F13–F20, Shift-F13–F17, and Option+H/J/K/L.
+AeroSpace binds those keys **directly** — there is no Alt-1-style intermediate
+on the Corne side. The canonical `dotfiles/aerospace.toml` keeps the F-key
+protocol additive to the laptop Alt bindings above.
 
 ```toml
-# Focus workspaces WEB/DEV/COMMS/RUN/AUX
+# Workspace focus WEB/DEV/COMMS/RUN/AUX
 f13 = 'workspace WEB'
 f14 = 'workspace DEV'
 f15 = 'workspace COMMS'
@@ -238,51 +251,51 @@ shift-f15 = 'move-node-to-workspace COMMS; workspace COMMS'
 shift-f16 = 'move-node-to-workspace RUN; workspace RUN'
 shift-f17 = 'move-node-to-workspace AUX; workspace AUX'
 
-# Context and window operations (HOST equivalents)
 f18 = 'workspace-back-and-forth'
 f19 = 'fullscreen'
 f20 = 'layout floating tiling'
+
+# Spatial focus/move controls emitted by HOST
+alt-h = 'focus left'
+alt-j = 'focus down'
+alt-k = 'focus up'
+alt-l = 'focus right'
+alt-shift-h = 'move left'
+alt-shift-j = 'move down'
+alt-shift-k = 'move up'
+alt-shift-l = 'move right'
 ```
 
-| Corne HOST key | AeroSpace binding            | Action                    |
-|----------------|------------------------------|---------------------------|
-| `F13`          | `f13` (`workspace WEB`)      | Focus WEB                 |
-| `F14`          | `f14` (`workspace DEV`)      | Focus DEV                 |
-| `F15`          | `f15` (`workspace COMMS`)    | Focus COMMS               |
-| `F16`          | `f16` (`workspace RUN`)      | Focus RUN                 |
-| `F17`          | `f17` (`workspace AUX`)      | Focus AUX                 |
-| `Shift-F13`…`Shift-F17` | `shift-f13`…`shift-f17` | Move window + follow      |
-| `F18`          | `f18` (`workspace-back-and-forth`) | Previous workspace  |
-| `F19`          | `f19` (`fullscreen`)         | Fullscreen                |
-| `F20`          | `f20` (`layout floating tiling`) | Toggle floating       |
+| Corne HOST key | AeroSpace binding | Action |
+|----------------|-------------------|--------|
+| `F13`–`F17` | `f13`–`f17` | Focus WEB/DEV/COMMS/RUN/AUX |
+| `Shift-F13`–`Shift-F17` | `shift-f13`–`shift-f17` | Move window + follow |
+| `F18` | `f18` | Previous workspace |
+| `F19` | `f19` | Fullscreen |
+| `F20` | `f20` | Toggle floating |
+| `Option+H/J/K/L` | `alt-h/j/k/l` | Spatial focus |
+| `Option+Shift+H/J/K/L` | `alt-shift-h/j/k/l` | Spatial move |
 
-The existing `Alt` bindings remain intact; the F-key bindings are an additive,
-keyboard-agnostic set. `Option+H/J/K/L` from the HOST layer is available for
-direction-style actions if you choose to bind them in AeroSpace.
+The firmware emits protocol keys; AeroSpace owns their meaning. The laptop
+keyboard remains standard QWERTY.
 
 ---
 
-## 8. Verified current routing
+## 8. Canonical app routing
 
-The following `on-window-detected` rules are the **verified current routing** in
-this setup. They use the recommended `if = 'test …'` syntax (the older
-`if.app-id = …` form is soft-deprecated).
+The repository-tracked config applies conservative routing only to
+hard-purpose applications:
 
 ```toml
-# Place on-window-detected above any [table] sections (TOML requirement).
-# See: https://nikitabobko.github.io/AeroSpace/guide#on-window-detected-callback
 on-window-detected = [
-    # DEV: Zed and Ghostty
     {
         if = 'test %{app-bundle-id} = dev.zed.Zed || test %{app-bundle-id} = com.mitchellh.ghostty',
         run = ['move-node-to-workspace DEV'],
     },
-    # WEB: Zen Browser
     {
         if = 'test %{app-bundle-id} = app.zen-browser.zen',
         run = ['move-node-to-workspace WEB'],
     },
-    # COMMS: Vencord (Vesktop)
     {
         if = 'test %{app-bundle-id} = dev.vencord.vesktop',
         run = ['move-node-to-workspace COMMS'],
@@ -290,15 +303,10 @@ on-window-detected = [
 ]
 ```
 
-**Intentional exceptions (unrestricted):**
-
-- **Finder** (`com.apple.finder`) — left unrestricted so it opens on whatever
-  workspace you are currently using.
-- **Obsidian** (`md.obsidian`) — left unrestricted for the same reason.
-
-Hard routing is applied **only** to Zed, Ghostty, Zen, and Vesktop; Finder and
-Obsidian remain unrestricted. If you later want these pinned, add a callback like
-the ones above (e.g. `move-node-to-workspace AUX` for Obsidian).
+Finder (`com.apple.finder`) and Obsidian (`md.obsidian`) are intentionally
+unrestricted so contextual windows open where they are invoked. If a new
+application deserves hard routing, add it to `dotfiles/aerospace.toml` only
+after confirming its bundle ID with `aerospace list-apps`.
 
 > To find an app's bundle ID, run `aerospace list-apps` (see below) or inspect the
 > app in Finder → *Get Info*.
@@ -397,3 +405,5 @@ Alfred). Always prefer `--dry-run` before a real reload.
 - Default config: <https://nikitabobko.github.io/AeroSpace/guide#default-config>
 - Releases / install: <https://nikitabobko.github.io/AeroSpace/> (check here for
   the current version — no specific release is asserted in this guide)
+- Configuration locations and TOML behavior:
+  <https://nikitabobko.github.io/AeroSpace/guide#config-location>

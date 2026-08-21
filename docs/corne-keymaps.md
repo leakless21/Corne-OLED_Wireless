@@ -31,16 +31,16 @@ refer to these indices:
 
 | Index | Layer name (`label` / `display-name`) | Purpose |
 |-------|----------------------------------------|---------|
-| 0 | `BASE` | Primary typing layer (Colemak-DH). Home-row modifiers + thumb/letter layer-taps to reach every other layer. |
-| 1 | `NAV` | macOS Cmd clipboard chords (Cmd+C/V/X/Z and Cmd+Shift+Z), arrows/text navigation, and the named `&to L_GAME` entry. No bootloader. |
-| 2 | `MOUSE` | Pointer control: scroll (`&msc`), mouse buttons (`&mkp MB1`–`MB5`, `MCLK`), and mouse movement (`&mmv`). |
+| 0 | `BASE` | Primary typing layer (Colemak-DH). Home-row modifiers + thumb/letter layer-taps reach the other layers. |
+| 1 | `NAV` | macOS Cmd clipboard chords, arrows/text navigation, Caps Lock, and the named `&to L_GAME` entry. |
+| 2 | `MOUSE` | Left-hand GUI/Alt/Ctrl/Shift modifiers; right-hand scroll, mouse buttons, and pointer movement. |
 | 3 | `MEDIA` | Media-only: volume, play/pause/stop/mute. |
-| 4 | `NUM` | Numpad: digits `0`–`9`, brackets, `MINUS`, `PERIOD`, `GRAVE`, `BACKSLASH`. |
-| 5 | `SYM` | Symbols: brackets, braces, parentheses, and math/punctuation glyphs (`&`, `*`, `$`, `%`, `@`, `#`, `|`, etc.). |
-| 6 | `FUN` | Function row: `F1`–`F12`. |
-| 7 | `HOST` | Bridge to macOS AeroSpace: emits `F13`–`F20` and `Option+H/J/K/L` from the BASE physical H/J/K/L positions. Activated by a BASE combo (see §3.3). |
-| 8 | `GAME` | Explicit full tap-only QWERTY. Entered via `&to L_GAME` from NAV; exits via an explicit right-thumb `&to L_BASE`. |
-| 9 | `ADJUST` | Conditional layer (active only when NAV + NUM are both held). BT select/clear, output toggle, external-power toggle, bootloader, reset. |
+| 4 | `NUM` | Numpad and punctuation on the left, with right-hand modifiers. |
+| 5 | `SYM` | Symbols: brackets, braces, parentheses, and math/punctuation glyphs. |
+| 6 | `FUN` | F1–F12 on the left, with right-hand modifiers. |
+| 7 | `HOST` | Direct AeroSpace bridge: F13–F20, Shift-F13–F17, and spatial Option+H/J/K/L focus/move clusters. |
+| 8 | `GAME` | Explicit full tap-only QWERTY. Entered via `&to L_GAME` from NAV; exits via `&to L_BASE`. |
+| 9 | `ADJUST` | Conditional admin layer: five BT profiles, explicit I/O power actions, and mirrored reset/bootloader bindings. |
 
 > **`BUTTON` is gone.** The previous `BUTTON` layer (index 3) has been removed;
 > `MEDIA` now occupies index 3 and `NUM`/`SYM`/`FUN`/`HOST`/`GAME`/`ADJUST` shift
@@ -53,6 +53,24 @@ refer to these indices:
 > **Verify, don't assume.** The exact key *positions* for every layer live in
 > `config/corne.keymap`. Always open that file to confirm a specific binding —
 > this table only summarizes each layer's intent.
+
+The administrative bindings follow current upstream ZMK semantics:
+
+- ZMK provides five Bluetooth profiles by default. `BT_SEL` is zero-based;
+  `BT_NXT` and `BT_PRV` cycle profiles; `BT_CLR` clears only the selected
+  profile; and `BT_CLR_ALL` clears every profile. After clearing a bond, forget
+  the keyboard on the host before pairing again so the host does not reuse an
+  old security key. See <https://zmk.dev/docs/keymaps/behaviors/bluetooth>.
+- Reset and bootloader behaviors are source-specific on split keyboards, which
+  is why ADJUST contains bindings on both halves. See
+  <https://zmk.dev/docs/keymaps/behaviors/reset>.
+- `OUT_USB`/`OUT_BLE` and `EP_ON`/`EP_OFF` are explicit persistent states rather
+  than hidden-state toggles. See
+  <https://zmk.dev/docs/keymaps/behaviors/outputs> and
+  <https://zmk.dev/docs/keymaps/behaviors/power>.
+- The HOST combo uses `slow-release`, so its momentary layer remains active
+  until both combo keys are released. See
+  <https://zmk.dev/docs/keymaps/combos>.
 
 ---
 
@@ -122,10 +140,22 @@ keymap).
 
 HOST is engaged by holding a **combo** on the BASE layer: the outer `ESC`
 (key-position `0`) together with `BACKSPACE` (key-position `11`), within an
-80 ms timeout (`host_combo`, `&mo L_HOST`). While HOST is active, the BASE
-physical H/J/K/L positions emit `Option+H/J/K/L` (`LA(H)`, `LA(J)`, `LA(K)`,
-`LA(L)`) and the top rows emit `F13`–`F20` for the AeroSpace bridge (see
-[docs/macos-aerospace.md](macos-aerospace.md)).
+80 ms timeout (`host_combo`, `&mo L_HOST`). The combo has `slow-release`, so
+HOST remains held until both trigger keys are released.
+
+HOST is arranged as a control surface rather than a Colemak-shaped copy of the
+base letters:
+
+| HOST group | Physical positions | Emitted binding |
+|------------|--------------------|-----------------|
+| Workspace focus | left top, F13–F17 | `F13`–`F17` → WEB/DEV/COMMS/RUN/AUX |
+| Move + follow | left home | `Shift-F13`–`Shift-F17` → move window and follow |
+| Context actions | right top | `F18` previous workspace, `F19` fullscreen, `F20` floating |
+| Focus windows | right home, left/down/up/right | `Option+H/J/K/L` |
+| Move windows | right bottom, left/down/up/right | `Option+Shift+H/J/K/L` |
+
+The firmware emits these protocol keys; AeroSpace assigns their meaning. The
+MacBook keyboard remains ordinary QWERTY and does not need Colemak remapping.
 
 ---
 
@@ -222,26 +252,31 @@ favored when the timing is ambiguous.
 Pointing is enabled (`CONFIG_ZMK_POINTING=y` in `config/corne.conf`) and used by
 the MOUSE layer:
 
-- **Mouse move** (`&mmv`): tuned with `acceleration-exponent = <1>`,
+- **Mouse modifiers** (`LGUI`, `LALT`, `LCTRL`, `LEFT_SHIFT`) occupy the
+  left-hand home row.
+- **Mouse scroll** (`&msc`) occupies the right-hand top row.
+- **Mouse buttons** (`&mkp MB1`–`MB5`, `MCLK`) occupy the right-hand home row.
+- **Mouse move** (`&mmv`) occupies the right-hand bottom row.
+- Mouse move is tuned with `acceleration-exponent = <1>`,
   `time-to-max-speed-ms = <500>`, `delay-ms = <0>`.
-- **Mouse scroll** (`&msc`): scroll directions on the MOUSE layer.
-- **Mouse buttons** (`&mkp`): `MB1`–`MB5` and `MCLK` on the MOUSE layer.
 - Default sensitivity overrides at the top of the keymap:
   `ZMK_POINTING_DEFAULT_MOVE_VAL 800` (default 600) and
   `ZMK_POINTING_DEFAULT_SCRL_VAL 20` (default 10).
 
 ---
 
-## 8. OLED & ZMK Studio settings
+## 8. OLED, power, and ZMK Studio settings
 
 From `config/corne.conf`:
 
 ```ini
 CONFIG_ZMK_DISPLAY=y
 CONFIG_ZMK_DISPLAY_STATUS_SCREEN_CUSTOM=y
+CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE=y
+CONFIG_ZMK_IDLE_TIMEOUT=30000
 CONFIG_ZMK_SLEEP=y
+CONFIG_ZMK_IDLE_SLEEP_TIMEOUT=900000
 
-# zmk studio
 CONFIG_ZMK_STUDIO=y
 CONFIG_ZMK_STUDIO_LOCKING=n
 CONFIG_ZMK_STUDIO_LOCK_ON_DISCONNECT=n
@@ -249,23 +284,24 @@ CONFIG_ZMK_STUDIO_LOCK_ON_DISCONNECT=n
 CONFIG_ZMK_POINTING=y
 ```
 
-- **OLED:** `CONFIG_ZMK_DISPLAY=y` with a custom status screen
-  (`CONFIG_ZMK_DISPLAY_STATUS_SCREEN_CUSTOM=y`). The build uses the `nice_oled`
-  shield (see `build.yaml`), provided by the `zmk-nice-oled` west project.
-- **Sleep:** `CONFIG_ZMK_SLEEP=y` enables auto-sleep.
-- **ZMK Studio:** enabled (`CONFIG_ZMK_STUDIO=y`) and **unlocked** for
-  experimentation — Studio *locking* is disabled
-  (`CONFIG_ZMK_STUDIO_LOCKING=n`) and the keyboard does **not** lock on
-  disconnect (`CONFIG_ZMK_STUDIO_LOCK_ON_DISCONNECT=n`), so the keymap can be
-  edited live via ZMK Studio without a lockout. The left-side build additionally
-  pulls in the `studio-rpc-usb-uart` snippet so Studio can connect over
-  USB-UART (see §9).
+- **OLED:** `CONFIG_ZMK_DISPLAY=y` with a custom status screen. The build uses
+  the `nice_oled` shield (see `build.yaml`), provided by the pinned
+  `zmk-nice-oled` west project.
+- **Power policy:** blank the display after 30 seconds of inactivity and enter
+  deep sleep after 15 minutes. These are explicit baseline values; characterize
+  wake latency, reconnect behavior, OLED reliability, and left/right battery
+  balance over several charge cycles before tuning them.
+- **ZMK Studio:** enabled and unlocked for experimentation. Studio edits
+  persist to on-device settings and can diverge from the Git-tracked
+  `config/corne.keymap`; flash `settings-reset` if an overlay misbehaves.
 
-> **Studio is experimental.** The **Git-tracked `config/corne.keymap` is the
-> canonical keymap.** Studio edits persist to on-device settings and can diverge
-> from the file; if a Studio edit or persisted setting misbehaves, flash the
-> **`settings-reset`** artifact to recover (it clears settings and Bluetooth
-> bonds).
+The current ZMK power defaults and display options are documented at
+<https://zmk.dev/docs/config/power> and
+<https://zmk.dev/docs/config/displays>. Deep-sleep behavior deserves physical
+testing: ZMK issue
+<https://github.com/zmkfirmware/zmk/issues/2686> records reports of lost
+keypresses during wake/reconnect and recommends treating timeout changes as a
+hardware/host trade-off, not a guarantee.
 
 ---
 
@@ -306,26 +342,50 @@ binding macros, so they do not obscure the actual key bindings in this keymap.
 
 ---
 
-## 11. Safe editing & flashing guidance
+## 11. Generated keymap diagram
 
-1. **Edit the keymap** in `config/corne.keymap` (or via the Keymap Editor / ZMK
-   Studio). Keep a copy of the last-known-good keymap before changing it. The
-   Git-tracked file is canonical; Studio edits are experimental overlays.
+The repository uses `keymap-drawer` to parse `config/corne.keymap` and generate:
+
+- `keymap-drawer/corne.yaml` — parsed, reviewable keymap representation.
+- `keymap-drawer/corne.svg` — visual layer reference.
+
+`.github/workflows/draw-keymap.yml` runs on keymap/config changes and pins the
+`keymap-drawer` workflow and package to v0.23.0. The generated files are the
+daily visual reference; this document explains behavior and rationale.
+
+The workflow uses the pinned v0.23.0 release and reusable-workflow commit
+`a44809b8cc718cbff646641f49a8f71a9368336d`. Upstream workflow and configuration
+references:
+<https://github.com/caksoylar/keymap-drawer/blob/main/.github/workflows/draw-zmk.yml>,
+<https://github.com/caksoylar/keymap-drawer/releases/tag/v0.23.0>.
+
+---
+
+## 12. Safe editing & flashing guidance
+
+1. **Edit the keymap** in `config/corne.keymap` (or via the Keymap Editor /
+   ZMK Studio). Keep a copy of the last-known-good keymap before changing it.
+   The Git-tracked file is canonical; Studio edits are experimental overlays.
 2. **Build** by pushing/running GitHub Actions; download the `.uf2` artifacts
    (`corne-left`, `corne-right`) from the Actions run.
 3. **Flash** each half:
    - Put the half into bootloader mode (double-tap the reset button, or use the
-     `bootloader` key on the ADJUST layer), then copy the matching `.uf2` onto
-     the mounted `NICENANO` drive.
+     matching left/right `bootloader` key on ADJUST), then copy the matching
+     `.uf2` onto the mounted `NICENANO` drive.
    - Alternatively, use **ZMK Studio** (left half) for live edits without
      reflashing — note Studio changes persist to settings, so use the
      `settings-reset` artifact if you need a clean slate.
 4. **Recover** with `settings-reset` if settings or a Studio edit misbehave, or
    after a layer renumbering migration (it also clears Bluetooth bonds).
 
+Repository checks can establish that the keymap parses and the generated
+diagram matches it. Only a physical smoke test can establish split reconnect,
+Bluetooth switching, source-local reset/bootloader behavior, OLED wake, HOST
+input delivery, and deep-sleep behavior on this hardware.
+
 ---
 
-## 12. Accuracy caveat — check the source
+## 13. Accuracy caveat — check the source
 
 - **Exact key positions** for every layer must be read from
   `config/corne.keymap`. This guide summarizes intent and behavior; it does not
@@ -340,11 +400,10 @@ binding macros, so they do not obscure the actual key bindings in this keymap.
 
 ---
 
-## 13. Corne HOST → AeroSpace integration (implemented)
+## 14. Corne HOST → AeroSpace integration (implemented)
 
-The HOST layer (7) is **implemented in firmware** and bridges to macOS
-AeroSpace. It emits `F13`–`F20` and `Option+H/J/K/L` from the BASE physical
-H/J/K/L positions; AeroSpace binds those keys directly (see
-[docs/macos-aerospace.md](macos-aerospace.md)). No `Alt-1`-style
-intermediate mapping is used on the Corne side — the keyboard sends the F-keys
-and AeroSpace binds them directly.
+The HOST layer (7) is implemented in firmware and bridges to macOS AeroSpace.
+It emits F13–F20, Shift-F13–F17, and spatial Option+H/J/K/L focus/move chords;
+AeroSpace binds those signals directly (see
+[docs/macos-aerospace.md](macos-aerospace.md)). No Alt-1-style intermediate
+mapping is used on the Corne side, and the MacBook remains ordinary QWERTY.

@@ -93,6 +93,7 @@
             timeout-ms = <80>;
             key-positions = <0 11>;
             layers = <L_BASE>;
+            slow-release;
             bindings = <&mo L_HOST>;
         };
     };
@@ -141,13 +142,14 @@
         MOUSE {
             label = "MOUSE";
             display-name = "MOUSE";
+            /* Left-hand modifiers; right-hand scroll, buttons, and movement. */
             bindings = <
-                &none            &msc SCRL_LEFT     &msc SCRL_DOWN     &msc SCRL_UP       &msc SCRL_RIGHT    &none
                 &none            &none              &none              &none              &none              &none
+                &msc SCRL_LEFT   &msc SCRL_DOWN      &msc SCRL_UP       &msc SCRL_RIGHT     &none              &none
+                &kp LGUI         &kp LALT           &kp LCTRL           &kp LEFT_SHIFT      &none              &none
+                &mkp MB5         &mkp MB1            &mkp MB2            &mkp MB3           &mkp MB4           &mkp MCLK
                 &none            &none              &none              &none              &none              &none
-                &mkp MB5         &mkp MB1           &mkp MB2           &mkp MB3           &mkp MB4           &mkp MCLK
-                &none            &none              &none              &none              &none              &none
-                &mmv MOVE_LEFT   &mmv MOVE_DOWN     &mmv MOVE_UP        &mmv MOVE_RIGHT    &none              &none
+                &mmv MOVE_LEFT   &mmv MOVE_DOWN      &mmv MOVE_UP       &mmv MOVE_RIGHT     &none              &none
                 &none            &none              &none              &none              &none              &none
             >;
         };
@@ -169,14 +171,15 @@
         NUM {
             label = "NUM";
             display-name = "NUM";
+            /* Number/symbol hand on the left; modifiers on the right. */
             bindings = <
-                &none            &kp LEFT_BRACKET   &kp NUMBER_7        &kp NUMBER_8        &kp NUMBER_9        &kp RIGHT_BRACKET
-                &kp PERIOD       &kp NUMBER_0       &kp MINUS           &none              &none              &none
-                &none            &kp SEMICOLON       &kp NUMBER_4        &kp NUMBER_5        &kp NUMBER_6        &kp EQUAL
-                &none            &none              &none              &none              &none              &none
-                &none            &kp GRAVE           &kp NUMBER_1        &kp NUMBER_2        &kp NUMBER_3        &kp BACKSLASH
-                &none            &none              &none              &none              &none              &none
-                &trans           &trans              &trans              &trans              &trans              &trans
+                &kp LEFT_BRACKET  &kp NUMBER_7        &kp NUMBER_8        &kp NUMBER_9        &kp RIGHT_BRACKET  &kp PERIOD
+                &none             &none               &none               &none               &none              &none
+                &kp NUMBER_0      &kp MINUS           &kp SEMICOLON       &kp NUMBER_4        &kp NUMBER_5        &kp NUMBER_6
+                &kp RIGHT_GUI     &kp RIGHT_ALT       &kp RCTRL            &kp RIGHT_SHIFT      &none              &none
+                &kp EQUAL         &kp GRAVE           &kp NUMBER_1        &kp NUMBER_2        &kp NUMBER_3        &kp BACKSLASH
+                &none             &none               &none               &none               &none              &none
+                &trans             &trans              &trans              &trans              &trans              &trans
             >;
         };
 
@@ -197,11 +200,12 @@
         FUN {
             label = "FUN";
             display-name = "FUN";
+            /* Function keys on the left; modifiers on the right. */
             bindings = <
                 &none            &kp F12             &kp F7              &kp F8              &kp F9              &none
                 &none            &none              &none              &none              &none              &none
                 &none            &kp F11             &kp F4              &kp F5              &kp F6              &none
-                &none            &none              &none              &none              &none              &none
+                &kp RIGHT_GUI    &kp RIGHT_ALT       &kp RCTRL           &kp RIGHT_SHIFT     &none              &none
                 &none            &kp F10             &kp F1              &kp F2              &kp F3              &none
                 &none            &none              &none              &none              &none              &none
                 &trans           &trans              &trans              &trans              &trans              &trans
@@ -211,14 +215,18 @@
         HOST {
             label = "HOST";
             display-name = "HOST";
-            /* Hold BASE outer ESC + BACKSPACE; F13-F20 bridge to AeroSpace. */
+            /*
+             * Hold BASE outer ESC + BACKSPACE. Workspace focus is F13-F17;
+             * Shift-F13-F17 moves the focused window and follows it. The
+             * right-hand H/J/K/L clusters emit AeroSpace focus and move chords.
+             */
             bindings = <
                 &none            &kp F13            &kp F14            &kp F15            &kp F16            &kp F17
-                &kp LA(J)        &kp LA(L)           &kp F18            &kp F19            &kp F20            &none
+                &none            &none              &kp F18            &kp F19            &kp F20            &none
+                &kp LS(F13)      &kp LS(F14)        &kp LS(F15)        &kp LS(F16)        &kp LS(F17)        &none
+                &kp LA(H)        &kp LA(J)          &kp LA(K)          &kp LA(L)          &none              &none
                 &none            &none              &none              &none              &none              &none
-                &none            &none              &none              &none              &none              &none
-                &none            &none              &none              &none              &none              &none
-                &kp LA(K)        &kp LA(H)           &none              &none              &none              &none
+                &kp LS(LA(H))    &kp LS(LA(J))      &kp LS(LA(K))      &kp LS(LA(L))      &none              &none
                 &none            &none              &none              &none              &none              &none
             >;
         };
@@ -241,15 +249,19 @@
         ADJUST {
             label = "ADJUST";
             display-name = "ADJUST";
-            /* NAV + NUM only: keep destructive/admin actions out of daily layers. */
+            /*
+             * NAV + NUM only. Reset/bootloader are present on both halves:
+             * source-local ZMK behaviors affect the half containing the key.
+             * BT_CLR_ALL is intentionally recovery-only and remains unbound.
+             */
             bindings = <
-                &none            &bootloader         &sys_reset         &bt BT_CLR         &out OUT_TOG       &ext_power EP_TOG
-                &bt BT_SEL 0     &bt BT_SEL 1        &bt BT_SEL 2       &bt BT_SEL 3       &none              &none
-                &none            &none               &none              &none              &none              &none
-                &none            &none               &none              &none              &none              &none
-                &none            &none               &none              &none              &none              &none
-                &none            &none               &none              &none              &none              &none
-                &none            &none               &none              &none              &none              &none
+                &bootloader       &sys_reset         &bt BT_CLR          &out OUT_USB        &out OUT_BLE        &ext_power EP_ON
+                &ext_power EP_OFF  &bt BT_NXT         &bt BT_PRV          &none              &sys_reset          &bootloader
+                &bt BT_SEL 0      &bt BT_SEL 1        &bt BT_SEL 2        &bt BT_SEL 3        &bt BT_SEL 4        &none
+                &none             &none               &none               &none               &none               &none
+                &none             &none               &none               &none               &none               &none
+                &none             &none               &none               &none               &none               &none
+                &none             &none               &none               &none               &none               &none
             >;
         };
     };
