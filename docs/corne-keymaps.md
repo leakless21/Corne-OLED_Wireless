@@ -3,10 +3,8 @@
 > **Repository context.** This repository is a **ZMK firmware** project for a Corne
 > split keyboard (it is **not** QMK). This guide documents the keymap, layers, and
 > related firmware settings found in `config/corne.keymap`, `config/corne.conf`,
-> `build.yaml`, and `config/west.yml`.
->
-> **Documentation only.** This guide does **not** modify any firmware, keymap,
-> build, west, or AeroSpace files. It only describes what is already present.
+> `build.yaml`, and `config/west.yml`. It describes what is present in those
+> source files; the canonical source of truth is always the files themselves.
 
 ---
 
@@ -14,32 +12,43 @@
 
 - The keymap is written in ZMK's Devicetree/behavior syntax (`&kp`, `&lt`, `&sk`,
   `&mo`/`&to`, `&mmv`, `&msc`, `&mkp`, etc.), not QMK's C `LAYOUT` arrays.
-- `config/west.yml` pulls in the **zmk** project from `github.com/zmkfirmware`
-  (revision `main`), plus two helpers:
-  - `zmk-nice-oled` (remote `mctechnology17`) — OLED display support.
-  - `zmk-helpers` (remote `urob`) — key-label and unicode helpers used for
-    visualization/editor labels.
+- `config/west.yml` pins the **zmk** project from `github.com/zmkfirmware` and two
+  helpers, all at **immutable revision SHAs** (do not replace these with `main`):
+  - `zmk` (remote `zmkfirmware`) — revision `6e2ef41e022d555b10f116e395832913f71717b3`.
+  - `zmk-nice-oled` (remote `mctechnology17`) — revision `46f824abb2bd41f1287c5c68abd14122af6042a3` — OLED display support.
+  - `zmk-helpers` (remote `urob`) — revision `95edb8f15ef1d1bd8332810555f8cf5837fbdd27` — key-label and unicode helpers used for visualization/editor labels.
 - The board target is **`nice_nano_v2`** (see `build.yaml`), a common wireless
   Corne controller.
 
 ---
 
-## 2. The 9 layers
+## 2. The 10 layers
 
-The keymap defines exactly **nine** layers. ZMK layers are **0-indexed**, so the
-`&lt N` / `&to N` numbers in the keymap refer to these indices:
+The keymap defines exactly **ten** layers. ZMK layers are **0-indexed**, and the
+indices below are **named constants** in `config/corne.keymap`
+(`L_BASE`, `L_NAV`, … `L_ADJUST`). The `&lt N` / `&to N` numbers in the keymap
+refer to these indices:
 
 | Index | Layer name (`label` / `display-name`) | Purpose |
 |-------|----------------------------------------|---------|
-| 0 | `BASE` | Primary typing layer. Home-row modifiers + thumb/letter layer-taps to reach every other layer. |
-| 1 | `NAVIGATION` (`NAV`) | Arrow keys, clipboard (copy/cut/paste/undo/redo), `Caps`, `bootloader`, and the `&to 8` switch into the GAME layer. |
-| 2 | `MOUSE` | Pointer control: scroll (`&msc`), mouse buttons (`&mkp`), and mouse movement (`&mmv`). |
-| 3 | `BUTTON` | Mouse-button cluster (`&mkp MB1`–`MB5`, `MCLK`) plus clipboard keys. |
-| 4 | `MEDIA` | Media / system: volume, play/pause/stop/mute, Bluetooth select/clear (`&bt`), output toggle (`&out`), external-power toggle (`&ext_power`). |
-| 5 | `NUM` | Numpad: digits `0`–`9`, brackets, `MINUS`, `PERIOD`, `GRAVE`, `BACKSLASH`, `bootloader`. |
-| 6 | `SYM` | Symbols: brackets, braces, parentheses, and math/punctuation glyphs (`&`, `*`, `$`, `%`, `@`, `#`, `|`, etc.). |
-| 7 | `FUN` (`FUNC`) | Function row: `F1`–`F12`, `PRINTSCREEN`, `SCROLLLOCK`, `PAUSE_BREAK`. |
-| 8 | `QWERTY` (`GAME`) | Gaming layer: number row + `Q/W/E/R`/`A/S/D/F`/`G`/`SPACE`. Entered via `&to 8` from NAVIGATION. |
+| 0 | `BASE` | Primary typing layer (Colemak-DH). Home-row modifiers + thumb/letter layer-taps to reach every other layer. |
+| 1 | `NAV` | macOS Cmd clipboard chords (Cmd+C/V/X/Z and Cmd+Shift+Z), arrows/text navigation, and the named `&to L_GAME` entry. No bootloader. |
+| 2 | `MOUSE` | Pointer control: scroll (`&msc`), mouse buttons (`&mkp MB1`–`MB5`, `MCLK`), and mouse movement (`&mmv`). |
+| 3 | `MEDIA` | Media-only: volume, play/pause/stop/mute. |
+| 4 | `NUM` | Numpad: digits `0`–`9`, brackets, `MINUS`, `PERIOD`, `GRAVE`, `BACKSLASH`. |
+| 5 | `SYM` | Symbols: brackets, braces, parentheses, and math/punctuation glyphs (`&`, `*`, `$`, `%`, `@`, `#`, `|`, etc.). |
+| 6 | `FUN` | Function row: `F1`–`F12`. |
+| 7 | `HOST` | Bridge to macOS AeroSpace: emits `F13`–`F20` and `Option+H/J/K/L` from the BASE physical H/J/K/L positions. Activated by a BASE combo (see §3.3). |
+| 8 | `GAME` | Explicit full tap-only QWERTY. Entered via `&to L_GAME` from NAV; exits via an explicit right-thumb `&to L_BASE`. |
+| 9 | `ADJUST` | Conditional layer (active only when NAV + NUM are both held). BT select/clear, output toggle, external-power toggle, bootloader, reset. |
+
+> **`BUTTON` is gone.** The previous `BUTTON` layer (index 3) has been removed;
+> `MEDIA` now occupies index 3 and `NUM`/`SYM`/`FUN`/`HOST`/`GAME`/`ADJUST` shift
+> up accordingly. Because **layer numbers are part of the persisted ZMK keymap
+> state**, deleting/renumbering a layer changes any Studio-persisted layer state
+> on the keyboard. After migrating, flash both halves and, if the persisted
+> settings or Bluetooth bonds look wrong, flash the **`settings-reset`** artifact
+> (it clears settings **and** Bluetooth bonds) to start clean.
 
 > **Verify, don't assume.** The exact key *positions* for every layer live in
 > `config/corne.keymap`. Always open that file to confirm a specific binding —
@@ -52,22 +61,27 @@ The keymap defines exactly **nine** layers. ZMK layers are **0-indexed**, so the
 ### 3.1 Base layout (as defined in `config/corne.keymap`)
 
 The BASE layer is a 6×3-per-side grid plus a 3-per-side thumb cluster. The
-actual bindings (not the template comment in the file) are:
+actual bindings (not a template comment) are:
 
 ```
-Top row:     ESC  Q  W  F  P  B | J  L  U  Y  '  BSPC
+Top row:     ESC  Q  W  F  P  B | J  L  U  Y  SQT  BSPC
 Home row:    TAB  A  R  S  T  G | M  N  E  I  O  ;
 Bottom row:  LSH  Z  X  C  D  V | K  H  ,  .  /  RSH
-Thumbs:           LCTL SPC TAB   | ENT BSPC RCTL
+Thumbs:           ESC MED  SPACE NAV  TAB MOUSE | ENT SYM  BSPC NUM  DEL FUN
 ```
 
-- **Home row letters** (`A R S T` / `N E I O`) are **hold-tap modifiers** — see
+- **Colemak-DH** base letters. The **outer** keys — `ESC` (top-left), `TAB`
+  (home-row left), the sticky `LSH` (bottom-left), and `BACKSPACE` (top-right),
+  `;` (home-row right), `RSH` (bottom-right) — remain plain keys.
+- **Home-row letters** (`A R S T` / `N E I O`) are **hold-tap modifiers** — see
   §4. The bare letters are the *tap* action.
-- **`LSH`** (bottom-left) is a **sticky** left shift — see §5.
-- **`Z`, `V`, `K`, `/`** are **layer-taps** — tap for the letter, hold to engage a
-  layer — see §6.
-- **Thumbs** `SPC`, `TAB`, `ENT`, `BSPC` are **layer-taps**; `LCTL` and `RCTL`
-  are plain `&kp LCTRL` / `&kp RCTRL`.
+- **`Z`, `V`, `K`, `/`** are **plain alpha/punctuation** (`&kp`) — not
+  layer-taps. (Earlier revisions made these layer-taps; the current keymap does
+  not.)
+- **`LSH`** (bottom-left) is a **sticky** left shift — see §5. The physical
+  outer shifts (`LSH`, `RSH`) remain as fallback shift keys.
+- **Thumbs** are all **layer-taps** (`&lt`): tap for the printed key, hold to
+  engage the named layer — see §3.2.
 
 ### 3.2 How layers are reached from BASE
 
@@ -76,42 +90,80 @@ key is held. The BASE-layer layer-taps map to these layers:
 
 | Key (tap → hold) | `&lt` target | Layer engaged (while held) |
 |------------------|--------------|----------------------------|
-| `SPACE`          | `&lt 1`      | NAVIGATION (1) |
+| `ESC` (thumb)    | `&lt 3`*     | MEDIA (3) |
+| `SPACE` (thumb)  | `&lt 1`      | NAV (1) |
 | `TAB` (thumb)    | `&lt 2`      | MOUSE (2) |
-| `/`              | `&lt 3`      | BUTTON (3) |
-| `Z`, `V`         | `&lt 4`      | MEDIA (4) |
-| `BSPC` (thumb)   | `&lt 5`      | NUM (5) |
-| `ENT` (thumb)    | `&lt 6`      | SYM (6) |
-| `K`              | `&lt 7`      | FUN (7) |
+| `ENTER` (thumb)  | `&lt 5`      | SYM (5) |
+| `BACKSPACE` (thumb) | `&lt 4`  | NUM (4) |
+| `DELETE` (thumb) | `&lt 6`      | FUN (6) |
 
-The **GAME** layer (8) is **not** a layer-tap. It is reached from the
-NAVIGATION layer via `&to 8` — a *layer switch* (`&to`) that activates layer 8
-and deactivates the others. Because `&to` is a switch rather than a momentary
-hold, the GAME layer stays active. The current `QWERTY`/GAME definition contains
-no `&to 0` return binding, so this is presently a one-way switch in the checked-in
-keymap; add and test a separate return binding before relying on GAME as a daily
-layer. The GAME layer itself is mostly `&trans`, so verify any future change in
-`config/corne.keymap`.
+\* The MEDIA thumb target is `L_MEDIA` (3); the table uses the numeric index for
+clarity.
 
-> All other layers use `&trans` (transparent) for keys they don't define, so
-> unspecified keys fall through to the layer below.
+The **GAME** layer (8) is **not** a layer-tap. It is reached from the **NAV**
+layer via `&to L_GAME` — a *layer switch* (`&to`) that activates layer 8 and
+deactivates the others. Because `&to` is a switch rather than a momentary hold,
+GAME stays active until you exit. The GAME layer includes an **explicit
+right-thumb `&to L_BASE`** exit binding, so it is a round-trip switch.
+
+The **HOST** layer (7) is reached from BASE by a **combo** (see §3.3), not a
+layer-tap.
+
+The **ADJUST** layer (9) is **conditional**: it activates automatically when both
+NAV (1) and NUM (4) are held simultaneously (see `conditional_layers` in the
+keymap).
+
+> Transparent fall-through is used only where the source explicitly contains
+> `&trans` (for example NAV, NUM, SYM, and FUN thumb positions). MOUSE, MEDIA,
+> HOST, GAME, and ADJUST use explicit `&none` entries for unused positions so
+> those domain layers do not leak BASE actions unexpectedly.
+
+### 3.3 HOST activation combo
+
+HOST is engaged by holding a **combo** on the BASE layer: the outer `ESC`
+(key-position `0`) together with `BACKSPACE` (key-position `11`), within an
+80 ms timeout (`host_combo`, `&mo L_HOST`). While HOST is active, the BASE
+physical H/J/K/L positions emit `Option+H/J/K/L` (`LA(H)`, `LA(J)`, `LA(K)`,
+`LA(L)`) and the top rows emit `F13`–`F20` for the AeroSpace bridge (see
+[docs/macos-aerospace.md](docs/macos-aerospace.md)).
 
 ---
 
-## 4. Home-row modifiers (`&bhm` balanced homerow mods)
+## 4. Home-row modifiers (two side-aware balanced behaviors)
 
-A custom hold-tap behavior `balanced_homerow_mods` (`bhm`) is defined in the
-keymap and applied to the home-row letters:
+Two custom hold-tap behaviors are defined — one per hand — and applied to the
+home-row letters:
 
 ```devicetree
-bhm: balanced_homerow_mods {
+hml: home_row_mods_left {
     compatible = "zmk,behavior-hold-tap";
-    tapping-term-ms = <220>;
-    quick-tap-ms = <180>;
-    flavor = "tap-preferred";
+    flavor = "balanced";
+    tapping-term-ms = <280>;
+    quick-tap-ms = <175>;
+    require-prior-idle-ms = <150>;
+    hold-trigger-on-release;
+    hold-trigger-key-positions = < /* opposite-hand positions */ >;
+    bindings = <&kp>, <&kp>;
+};
+
+hmr: home_row_mods_right {
+    compatible = "zmk,behavior-hold-tap";
+    flavor = "balanced";
+    tapping-term-ms = <280>;
+    quick-tap-ms = <175>;
+    require-prior-idle-ms = <150>;
+    hold-trigger-on-release;
+    hold-trigger-key-positions = < /* opposite-hand positions */ >;
     bindings = <&kp>, <&kp>;
 };
 ```
+
+Both are **positional balanced** hold-taps with identical timing:
+**280 ms** tapping term, **175 ms** quick-tap, **150 ms** require-prior-idle, and
+**`hold-trigger-on-release`**. Each behavior lists the **opposite hand's**
+key positions in `hold-trigger-key-positions`, so a hold only becomes a modifier
+when a key on the other hand is pressed (opposite-hand triggers). The physical
+outer shifts (`LSH`/`RSH`) remain as fallback shift sources.
 
 | Key | Tap | Hold (modifier) |
 |-----|-----|-----------------|
@@ -123,9 +175,6 @@ bhm: balanced_homerow_mods {
 | `E` | `E` | `RCTRL` |
 | `I` | `I` | `RIGHT_ALT` |
 | `O` | `O` | `RIGHT_GUI` |
-
-With `flavor = "tap-preferred"` and a 220 ms tapping term, a quick tap sends the
-letter and a hold sends the modifier.
 
 ---
 
@@ -171,13 +220,12 @@ favored when the timing is ambiguous.
 ## 7. Pointing features
 
 Pointing is enabled (`CONFIG_ZMK_POINTING=y` in `config/corne.conf`) and used by
-the MOUSE and BUTTON layers:
+the MOUSE layer:
 
 - **Mouse move** (`&mmv`): tuned with `acceleration-exponent = <1>`,
   `time-to-max-speed-ms = <500>`, `delay-ms = <0>`.
 - **Mouse scroll** (`&msc`): scroll directions on the MOUSE layer.
-- **Mouse buttons** (`&mkp`): `MB1`–`MB5`, `MB2`, `MB3`, `MCLK` on the MOUSE and
-  BUTTON layers.
+- **Mouse buttons** (`&mkp`): `MB1`–`MB5` and `MCLK` on the MOUSE layer.
 - Default sensitivity overrides at the top of the keymap:
   `ZMK_POINTING_DEFAULT_MOVE_VAL 800` (default 600) and
   `ZMK_POINTING_DEFAULT_SCRL_VAL 20` (default 10).
@@ -205,25 +253,32 @@ CONFIG_ZMK_POINTING=y
   (`CONFIG_ZMK_DISPLAY_STATUS_SCREEN_CUSTOM=y`). The build uses the `nice_oled`
   shield (see `build.yaml`), provided by the `zmk-nice-oled` west project.
 - **Sleep:** `CONFIG_ZMK_SLEEP=y` enables auto-sleep.
-- **ZMK Studio:** enabled (`CONFIG_ZMK_STUDIO=y`). Studio *locking* is disabled
+- **ZMK Studio:** enabled (`CONFIG_ZMK_STUDIO=y`) and **unlocked** for
+  experimentation — Studio *locking* is disabled
   (`CONFIG_ZMK_STUDIO_LOCKING=n`) and the keyboard does **not** lock on
   disconnect (`CONFIG_ZMK_STUDIO_LOCK_ON_DISCONNECT=n`), so the keymap can be
   edited live via ZMK Studio without a lockout. The left-side build additionally
   pulls in the `studio-rpc-usb-uart` snippet so Studio can connect over
   USB-UART (see §9).
 
+> **Studio is experimental.** The **Git-tracked `config/corne.keymap` is the
+> canonical keymap.** Studio edits persist to on-device settings and can diverge
+> from the file; if a Studio edit or persisted setting misbehaves, flash the
+> **`settings-reset`** artifact to recover (it clears settings and Bluetooth
+> bonds).
+
 ---
 
 ## 9. Build targets & artifact workflow
 
-`build.yaml` defines the GitHub Actions matrix. There are **three** build
+`build.yaml` defines the GitHub Actions matrix. There are **three** named build
 targets, all on `nice_nano_v2`:
 
-| Board | Shield(s) | Extra | Artifact |
-|-------|-----------|-------|----------|
-| `nice_nano_v2` | `corne_left nice_oled` | `snippet: studio-rpc-usb-uart`, `cmake-args: -DCONFIG_ZMK_STUDIO=y` | left half firmware |
-| `nice_nano_v2` | `corne_right nice_oled` | — | right half firmware |
-| `nice_nano_v2` | `settings_reset` | — | settings-reset image |
+| Board | Shield(s) | Extra | Artifact name |
+|-------|-----------|-------|---------------|
+| `nice_nano_v2` | `corne_left nice_oled` | `snippet: studio-rpc-usb-uart`, `cmake-args: -DCONFIG_ZMK_STUDIO=y` | `corne-left` |
+| `nice_nano_v2` | `corne_right nice_oled` | — | `corne-right` |
+| `nice_nano_v2` | `settings_reset` | — | `settings-reset` |
 
 - Pushing to the repo (or running the workflow manually) builds these via GitHub
   Actions; download the resulting **`.uf2`** artifacts from the Actions run.
@@ -231,7 +286,8 @@ targets, all on `nice_nano_v2`:
   talk to ZMK Studio. The right half relies on the global `CONFIG_ZMK_STUDIO=y`
   from `corne.conf`.
 - The **`settings_reset`** artifact clears persisted ZMK settings (layers,
-  bluetooth bonds, etc.) — useful if a bad Studio edit or setting gets stuck.
+  bluetooth bonds, etc.) — the recovery path if a bad Studio edit or setting gets
+  stuck.
 
 ---
 
@@ -253,20 +309,19 @@ binding macros, so they do not obscure the actual key bindings in this keymap.
 ## 11. Safe editing & flashing guidance
 
 1. **Edit the keymap** in `config/corne.keymap` (or via the Keymap Editor / ZMK
-   Studio). Keep a copy of the last-known-good keymap before changing it.
+   Studio). Keep a copy of the last-known-good keymap before changing it. The
+   Git-tracked file is canonical; Studio edits are experimental overlays.
 2. **Build** by pushing/running GitHub Actions; download the `.uf2` artifacts
-   (left, right) from the Actions run.
+   (`corne-left`, `corne-right`) from the Actions run.
 3. **Flash** each half:
    - Put the half into bootloader mode (double-tap the reset button, or use the
-     `bootloader` key present on the NAVIGATION and NUM layers), then copy the
-     matching `.uf2` onto the mounted `NICENANO` drive.
+     `bootloader` key on the ADJUST layer), then copy the matching `.uf2` onto
+     the mounted `NICENANO` drive.
    - Alternatively, use **ZMK Studio** (left half) for live edits without
      reflashing — note Studio changes persist to settings, so use the
-     `settings_reset` artifact if you need a clean slate.
-4. **Recover** with `settings_reset` if settings or a Studio edit misbehave.
-
-> The README's existing note about downloading firmware from Actions (and the
-> keymap-editor link) remains the canonical quick-start; this guide expands on it.
+     `settings-reset` artifact if you need a clean slate.
+4. **Recover** with `settings-reset` if settings or a Studio edit misbehave, or
+   after a layer renumbering migration (it also clears Bluetooth bonds).
 
 ---
 
@@ -277,20 +332,19 @@ binding macros, so they do not obscure the actual key bindings in this keymap.
   replace the file.
 - Where a keymap uses **macros or includes** that could obscure a binding, do not
   guess — open the file and trace the definition. In this repository the active
-  bindings are written out explicitly (`&kp`, `&lt`, `&sk`, `&bhm`, `&msc`,
-  `&mmv`, `&mkp`, `&to`, `&trans`, `&bootloader`, `&bt`, `&out`, `&ext_power`);
+  bindings are written out explicitly (`&kp`, `&lt`, `&sk`, `&mo`, `&to`,
+  `&msc`, `&mmv`, `&mkp`, `&trans`, `&bootloader`, `&bt`, `&out`, `&ext_power`);
   the only includes are label/unicode helpers that do not change bindings.
-- Layer indices in `&lt`/`&to` are **0-based** and correspond to the table in §2.
+- Layer indices in `&lt`/`&to` are **0-based** and correspond to the named
+  constants (`L_BASE`…`L_ADJUST`) and the table in §2.
 
 ---
 
-## 13. Future AeroSpace WM integration — not in firmware
+## 13. Corne HOST → AeroSpace integration (implemented)
 
-A future enhancement may map Corne keys (e.g. `F13`–`F20`) to macOS
-[AeroSpace](https://nikitabobko.github.io/AeroSpace/) workspace/action bindings.
-**This is not implemented in the firmware.** No `F13`–`F20` mappings exist in
-`config/corne.keymap` today, and the AeroSpace configuration lives entirely in
-the user's `~/.config/aerospace/aerospace.toml` (see
-[docs/macos-aerospace.md](docs/macos-aerospace.md)). Any such integration would
-require a separate firmware/keymap change and is out of scope for this
-documentation.
+The HOST layer (7) is **implemented in firmware** and bridges to macOS
+AeroSpace. It emits `F13`–`F20` and `Option+H/J/K/L` from the BASE physical
+H/J/K/L positions; AeroSpace binds those keys directly (see
+[docs/macos-aerospace.md](docs/macos-aerospace.md)). No `Alt-1`-style
+intermediate mapping is used on the Corne side — the keyboard sends the F-keys
+and AeroSpace binds them directly.
