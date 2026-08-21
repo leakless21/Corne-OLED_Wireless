@@ -2,9 +2,9 @@ manifest:
   remotes:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
-    # LVGL 9-compatible community fork; remove when upstream merges its migration.
-    - name: chyuuu
-      url-base: https://github.com/chyuuu
+    # Full LVGL 9 migration fork; remove when upstream merges its migration.
+    - name: tokyo2006
+      url-base: https://github.com/tokyo2006
     - name: urob
       url-base: https://github.com/urob
   projects:
@@ -14,8 +14,8 @@ manifest:
       import: app/west.yml
     # support nice_oled and nice_epaper
     - name: zmk-nice-oled
-      remote: chyuuu
-      revision: d730da13b8eb6f9506d55d3043c6fd9f4a501923
+      remote: tokyo2006
+      revision: de5b2afbd05f1a136e31ca28659373cd07d1e443
     - name: zmk-helpers
       remote: urob
       revision: 95edb8f15ef1d1bd8332810555f8cf5837fbdd27
