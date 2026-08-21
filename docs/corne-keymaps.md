@@ -26,22 +26,22 @@
 
 The keymap defines exactly **eleven** layers. ZMK layers are **0-indexed**, and the
 indices below are **named constants** in `config/corne.keymap`
-(`L_BASE`, `L_NAV`, … `L_GAME_NUM`). The `&lt N` / `&mo N` / `&to N` numbers in the keymap
+(`L_BASE`, `L_NAV`, … `L_GAME_AUX`). The `&lt N` / `&mo N` / `&to N` numbers in the keymap
 refer to these indices:
 
 | Index | Layer name (`label` / `display-name`) | Purpose |
 |-------|----------------------------------------|---------|
 | 0 | `BASE` | Primary Colemak-DH layer with bilateral home-row modifiers, LM5 momentary MEDIA, and six thumb layer-taps. |
-| 1 | `NAV` | macOS Cmd clipboard, Caps Lock, cursor navigation, line/page navigation, and explicit editing thumbs. |
+| 1 | `NAV` | macOS Cmd clipboard, Caps Lock, cursor navigation, line/page navigation, explicit editing thumbs, and same-side left bootloader (`LT5`). |
 | 2 | `MOUSE` | NAV-aligned pointer movement and scrolling, left modifiers, clipboard, MB4/MB5 side buttons, and thumb clicks. |
 | 3 | `MEDIA` | NAV-aligned previous/volume/next controls with right-thumb stop/play/mute controls. |
-| 4 | `NUM` | Standard spatial numpad and punctuation on the left, mirrored modifiers on the right. |
+| 4 | `NUM` | Standard spatial numpad and punctuation on the left, mirrored modifiers on the right, and same-side right bootloader (`RT5`). |
 | 5 | `SYM` | Shifted NUM geometry with direct programming symbols on the thumbs. |
 | 6 | `FUN` | NUM-aligned F-key grid with mirrored modifiers and App/Space/Tab thumbs. |
 | 7 | `HOST` | Host-agnostic F13–F20 workspace protocol, move-to-workspace, and Ctrl+F directional signals. |
-| 8 | `GAME` | Full plain tap-only QWERTY for gaming; entered from ADJUST and exited explicitly. |
-| 9 | `ADJUST` | Conditional device administration plus the deliberate GAME entry. |
-| 10 | `GAME_NUM` | Momentary top-row numbers (1–0) over GAME, falling through to tap-only QWERTY. |
+| 8 | `GAME` | Full plain tap-only QWERTY for gaming; dedicated left-hand Esc/AUX hold-tap, momentary RH1 AUX, and protected exit. |
+| 9 | `ADJUST` | Conditional device administration, mirrored reset/bootloader, plus deliberate GAME entry. |
+| 10 | `GAME_AUX` | Auxiliary gaming layer over GAME: numbers 1–0, F1–F10, missing symbols, and deliberate exit to BASE (`RH2`). |
 > **`BUTTON` is gone.** The previous `BUTTON` layer (index 3) was removed in
 > the earlier migration; `MEDIA` now occupies index 3 and the remaining layer
 > numbers are persisted in ZMK state. If a device still has stale Studio
@@ -112,12 +112,16 @@ key is held. The BASE-layer layer-taps map to these layers:
 
 The **HOST** layer (7) is engaged directly by holding the `TAB` thumb (`LH0`).
 
-The **GAME** layer (8) is a persistent `&to` switch entered from ADJUST.
-Holding `RH1` while on GAME momentarily activates **GAME_NUM** (10) for numbers
-1–0 on the top alpha row. Exit GAME via the right outer thumb `&to L_BASE`.
+The **GAME** layer (8) is a persistent `&to` switch entered deliberately from
+ADJUST. While on GAME, **GAME_AUX** (10) can be engaged from either hand:
+- **Left-hand mouse gaming:** Hold top-left `Escape` (`&game_aux_lt L_GAME_AUX ESCAPE`) + `Q`/`W`/`E`/`R`/`T` for numbers `1`–`5`.
+- **Two-handed access:** Hold right-middle thumb `RH1` (`&mo L_GAME_AUX`) + top row for numbers `1`–`0`.
+
+To prevent accidental exits during gameplay, GAME has no naked single-key exit;
+exit to BASE is protected behind **`GAME_AUX` + right outer thumb (`RH2`)** (`&to L_BASE`).
+
 The **ADJUST** layer (9) is conditional: it activates automatically when both
 NAV (1) and NUM (4) are held simultaneously.
-
 Functional layers use explicit `&none` for unused positions and explicit
 single-action thumb bindings. `&trans` is not used in the functional layer
 thumbs, so a held Backspace or other editor key cannot inherit a BASE
@@ -145,6 +149,26 @@ The firmware emits semantic protocol keys. AeroSpace, GlazeWM, or another host
 adapter assigns their meaning. The macOS adapter also keeps ordinary
 Option+H/J/K/L for the laptop keyboard.
 ---
+
+### 3.4 GAME and GAME_AUX layouts
+
+```text
+GAME (Layer 8)
+
+ESC/AUX  Q      W      E      R      T   |  Y      U      I      O      P      BSPC
+TAB      A      S      D      F      G   |  H      J      K      L      ;      ENTER
+SHIFT    Z      X      C      V      B   |  N      M      ,      .      /      SHIFT
+                CTRL   SPACE  ALT        |  ENTER  AUX    _
+```
+
+```text
+GAME_AUX (Layer 10)
+
+_        1      2      3      4      5   |  6      7      8      9      0      _
+_        F1     F2     F3     F4     F5  |  F6     F7     F8     F9     F10    _
+_        `      -      =      [      ]   |  _      _      _      _      _      _
+                _      _      _          |  _      _      BASE
+```
 
 ## 4. Home-row modifiers (two side-aware balanced behaviors)
 
@@ -251,6 +275,27 @@ host_lt: host_lt {
 - **No `quick-tap-ms` or `require-prior-idle-ms`** is set, so HOST can be entered
   immediately after typing without timing lockouts.
 ---
+
+### 6.2 GAME Esc/AUX hold-tap (`&game_aux_lt`)
+
+GAME uses a dedicated hold-tap on the top-left `Escape` position (`LT5`) designed
+specifically for rapid chord resolution during mouse + keyboard gaming:
+
+```devicetree
+game_aux_lt: game_aux_lt {
+    compatible = "zmk,behavior-hold-tap";
+    #binding-cells = <2>;
+    flavor = "hold-preferred";
+    tapping-term-ms = <200>;
+    bindings = <&mo>, <&kp>;
+};
+```
+
+- **`flavor = "hold-preferred"`**: Pressing another key while Escape is held
+  immediately resolves as hold (`&mo L_GAME_AUX`), sending numbers (e.g. `Esc + Q` → `1`)
+  without sending an accidental Escape tap.
+- **Tapping Escape** alone (press and release) reliably sends `Escape`.
+- Independent of opposite-hand triggers, home-row-mod timing, or idle requirements.
 
 ## 7. Pointing features
 
@@ -369,7 +414,11 @@ references:
 2. **Build** by pushing/running GitHub Actions; download the `.uf2` artifacts
    (`corne-left`, `corne-right`).
 3. **Flash** each half with its matching artifact. Put the half into bootloader
-   mode using double-tap reset or its source-local ADJUST `&bootloader` binding.
+   mode using:
+   - **Convenient firmware shortcuts:** `NAV` + left outer/top key (`LT5`) for left half;
+     `NUM` + right outer/top key (`RT5`) for right half.
+   - **Administrative layer:** `ADJUST` + mirrored `&bootloader` bindings.
+   - **Guaranteed standalone recovery:** double-tap the physical reset button on the individual nice!nano.
 4. **Recover Studio divergence** with Studio's **Restore Stock Settings** first,
    then flash the normal firmware. This preserves Bluetooth bonds.
 5. **Use `settings-reset` only for full recovery.** It clears persisted settings,

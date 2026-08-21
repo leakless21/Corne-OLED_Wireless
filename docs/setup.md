@@ -125,16 +125,16 @@ be assembled or connected to the other half during flashing.
 
 1. **Connect the left half** to your computer with a USB-C cable.
 
-2. **Put the nice\_nano\_v2 into bootloader mode.** There are a few ways:
-   - **Quickly double-press the reset button** on the nice\_nano\_v2 board. The
-     board enters its UF2 bootloader.
-   - **For a bare controller** (no reset button wired to a key): briefly short the
-     RST pin to GND twice in quick succession.
-   - **Use the firmware:** hold ADJUST (NAV + NUM) and press the left-half
-     `&bootloader` binding to flash the left controller, or the mirrored
-     right-half `&bootloader` binding to flash the right controller. Reset and
-     bootloader behaviors are source-specific on split keyboards.
-
+2. **Put the nice\_nano\_v2 into bootloader mode.** Choose the appropriate method:
+   - **Convenient firmware shortcuts (software):**
+     - **Left controller:** Hold `NAV` thumb (`LH1`) and press the left outer/top key (`LT5`).
+     - **Right controller:** Hold `NUM` thumb (`RH1`) and press the right outer/top key (`RT5`).
+   - **Administrative layer (software fallback):** Hold `ADJUST` (`NAV` + `NUM`) and press the
+     left-half `&bootloader` binding (`LT5`) or right-half `&bootloader` binding (`RT5`).
+   - **Guaranteed standalone recovery (hardware):** Quickly double-press the physical reset button
+     on the individual nice\_nano\_v2 board (or short RST to GND twice for bare controllers).
+     *Note:* This hardware procedure is the **only** recovery route guaranteed to work when a half
+     cannot participate in the split connection, has broken keymap firmware, or is completely isolated.
 3. **A removable USB drive appears** on your computer. The drive is typically
    named `NICENANO`, though the name can vary depending on the bootloader
    version.
@@ -185,8 +185,8 @@ keyboard will not function normally until normal firmware is restored.
 ### How to use it
 
 1. Download `settings-reset.uf2` from the GitHub Actions artifacts.
-2. Put the half into bootloader mode (double-tap reset, or use `&bootloader`
-   on ADJUST if the current firmware is still functional).
+2. Put the half into bootloader mode (use the convenient `NAV`/`NUM` same-side shortcuts,
+   `ADJUST` `&bootloader`, or double-tap physical reset if keymap is unresponsive).
 3. Copy `settings-reset.uf2` onto the bootloader drive. The board reboots.
 4. Repeat for the other half.
 5. Re-flash the matching normal firmware on both halves.

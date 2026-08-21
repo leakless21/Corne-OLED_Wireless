@@ -72,7 +72,9 @@ RH2 (right outer):  tap Delete     hold FUN
 - Thumb bindings on functional layers are explicit single actions. They MUST
   NOT use transparent fall-through when that would inherit BASE layer-taps.
 - Unused positions are `&none`. `&trans` is reserved for intentional fall-through
-  documented beside the binding (e.g. GAME_NUM falling through to GAME).
+  documented beside the binding (e.g. GAME_AUX falling through to GAME).
+- Same-side bootloader access: `NAV` carries the left controller bootloader at `LT5`;
+  `NUM` carries the right controller bootloader at `RT5`. `ADJUST` retains mirrored fallback controls.
 - HOST emits semantic high-function-key signals. Host configuration decides
   whether those signals mean AeroSpace, GlazeWM, or another window manager.
 - ADJUST is the only layer for destructive or device-management actions; Bluetooth
@@ -82,15 +84,15 @@ RH2 (right outer):  tap Delete     hold FUN
 | Layer | Left-hand role | Right-hand role | Explicit thumb role |
 | --- | --- | --- | --- |
 | BASE | Colemak-DH and HRMs; LM5 holds MEDIA | Colemak-DH and HRMs | Six layer-taps (MOUSE, NAV, HOST, SYM, NUM, FUN) |
-| NAV | Cmd/Alt/Ctrl/Shift | Caps Lock, clipboard, cursor, line/page | Esc/Space/Tab and Enter/Bspc/Delete |
+| NAV | Cmd/Alt/Ctrl/Shift; `LT5` left bootloader | Caps Lock, clipboard, cursor, line/page | Esc/Space/Tab and Enter/Bspc/Delete |
 | MOUSE | Cmd/Alt/Ctrl/Shift | MB4 (Back), MB5 (Fwd), clipboard, pointer, scroll | Right/left/middle click |
 | MEDIA | Cmd/Alt/Ctrl/Shift | Prev, volume, next | Stop/play/pause/mute (right thumbs only) |
-| NUM | Numpad geometry | Shift/Ctrl/Alt/Cmd | `.`, `0`, `-` |
+| NUM | Numpad geometry | Shift/Ctrl/Alt/Cmd; `RT5` right bootloader | `.`, `0`, `-` |
 | SYM | Shifted NUM geometry | Shift/Ctrl/Alt/Cmd | `(`, `)`, `_` |
 | FUN | F-key geometry | Shift/Ctrl/Alt/Cmd | App, Space, Tab |
 | HOST | Workspace focus (home) & move (top) | Directional focus (home) & move (bottom) | Fullscreen, Previous WS, Float (right thumbs) |
-| GAME | Plain tap-only QWERTY | Plain tap-only QWERTY | Ctrl/Space/Alt and Enter/GAME_NUM/Base |
-| GAME_NUM | Numbers 1–5 (top row) | Numbers 6–0 (top row) | Fall-through to GAME (`&trans`) |
+| GAME | Plain tap-only QWERTY; `LT5` Esc/AUX hold-tap | Plain tap-only QWERTY | Ctrl/Space/Alt and Enter/AUX/transparent |
+| GAME_AUX | Numbers 1–5, F1–F5, symbols (`` ` ``, `-`, `=`, `[`, `]`) | Numbers 6–0, F6–F10 | Fall-through to GAME, RH2 exits to BASE |
 | ADJUST | Bluetooth in core (`LM4`–`LM0`), power/reset | Output/power/reset/GAME entry | None |
 
 ## HOST protocol

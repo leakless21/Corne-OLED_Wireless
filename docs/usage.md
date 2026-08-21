@@ -50,8 +50,8 @@ the **MEDIA** layer (`&mo L_MEDIA`).
 | **NUM** | Hold right-backspace thumb (`RH1`) | Standard spatial numpad and punctuation on the left; Shift/Ctrl/Alt/Cmd on the right. |
 | **SYM** | Hold right-enter thumb (`RH0`) | Shifted NUM geometry with `(`, `)`, and `_` on the left thumbs. |
 | **FUN** | Hold right-delete thumb (`RH2`) | NUM-aligned F1–F12 grid with mirrored modifiers and App/Space/Tab thumbs. |
-| **GAME** | Hold NAV + NUM, then press GAME in ADJUST | Full plain tap-only QWERTY for gaming; hold RH1 for numbers. Exit via right outer `&to L_BASE`. |
-| **GAME_NUM** | Hold right-middle thumb (`RH1`) while in GAME | Momentary top-row numbers 1–0 over tap-only QWERTY. |
+| **GAME** | Hold NAV + NUM, then press GAME in ADJUST | Full plain tap-only QWERTY for gaming; hold Esc or RH1 for auxiliary keys. Exit via GAME_AUX + right outer thumb (`RH2`). |
+| **GAME_AUX** | Hold GAME `Esc` (left hand) or `RH1` (two-handed) | Auxiliary gaming numbers 1–0, F1–F10, missing symbols, and deliberate exit to BASE (`RH2`). |
 | **ADJUST** | Hold NAV + NUM simultaneously | Five Bluetooth profiles in core (`LM4`–`LM0`), output/power state, mirrored reset/bootloader, and deliberate GAME entry. |
 > **Verify, don't assume.** Exact positions live in `config/corne.keymap`;
 > shared physical rules are recorded in [layout-principles.md](layout-principles.md).
@@ -68,6 +68,22 @@ organized strictly by usage frequency:
 5. **Move window directionally**: Hold `Tab` + press right bottom direction (`K`/`H`/`,`/`.` columns → Move `←`, `↓`, `↑`, `→`).
 6. **Context actions**: Hold `Tab` + right inner thumb `RH0` (Fullscreen), right outer thumb `RH2` (Float/tile), right top `RT1` (Resize mode), or `RT5` (Esc).
 
+
+### Daily GAME & GAME_AUX workflow
+
+1. **Enter GAME:** Hold `NAV` (`LH1`) + `NUM` (`RH1`) to enter ADJUST, then press `GAME` (`RT3`).
+2. **Left-hand mouse gaming (numbers 1–5):** Hold top-left `Escape` (`LT5`) with your left hand:
+   - `Esc` + `Q` → `1`
+   - `Esc` + `W` → `2`
+   - `Esc` + `E` → `3`
+   - `Esc` + `R` → `4`
+   - `Esc` + `T` → `5`
+   - Tapping `Escape` alone still sends standard `Escape`.
+3. **Two-handed gaming access (numbers 1–0, F-keys, symbols):**
+   - Hold right-middle thumb `RH1` to access numbers `1`–`0` on the top row.
+   - Home row provides `F1`–`F10`.
+   - Left bottom row provides `` ` ``, `-`, `=`, `[`, `]`.
+4. **Exit GAME deliberately:** Hold `Escape` or `RH1` (to engage `GAME_AUX`), then tap the **right outer thumb (`RH2`)** to switch back to `BASE`. Naked thumb presses on GAME will not accidentally exit gaming mode.
 ---
 
 ## 2. Bluetooth & device use
@@ -179,14 +195,15 @@ After flashing a firmware change, run through this compact checklist:
   home-row workspace focus (F13–F17), top-row move-to-workspace (Shift-F13–F17),
   right-home focus (Ctrl-F13–F16), right-bottom move (Ctrl-Shift-F13–F16),
   right-thumb Previous WS (F18), Fullscreen (F19), Float (F20), and Resize (Shift-F18).
-- [ ] **GAME & GAME_NUM** — enter GAME from ADJUST; confirm full QWERTY with
-  Space on LH1; hold RH1 to test numbers 1–0 on top alpha row; exit via right outer `&to L_BASE`.
+- [ ] **GAME & GAME_AUX** — enter GAME from ADJUST; confirm full QWERTY with
+  Space on LH1; test left-hand `Esc + Q/W/E/R/T` (1–5) and tap `Esc`; test RH1 + top row (1–0),
+  home row (F1–F10), and bottom row punctuation; confirm ordinary right outer thumb does NOT exit;
+  confirm `GAME_AUX` + right outer thumb exits to BASE.
 - [ ] **OLED and power** — confirm the status screen renders on both halves,
   blanks after idle, and wakes; characterize deep-sleep reconnect behavior.
-- [ ] **Recovery path** — confirm left/right ADJUST bootloader/reset bindings
-  affect the intended half; use Studio Restore Stock Settings before
-  `settings-reset`.
-
+- [ ] **Recovery and bootloader paths** — confirm same-side firmware bootloader shortcuts
+  (`NAV` + `LT5` for left half; `NUM` + `RT5` for right half); confirm ADJUST mirrored bindings;
+  verify hardware double-tap reset recovery on nice!nano.
 ---
 
 ## 6. AeroSpace-only workflow note
