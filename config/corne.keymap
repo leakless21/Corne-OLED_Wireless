@@ -134,7 +134,7 @@
                 &none            &none             &none             &none             &none             &none
                 &kp LS(LG(Z))    &kp LG(V)         &kp LG(C)         &kp LG(X)         &kp LG(Z)         &none
                 &none            &kp LGUI          &kp LALT          &kp LCTRL         &kp LEFT_SHIFT    &none
-                &kp CAPS_LOCK    &kp LEFT          &kp DOWN_ARROW     &kp UP_ARROW      &kp RIGHT         &none
+                &kp CAPSLOCK     &kp LEFT          &kp DOWN_ARROW     &kp UP_ARROW      &kp RIGHT         &none
                 &none            &none             &none             &none             &none             &none
                 &kp INSERT       &kp HOME          &kp PAGE_DOWN     &kp PAGE_UP       &kp END           &none
                 &kp ESCAPE       &kp SPACE        &kp TAB            &kp ENTER         &kp BACKSPACE     &kp DELETE
