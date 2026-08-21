@@ -83,7 +83,7 @@
          * require-prior-idle: HOST must engage reliably immediately after
          * ordinary typing.
          */
-        host_lt {
+        host_lt: host_lt {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
             flavor = "balanced";

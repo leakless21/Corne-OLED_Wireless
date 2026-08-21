@@ -13,7 +13,7 @@ layers:
   - Y
   - ''''
   - BACKSPACE
-  - TAB
+  - MEDIA
   - {t: A, h: LMETA}
   - {t: R, h: LEFT ALT}
   - {t: S, h: LCTRL}
@@ -37,9 +37,9 @@ layers:
   - .
   - /
   - RIGHT SHIFT
-  - {t: ESCAPE, h: MEDIA}
+  - {t: ESCAPE, h: MOUSE}
   - {t: SPACE, h: NAV}
-  - {t: TAB, h: MOUSE}
+  - {t: TAB, h: HOST}
   - {t: ENTER, h: SYM}
   - {t: BACKSPACE, h: NUM}
   - {t: DELETE, h: FUN}
@@ -62,12 +62,11 @@ layers:
   - LCTRL
   - LEFT SHIFT
   - ''
-  - ''
+  - CAPS LOCK
   - LEFT
   - DOWN ARROW
   - UP ARROW
   - RIGHT
-  - ''
   - ''
   - ''
   - ''
@@ -80,6 +79,7 @@ layers:
   - PAGE DOWN
   - PAGE UP
   - END
+  - ''
   - ESCAPE
   - {t: SPACE, type: held}
   - TAB
@@ -105,12 +105,12 @@ layers:
   - LCTRL
   - LEFT SHIFT
   - ''
-  - Back button
+  - Back
   - Pointer ←
   - Pointer ↓
   - Pointer ↑
   - Pointer →
-  - Forward button
+  - Forward
   - ''
   - ''
   - ''
@@ -123,9 +123,9 @@ layers:
   - Scroll ↑
   - Scroll →
   - ''
-  - ''
-  - ''
   - {type: held}
+  - ''
+  - ''
   - Right click
   - Left click
   - Middle click
@@ -142,7 +142,7 @@ layers:
   - ''
   - ''
   - ''
-  - ''
+  - {type: held}
   - LGUI
   - LALT
   - LCTRL
@@ -166,12 +166,12 @@ layers:
   - ''
   - ''
   - ''
-  - {type: held}
+  - ''
+  - ''
   - ''
   - Stop
   - Play/Pause
   - Mute
-  - ''
   NUM:
   - ''
   - '['
@@ -302,24 +302,24 @@ layers:
   - ''
   - {type: held}
   HOST:
-  - {type: held}
-  - WEB
-  - DEV
-  - COMMS
-  - RUN
-  - AUX
-  - ''
-  - Resize mode
-  - Prev WS
-  - Fullscreen
-  - Float
-  - {t: ESCAPE, type: held}
   - ''
   - Move→WEB
   - Move→DEV
   - Move→COMMS
   - Move→RUN
   - Move→AUX
+  - ''
+  - Resize
+  - ''
+  - ''
+  - ''
+  - ESCAPE
+  - ''
+  - WEB
+  - DEV
+  - COMMS
+  - RUN
+  - AUX
   - ''
   - Focus ←
   - Focus ↓
@@ -338,12 +338,12 @@ layers:
   - Move ↑
   - Move →
   - ''
-  - ENTER
-  - SPACE
-  - TAB
   - ''
   - ''
-  - ''
+  - {type: held}
+  - Fullscreen
+  - Previous WS
+  - Float
   GAME:
   - ESCAPE
   - Q
@@ -382,10 +382,10 @@ layers:
   - /
   - RIGHT SHIFT
   - LCTRL
-  - LALT
   - SPACE
+  - LALT
   - ENTER
-  - RCTRL
+  - GAME_NUM
   - {t: BASE, h: toggle}
   ADJUST:
   - '&bootloader'
@@ -400,6 +400,7 @@ layers:
   - {t: GAME, h: toggle}
   - '&sys_reset'
   - '&bootloader'
+  - ''
   - {t: BT, h: '0'}
   - {t: BT, h: '1'}
   - {t: BT, h: '2'}
@@ -424,13 +425,51 @@ layers:
   - ''
   - ''
   - ''
-  - ''
   - {type: held}
   - ''
   - ''
   - {type: held}
   - ''
-combos:
-- p: [0, 11]
-  k: HOST
-  l: [BASE]
+  GAME_NUM:
+  - {t: ▽, type: trans}
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  - '8'
+  - '9'
+  - '0'
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {type: held}
+  - {t: ▽, type: trans}
