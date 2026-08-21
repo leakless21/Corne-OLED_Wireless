@@ -1,10 +1,13 @@
-# Setup & Usage Guide
+# Setup & Recovery Guide
 
-> **Scope.** This guide walks you through editing the ZMK keymap, building
-> firmware via GitHub Actions, flashing both halves of the Corne, recovering
-> from bad settings, and re-pairing Bluetooth. It does **not** cover local
-> builds or AeroSpace configuration (see
-> [docs/macos-aerospace.md](macos-aerospace.md) for the latter).
+> **For daily keyboard use and the firmware change workflow**, see
+> [docs/usage.md](usage.md).
+
+> **Scope.** This guide covers the initial setup: first flash of both halves
+> of the Corne, recovery via settings-reset, and Bluetooth re-pairing. It does
+> **not** cover day-to-day layer usage or the complete firmware iteration workflow.
+> See [docs/usage.md](usage.md) for those, and
+> [docs/macos-aerospace.md](macos-aerospace.md) for AeroSpace configuration.
 
 ---
 

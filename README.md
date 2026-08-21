@@ -7,8 +7,9 @@ controllers with **nice\_oled** displays. The GitHub Actions workflow builds
 ## Quick Start
 
 1. Fork / clone this repo.
-2. Edit `config/corne.keymap` (see [docs/setup.md](docs/setup.md) for a full
-   walkthrough, including how to flash, recover, and re-pair Bluetooth).
+2. Edit `config/corne.keymap` (see [docs/setup.md](docs/setup.md) for first
+   flash, recovery, and Bluetooth re-pairing; [docs/usage.md](docs/usage.md)
+   for daily use and the firmware change workflow).
 3. Push — GitHub Actions builds `corne-left.uf2`, `corne-right.uf2`, and
    `settings-reset.uf2`, then merges them into a single downloadable
    `firmware` archive (`.zip`) on the Actions run.
@@ -29,7 +30,8 @@ controllers with **nice\_oled** displays. The GitHub Actions workflow builds
 
 | Guide | What it covers |
 |-------|---------------|
-| [docs/setup.md](docs/setup.md) | End-to-end setup: editing the keymap, GitHub Actions builds, first flash, recovery / settings-reset, Bluetooth re-pairing, ZMK Studio caveats. |
+| [docs/setup.md](docs/setup.md) | Initial setup: first flash of both halves, recovery / settings-reset, Bluetooth re-pairing. |
+| [docs/usage.md](docs/usage.md) | Daily use & development workflow: layers, Bluetooth profiles, ZMK Studio, firmware change workflow, smoke-test checklist, decision table. |
 | [docs/corne-keymaps.md](docs/corne-keymaps.md) | Keymap & layers reference: all 10 layers, home-row mods, sticky keys, layer-taps, pointing, OLED/ZMK Studio settings. |
 | [docs/macos-aerospace.md](docs/macos-aerospace.md) | macOS AeroSpace tiling-window-manager guide: the Corne HOST/F13–F20 bridge, workspace bindings, app routing, install, and troubleshooting. |
 
