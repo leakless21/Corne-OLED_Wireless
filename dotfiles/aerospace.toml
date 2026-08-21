@@ -36,7 +36,8 @@ alt-shift-3 = 'move-node-to-workspace COMMS; workspace COMMS'
 alt-shift-4 = 'move-node-to-workspace RUN; workspace RUN'
 alt-shift-5 = 'move-node-to-workspace AUX; workspace AUX'
 
-# Corne HOST F13-F20 bridge.
+# Corne HOST semantic protocol. Firmware emits high-function-key signals;
+# this adapter assigns their meaning. The laptop bindings below stay Option+HJKL.
 f13 = 'workspace WEB'
 f14 = 'workspace DEV'
 f15 = 'workspace COMMS'
@@ -47,11 +48,24 @@ shift-f14 = 'move-node-to-workspace DEV; workspace DEV'
 shift-f15 = 'move-node-to-workspace COMMS; workspace COMMS'
 shift-f16 = 'move-node-to-workspace RUN; workspace RUN'
 shift-f17 = 'move-node-to-workspace AUX; workspace AUX'
+
+# Context and mode controls.
+shift-f18 = 'mode resize'
 f18 = 'workspace-back-and-forth'
 f19 = 'fullscreen'
 f20 = 'layout floating tiling'
 
-# Corne HOST right-hand spatial clusters and laptop fallbacks.
+# Semantic directional signals from the Corne HOST layer.
+ctrl-f13 = 'focus left'
+ctrl-f14 = 'focus down'
+ctrl-f15 = 'focus up'
+ctrl-f16 = 'focus right'
+ctrl-shift-f13 = 'move left'
+ctrl-shift-f14 = 'move down'
+ctrl-shift-f15 = 'move up'
+ctrl-shift-f16 = 'move right'
+
+# Laptop keyboard fallbacks.
 alt-h = 'focus left'
 alt-j = 'focus down'
 alt-k = 'focus up'
@@ -66,9 +80,11 @@ alt-shift-space = 'layout floating tiling'
 alt-tab = 'workspace-back-and-forth'
 
 [mode.resize.binding]
-h = 'resize width -50'
-j = 'resize height +50'
-k = 'resize height -50'
-l = 'resize width +50'
+# The Corne continues to emit Ctrl+F13..F16 in this mode; the semantic
+# direction signals are now interpreted as resize operations.
+ctrl-f13 = 'resize width -50'
+ctrl-f14 = 'resize height +50'
+ctrl-f15 = 'resize height -50'
+ctrl-f16 = 'resize width +50'
 enter = 'mode main'
 esc = 'mode main'

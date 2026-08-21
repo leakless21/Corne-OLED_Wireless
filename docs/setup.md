@@ -75,8 +75,9 @@ the visual [Keymap Editor](https://nickcoutsos.github.io/keymap-editor/)).
   sensitivity), edit the `&lt`, `&sk`, or `&mmv`/`&msc` property blocks near
   the top of the file.
 
-**After editing:** push to the repo (or open a PR) to trigger the build
-workflow.
+**After editing:** push to the repo or open a PR. Firmware input changes
+(`config/**`, `build.yaml`, board/shield sources, or the build workflow) trigger
+the build; documentation-only changes do not. Manual dispatch remains available.
 
 ---
 
@@ -84,10 +85,11 @@ workflow.
 
 ### How the build works
 
-The workflow (`.github/workflows/build.yml`) triggers on **push**, **pull
-request**, and **manual dispatch**. It calls the upstream ZMK build workflow,
-which reads `build.yaml` for the matrix and `config/west.yml` for dependency
-pins.
+The workflow (`.github/workflows/build.yml`) runs for firmware input changes on
+**push** or **pull request**, and also supports **manual dispatch**. Its
+concurrency group cancels superseded builds for the same ref. The workflow calls
+the upstream ZMK build workflow, which reads `build.yaml` for the matrix and
+`config/west.yml` for dependency pins.
 
 ### What gets built
 
@@ -153,48 +155,47 @@ be assembled or connected to the other half during flashing.
 
 ---
 
-## 6. Recovery & Settings Reset
+## 6. Recovery & settings reset
 
-If the keymap behaves unexpectedly — for example after a layer renumbering,
-a bad ZMK Studio edit, or corrupted Bluetooth bonds — use the
-**`settings-reset`** artifact.
+ZMK Studio stores runtime keymap overrides in persistent settings. If Studio
+diverges from the Git-tracked keymap, use the least-destructive recovery first:
+
+1. Open ZMK Studio while connected to the left half.
+2. Choose **Restore Stock Settings**.
+3. Flash the normal `corne-left.uf2` / `corne-right.uf2` firmware if needed.
+4. Re-test the keymap before clearing Bluetooth or split state.
+
+Restore Stock Settings clears Studio-specific settings without clearing
+Bluetooth bonds. Use the **`settings-reset`** artifact only when Studio restore
+fails, persisted device state is corrupted, or a full reset is intentional.
 
 ### What settings-reset does
 
 The `settings-reset` image is a **temporary firmware** — not a standalone
-utility that runs alongside your normal firmware. When flashed, it
-**replaces** the current firmware on the controller. On the next boot it:
+utility that runs alongside normal firmware. When flashed, it replaces the
+current firmware on the controller and erases persisted Zephyr/ZMK settings,
+including Bluetooth bond keys, split pairing information, output/power state,
+and Studio-edited overrides. It runs with BLE and the display disabled, wipes
+the settings partition, and halts.
 
-- **Erases all persisted Zephyr/ZMK settings**: Bluetooth bond keys, split
-  pairing information, output/power state, and any Studio-edited overrides.
-- Runs with **BLE and the display disabled**, so the board does not attempt to
-  advertise or render a status screen — it simply wipes the settings partition
-  and halts.
-
-Because it replaces the normal firmware, you **must reflash** with the
-appropriate `corne-left.uf2` or `corne-right.uf2` after running
-settings-reset on each half. The keyboard will not function normally until the
-normal firmware is restored.
+Because it replaces normal firmware, you **must reflash** the appropriate
+`corne-left.uf2` or `corne-right.uf2` after running it on each half. The
+keyboard will not function normally until normal firmware is restored.
 
 ### How to use it
 
 1. Download `settings-reset.uf2` from the GitHub Actions artifacts.
-2. Put the half into bootloader mode (double-tap reset, or use
-   `&bootloader` on the ADJUST layer if the current firmware is still
-   functional).
+2. Put the half into bootloader mode (double-tap reset, or use `&bootloader`
+   on ADJUST if the current firmware is still functional).
 3. Copy `settings-reset.uf2` onto the bootloader drive. The board reboots.
-4. **Repeat for the other half.**
-5. After both halves have been reset, **re-flash** with the correct firmware
-   (`corne-left.uf2` / `corne-right.uf2`). This is required — the keyboard
-   will not function normally until the normal firmware is restored.
-6. **Re-pair Bluetooth** (see §7).
+4. Repeat for the other half.
+5. Re-flash the matching normal firmware on both halves.
+6. Re-pair Bluetooth (see §7).
 
-> **When to use settings-reset:**
-> - After changing the number or order of layers in the keymap.
-> - After ZMK Studio edits that caused unexpected behavior.
-> - When Bluetooth connections are stuck or won't pair.
-> - As a clean-slate step before re-pairing all devices.
-
+> `OUT_USB` selects USB output explicitly. If the cable is connected to a
+> charger-only port, the keyboard may appear to stop typing because no usable
+> host is present. `EP_OFF` is also persistent; a peripheral or display that
+> stays blank after reboot may simply have external power disabled.
 ---
 
 ## 7. Bluetooth Re-pairing
@@ -230,35 +231,37 @@ needed.
 
 ## 8. ZMK Studio Caveats
 
-ZMK Studio is **enabled** in this configuration (`CONFIG_ZMK_STUDIO=y` in
-`config/corne.conf`). Studio allows live keymap editing without reflashing.
+ZMK Studio is **enabled** in this configuration (`CONFIG_ZMK_STUDIO=y`) and
+allows live keymap editing over USB-UART on the left half.
 
 ### What to know
 
-- **Studio edits persist to on-device settings**, not to the Git-tracked
-  `config/corne.keymap`. The file in Git is the **canonical** source of truth.
-  Studio changes can diverge from it.
-- **Studio locking is disabled** (`CONFIG_ZMK_STUDIO_LOCKING=n`), so the
-  keymap can be edited live without a lockout.
-- **Studio connects over USB-UART** on the left half (via the
-  `studio-rpc-usb-uart` snippet). The right half relies on the global config.
-- If Studio edits cause problems, **flash `settings-reset`** to clear all
-  persisted Studio overrides, then re-flash the standard firmware.
+- Studio edits persist to on-device settings, not to the Git-tracked
+  `config/corne.keymap`. The Git file remains the canonical source of truth.
+- **Restore Stock Settings** is the normal way to discard Studio overrides and
+  return to firmware-defined bindings.
+- `settings-reset` is the destructive fallback: it clears Studio overrides,
+  Bluetooth bonds, split state, output selection, and external-power state.
+- Studio connects over USB-UART on the left half via the
+  `studio-rpc-usb-uart` snippet; the right half relies on the global config.
 
 ### Practical recommendation
 
-Use Studio for quick experiments. For anything you want to keep, edit
-`config/corne.keymap` directly and commit the change. That way the keymap is
-version-controlled and reproducible.
+Use Studio for quick experiments. For durable changes, edit
+`config/corne.keymap` directly and commit it. When returning from Studio to Git
+firmware, use **Restore Stock Settings** before considering `settings-reset`.
 
 ---
 
 ## 9. Links to Other Guides
 
+- **Layout contract and physical invariants:**
+  [docs/layout-principles.md](layout-principles.md)
 - **Keymap & layers reference** (detailed layer-by-layer documentation):
   [docs/corne-keymaps.md](corne-keymaps.md)
-- **macOS AeroSpace setup** (the HOST/F13–F20 bridge, workspace bindings,
-  troubleshooting): [docs/macos-aerospace.md](macos-aerospace.md)
+- **macOS AeroSpace setup** (the semantic HOST bridge, workspace bindings,
+  troubleshooting):
+  [docs/macos-aerospace.md](macos-aerospace.md)
 
 ---
 

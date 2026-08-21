@@ -18,21 +18,18 @@ tiling-window-manager setup used alongside this repository, including the
 **In scope**
 
 - Documenting the canonical AeroSpace configuration: workspace layout, key
-  bindings (including F13–F20 / Shift-F13–F17), and per-app routing.
-- The Corne HOST bridge: how F13–F20 and Option+H/J/K/L emitted by the keyboard
-  map to AeroSpace workspaces and window actions.
-- Installation prerequisites (including the macOS Accessibility permission).
-- How to install, validate, back up, and roll back the repository-tracked config.
-- Useful CLI commands and troubleshooting.
+  bindings, semantic F13–F20 / modifier+F-key protocol, and per-app routing.
+- The Corne HOST bridge: how workspace, direction, move, and resize signals
+  map to AeroSpace.
+- Installation prerequisites, validation, backups, rollback, and troubleshooting.
 
 **Non-goals**
 
 - This guide does not ship or modify AeroSpace itself. Install it separately
   from the [official AeroSpace documentation](https://nikitabobko.github.io/AeroSpace/guide).
-- It does not modify ZMK firmware or the Corne keymap. Firmware changes are a
-  separate workflow (see the README and [docs/corne-keymaps.md](corne-keymaps.md)).
-- It does not prescribe a specific AeroSpace release. Follow the official
-  documentation for the version you have installed.
+- It does not modify ZMK firmware. Firmware changes are a separate workflow
+  documented in [docs/corne-keymaps.md](corne-keymaps.md).
+- It does not make the firmware encode macOS-specific Option+H/J/K/L chords.
 
 ---
 
@@ -229,12 +226,10 @@ Behavior notes:
 
 ---
 
-## 7. Corne HOST bridge: direct F13–F20 and spatial bindings
+## 7. Corne HOST bridge: semantic F13–F20 protocol
 
-The Corne **HOST** layer emits F13–F20, Shift-F13–F17, and Option+H/J/K/L.
-AeroSpace binds those keys **directly** — there is no Alt-1-style intermediate
-on the Corne side. The canonical `dotfiles/aerospace.toml` keeps the F-key
-protocol additive to the laptop Alt bindings above.
+The Corne **HOST** layer emits semantic high-function-key signals. AeroSpace
+assigns their meaning directly; the laptop keyboard remains ordinary QWERTY.
 
 ```toml
 # Workspace focus WEB/DEV/COMMS/RUN/AUX
@@ -244,40 +239,58 @@ f15 = 'workspace COMMS'
 f16 = 'workspace RUN'
 f17 = 'workspace AUX'
 
-# Move focused window to corresponding workspace and follow it
+# Move the focused window and follow it
 shift-f13 = 'move-node-to-workspace WEB; workspace WEB'
 shift-f14 = 'move-node-to-workspace DEV; workspace DEV'
 shift-f15 = 'move-node-to-workspace COMMS; workspace COMMS'
 shift-f16 = 'move-node-to-workspace RUN; workspace RUN'
 shift-f17 = 'move-node-to-workspace AUX; workspace AUX'
 
+# Context and resize mode
+shift-f18 = 'mode resize'
 f18 = 'workspace-back-and-forth'
 f19 = 'fullscreen'
 f20 = 'layout floating tiling'
 
-# Spatial focus/move controls emitted by HOST
-alt-h = 'focus left'
-alt-j = 'focus down'
-alt-k = 'focus up'
-alt-l = 'focus right'
-alt-shift-h = 'move left'
-alt-shift-j = 'move down'
-alt-shift-k = 'move up'
-alt-shift-l = 'move right'
+# Direction signals from HOST
+ctrl-f13 = 'focus left'
+ctrl-f14 = 'focus down'
+ctrl-f15 = 'focus up'
+ctrl-f16 = 'focus right'
+ctrl-shift-f13 = 'move left'
+ctrl-shift-f14 = 'move down'
+ctrl-shift-f15 = 'move up'
+ctrl-shift-f16 = 'move right'
 ```
 
-| Corne HOST key | AeroSpace binding | Action |
-|----------------|-------------------|--------|
+The direction geometry is shared with NAV and MOUSE:
+
+| Corne HOST signal | AeroSpace binding | Action |
+|-------------------|-------------------|--------|
 | `F13`–`F17` | `f13`–`f17` | Focus WEB/DEV/COMMS/RUN/AUX |
 | `Shift-F13`–`Shift-F17` | `shift-f13`–`shift-f17` | Move window + follow |
+| `Shift-F18` | `shift-f18` | Enter resize mode |
 | `F18` | `f18` | Previous workspace |
 | `F19` | `f19` | Fullscreen |
 | `F20` | `f20` | Toggle floating |
-| `Option+H/J/K/L` | `alt-h/j/k/l` | Spatial focus |
-| `Option+Shift+H/J/K/L` | `alt-shift-h/j/k/l` | Spatial move |
+| `Ctrl-F13`–`Ctrl-F16` | `ctrl-f13`–`ctrl-f16` | Focus left/down/up/right |
+| `Ctrl-Shift-F13`–`Ctrl-Shift-F16` | `ctrl-shift-f13`–`ctrl-shift-f16` | Move left/down/up/right |
 
-The firmware emits protocol keys; AeroSpace owns their meaning. The laptop
-keyboard remains standard QWERTY.
+Resize mode reuses `Ctrl-F13`–`Ctrl-F16`:
+
+```toml
+[mode.resize.binding]
+ctrl-f13 = 'resize width -50'
+ctrl-f14 = 'resize height +50'
+ctrl-f15 = 'resize height -50'
+ctrl-f16 = 'resize width +50'
+enter = 'mode main'
+esc = 'mode main'
+```
+
+The firmware protocol does not encode Option+H/J/K/L. Those remain separate
+laptop fallbacks in AeroSpace. A Windows/GlazeWM adapter can assign the same
+semantic F-key signals without changing firmware.
 
 ---
 
@@ -371,13 +384,16 @@ Alfred). Always prefer `--dry-run` before a real reload.
 - Remember only `cmd`/`alt`/`ctrl`/`shift` modifiers are valid; an unsupported
   modifier silently fails to bind.
 
-**Corne HOST keys (F13–F20) do nothing in AeroSpace**
+**Corne HOST keys do nothing in AeroSpace**
 
-- Confirm the keyboard is on the HOST layer (hold BASE outer `ESC` + `BACKSPACE`
-  to engage it — see [docs/corne-keymaps.md](corne-keymaps.md)).
-- Confirm the `f13`–`f20` / `shift-f13`–`shift-f17` bindings are present in
-  `~/.config/aerospace/aerospace.toml` and pass `aerospace reload-config --dry-run`.
-- Some macOS apps swallow F-keys; verify with a known-good app first.
+- Confirm the keyboard is on the HOST layer (hold BASE outer `ESC` +
+  `BACKSPACE` to engage it — see [docs/corne-keymaps.md](corne-keymaps.md)).
+- Confirm the semantic bindings (`f13`–`f20`, `shift-f13`–`shift-f18`,
+  `ctrl-f13`–`ctrl-f16`, and `ctrl-shift-f13`–`ctrl-shift-f16`) are present in
+  `~/.config/aerospace/aerospace.toml`.
+- Run `aerospace reload-config --dry-run` before applying changes.
+- Some macOS apps swallow F-keys or modifier+F-key events; verify with a
+  known-good app first.
 
 **Config edit broke things**
 

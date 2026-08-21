@@ -44,48 +44,48 @@ layers:
   - {t: BACKSPACE, h: NUM}
   - {t: DELETE, h: FUN}
   NAV:
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
+  - ''
+  - ''
+  - ''
+  - ''
+  - ''
+  - ''
   - Sft+Gui+Z
   - Gui+V
   - Gui+C
   - Gui+X
   - Gui+Z
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
+  - ''
+  - ''
   - LGUI
   - LALT
   - LCTRL
   - LEFT SHIFT
-  - {t: GAME, h: toggle}
-  - CAPS
+  - ''
+  - ''
   - LEFT
   - DOWN ARROW
   - UP ARROW
   - RIGHT
-  - CONTEXT MENU
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
+  - ''
+  - ''
+  - ''
+  - ''
+  - ''
+  - ''
+  - ''
+  - ''
   - INSERT
   - HOME
   - PAGE DOWN
   - PAGE UP
   - END
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {type: held}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
+  - ESCAPE
+  - {t: SPACE, type: held}
+  - TAB
+  - ENTER
+  - BACKSPACE
+  - DELETE
   MOUSE:
   - ''
   - ''
@@ -93,10 +93,54 @@ layers:
   - ''
   - ''
   - ''
-  - '&msc SCRL_LEFT'
-  - '&msc SCRL_DOWN'
-  - '&msc SCRL_UP'
-  - '&msc SCRL_RIGHT'
+  - Sft+Gui+Z
+  - Gui+V
+  - Gui+C
+  - Gui+X
+  - Gui+Z
+  - ''
+  - ''
+  - LGUI
+  - LALT
+  - LCTRL
+  - LEFT SHIFT
+  - ''
+  - Back button
+  - Pointer ←
+  - Pointer ↓
+  - Pointer ↑
+  - Pointer →
+  - Forward button
+  - ''
+  - ''
+  - ''
+  - ''
+  - ''
+  - ''
+  - ''
+  - Scroll ←
+  - Scroll ↓
+  - Scroll ↑
+  - Scroll →
+  - ''
+  - ''
+  - ''
+  - {type: held}
+  - Right click
+  - Left click
+  - Middle click
+  MEDIA:
+  - ''
+  - ''
+  - ''
+  - ''
+  - ''
+  - ''
+  - ''
+  - ''
+  - ''
+  - ''
+  - ''
   - ''
   - ''
   - LGUI
@@ -105,54 +149,10 @@ layers:
   - LEFT SHIFT
   - ''
   - ''
-  - '&mkp MB5'
-  - '&mkp MB1'
-  - '&mkp MB2'
-  - '&mkp MB3'
-  - '&mkp MB4'
-  - '&mkp MCLK'
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - '&mmv MOVE_LEFT'
-  - '&mmv MOVE_DOWN'
-  - '&mmv MOVE_UP'
-  - '&mmv MOVE_RIGHT'
-  - ''
-  - ''
-  - ''
-  - ''
-  - {type: held}
-  - ''
-  - ''
-  - ''
-  MEDIA:
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - PREV
-  - VOLUME DOWN
-  - VOLUME UP
-  - NEXT
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - STOP
-  - PLAY PAUSE
-  - MUTE
-  - ''
-  - ''
+  - Prev
+  - Vol−
+  - Vol+
+  - Next
   - ''
   - ''
   - ''
@@ -168,36 +168,36 @@ layers:
   - ''
   - {type: held}
   - ''
-  - ''
-  - ''
-  - ''
+  - Stop
+  - Play/Pause
+  - Mute
   - ''
   NUM:
+  - ''
   - '['
   - '7'
   - '8'
   - '9'
   - ']'
-  - .
   - ''
   - ''
   - ''
   - ''
   - ''
   - ''
-  - '0'
-  - '-'
+  - ''
   - ;
   - '4'
   - '5'
   - '6'
-  - RIGHT GUI
-  - RIGHT ALT
-  - RCTRL
-  - RIGHT SHIFT
-  - ''
-  - ''
   - '='
+  - ''
+  - RIGHT SHIFT
+  - RCTRL
+  - RIGHT ALT
+  - RIGHT GUI
+  - ''
+  - ''
   - '`'
   - '1'
   - '2'
@@ -209,23 +209,23 @@ layers:
   - ''
   - ''
   - ''
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
+  - .
+  - '0'
+  - '-'
+  - ''
   - {type: held}
-  - {t: ▽, type: trans}
+  - ''
   SYM:
   - ''
-  - '`'
+  - '{'
   - '&'
   - '*'
-  - '{'
-  - '}'
   - (
-  - )
-  - '['
-  - ']'
+  - '}'
+  - ''
+  - ''
+  - ''
+  - ''
   - ''
   - ''
   - ''
@@ -233,8 +233,8 @@ layers:
   - $
   - '%'
   - ^
-  - '='
-  - /
+  - +
+  - ''
   - RIGHT SHIFT
   - RCTRL
   - RIGHT ALT
@@ -246,25 +246,25 @@ layers:
   - '@'
   - '#'
   - '|'
-  - \
   - ''
   - ''
   - ''
   - ''
   - ''
-  - <
-  - '>'
-  - '-'
+  - ''
+  - (
+  - )
+  - _
   - {type: held}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
+  - ''
+  - ''
   FUN:
   - ''
   - F12
   - F7
   - F8
   - F9
-  - ''
+  - PRINTSCREEN
   - ''
   - ''
   - ''
@@ -276,88 +276,76 @@ layers:
   - F4
   - F5
   - F6
+  - SCROLLLOCK
   - ''
-  - RIGHT GUI
-  - RIGHT ALT
-  - RCTRL
   - RIGHT SHIFT
-  - ''
+  - RCTRL
+  - RIGHT ALT
+  - RIGHT GUI
   - ''
   - ''
   - F10
   - F1
   - F2
   - F3
+  - PAUSE BREAK
   - ''
   - ''
   - ''
   - ''
   - ''
   - ''
+  - APP
+  - SPACE
+  - TAB
   - ''
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
+  - ''
   - {type: held}
   HOST:
   - {type: held}
-  - F13
-  - F14
-  - F15
-  - F16
-  - F17
+  - WEB
+  - DEV
+  - COMMS
+  - RUN
+  - AUX
   - ''
+  - Resize mode
+  - Prev WS
+  - Fullscreen
+  - Float
+  - {t: ESCAPE, type: held}
   - ''
-  - F18
-  - F19
-  - F20
-  - {type: held}
-  - Sft+F13
-  - Sft+F14
-  - Sft+F15
-  - Sft+F16
-  - Sft+F17
+  - Move→WEB
+  - Move→DEV
+  - Move→COMMS
+  - Move→RUN
+  - Move→AUX
   - ''
-  - Alt+H
-  - Alt+J
-  - Alt+K
-  - Alt+L
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - Sft+Alt+H
-  - Sft+Alt+J
-  - Sft+Alt+K
-  - Sft+Alt+L
+  - Focus ←
+  - Focus ↓
+  - Focus ↑
+  - Focus →
   - ''
   - ''
   - ''
   - ''
   - ''
+  - ''
+  - ''
+  - ''
+  - Move ←
+  - Move ↓
+  - Move ↑
+  - Move →
+  - ''
+  - ENTER
+  - SPACE
+  - TAB
   - ''
   - ''
   - ''
   GAME:
   - ESCAPE
-  - '`'
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  - '5'
-  - '6'
-  - '7'
-  - '8'
-  - '9'
-  - BACKSPACE
-  - TAB
   - Q
   - W
   - E
@@ -368,8 +356,8 @@ layers:
   - I
   - O
   - P
-  - ENTER
-  - LEFT SHIFT
+  - BACKSPACE
+  - TAB
   - A
   - S
   - D
@@ -380,12 +368,24 @@ layers:
   - K
   - L
   - ;
+  - ENTER
+  - LEFT SHIFT
+  - Z
+  - X
+  - C
+  - V
+  - B
+  - N
+  - M
+  - ','
+  - .
+  - /
   - RIGHT SHIFT
   - LCTRL
   - LALT
   - SPACE
   - ENTER
-  - RALT
+  - RCTRL
   - {t: BASE, h: toggle}
   ADJUST:
   - '&bootloader'
@@ -397,7 +397,7 @@ layers:
   - EP OFF
   - BT NXT
   - BT PRV
-  - ''
+  - {t: GAME, h: toggle}
   - '&sys_reset'
   - '&bootloader'
   - {t: BT, h: '0'}

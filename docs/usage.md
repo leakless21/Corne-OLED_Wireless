@@ -43,19 +43,19 @@ Each layer is **momentary** — it deactivates when you release the thumb key.
 
 | Layer | How to reach | What it provides |
 |-------|-------------|------------------|
-| **NAV** | Hold left-space thumb | macOS Cmd clipboard chords (Cmd+C/V/X/Z), arrows, text navigation, Caps Lock. Also contains `&to L_GAME` to switch to GAME. |
-| **MOUSE** | Hold left-tab thumb | Left-hand GUI/Alt/Ctrl/Shift modifiers; right-hand scroll, mouse buttons, and pointer movement. |
-| **MEDIA** | Hold left-escape thumb | Volume up/down, play/pause, next/prev track, stop, mute. |
-| **NUM** | Hold right-backspace thumb | Numpad digits and punctuation on the left, with right-hand GUI/Alt/Ctrl/Shift modifiers. |
-| **SYM** | Hold right-enter thumb | Symbols: ampersand, asterisk, braces, brackets, parentheses, dollar, percent, caret, at, hash, pipe, tilde, exclamation, colon, slash, backslash, less/greater than. |
-| **FUN** | Hold right-delete thumb | F1–F12 on the left, with right-hand GUI/Alt/Ctrl/Shift modifiers. |
-| **HOST** | Hold BASE outer ESC + BACKSPACE combo (80 ms timeout; slow release) | AeroSpace bridge: F13–F20, Shift-F13–F17, and spatial Option+H/J/K/L focus/move controls. See [docs/macos-aerospace.md](macos-aerospace.md). |
-| **GAME** | From NAV, press `&to L_GAME` | Tap-only QWERTY for gaming. Exit via right-thumb `&to L_BASE`. |
-| **ADJUST** | Hold NAV + NUM simultaneously (conditional layer) | Five Bluetooth profiles, next/previous profile, selected-profile clear, explicit USB/BLE output, explicit external-power ON/OFF, mirrored reset/bootloader. |
+| **NAV** | Hold left-space thumb | macOS Cmd clipboard chords, arrows, text navigation, line/page movement, and explicit editing thumbs. |
+| **MOUSE** | Hold left-tab thumb | NAV-aligned clipboard, pointer movement, wheel movement, left modifiers, and right-thumb clicks. |
+| **MEDIA** | Hold left-escape thumb | NAV-aligned previous/volume/next controls with stop/play/mute thumbs. |
+| **NUM** | Hold right-backspace thumb | Standard spatial numpad and punctuation on the left; Shift/Ctrl/Alt/Cmd on the right. |
+| **SYM** | Hold right-enter thumb | Shifted NUM geometry with `(`, `)`, and `_` on the left thumbs. |
+| **FUN** | Hold right-delete thumb | NUM-aligned F1–F12 grid with mirrored modifiers and App/Space/Tab thumbs. |
+| **HOST** | Hold BASE outer ESC + BACKSPACE combo | Host-agnostic F13–F20 workspace signals and Ctrl+F directional focus/move signals. See [docs/macos-aerospace.md](macos-aerospace.md). |
+| **GAME** | Hold NAV + NUM, then press GAME in ADJUST | Full plain tap-only QWERTY for gaming. Exit via right outer `&to L_BASE`. |
+| **ADJUST** | Hold NAV + NUM simultaneously | Five Bluetooth profiles, output/power state, mirrored reset/bootloader, and deliberate GAME entry. |
 
-> **Verify, don't assume.** The exact key positions for every layer live in
-> `config/corne.keymap`. This table summarizes intent; always open that file
-> to confirm a specific binding.
+> **Verify, don't assume.** Exact positions live in `config/corne.keymap`;
+> shared physical rules are recorded in [layout-principles.md](layout-principles.md).
+
 
 ---
 
@@ -85,19 +85,19 @@ After clearing a bond or after first setup, use the pairing procedure in
 ## 3. ZMK Studio (day-to-day caveat)
 
 ZMK Studio is enabled (`CONFIG_ZMK_STUDIO=y`) and allows live keymap editing
-over USB-UART on the left half without reflashing.
+over USB-UART on the left half.
 
 **Workflow guidance:**
 
-- Use Studio for **quick experiments** — try a remap, test it, iterate.
-- Studio edits persist to **on-device settings**, not to the Git-tracked
-  `config/corne.keymap`. The device state and the Git source can diverge.
-- **Durable changes** should be made in `config/corne.keymap` (or via the
-  visual [Keymap Editor](https://nickcoutsos.github.io/keymap-editor/)) and
-  committed. That way the keymap is version-controlled and reproducible.
-- If Studio edits cause unexpected behavior, see
-  [docs/setup.md section 6](setup.md#6-recovery--settings-reset) for the
-  settings-reset recovery procedure.
+- Use Studio for quick experiments. Studio edits persist to on-device settings,
+  not to the Git-tracked `config/corne.keymap`.
+- **Restore Stock Settings** is the normal way to discard Studio overrides and
+  return to the firmware-defined keymap without clearing Bluetooth bonds.
+- Durable changes belong in `config/corne.keymap` and should be committed.
+- Use `settings-reset` only as a destructive fallback for broken persistent
+  state, split/Bluetooth recovery, or an intentional full reset.
+- `OUT_USB` with a charger-only cable can make the keyboard appear unresponsive.
+  `EP_OFF` persists across reboot and can leave peripherals/displays unpowered.
 
 ---
 
@@ -117,13 +117,15 @@ use GitHub Actions instead.
    structural changes (adding/removing layers, renumbering layer indices),
    commit the current known-good state first so you can roll back via Git.
 
-3. **Push a branch or open a PR.** The GitHub Actions workflow triggers on
-   push. Each push builds three `.uf2` firmware images: `corne-left`,
-   `corne-right`, and `settings-reset`. The upstream reusable workflow merges
-   them into a single `firmware` archive (`.zip`) for download.
+3. **Push a branch or open a PR.** Firmware input changes (`config/**`,
+   `build.yaml`, board/shield sources, or the build workflow) trigger the
+   GitHub Actions build. Documentation-only changes do not. Manual dispatch is
+   also available. Each run builds three `.uf2` firmware images:
+   `corne-left`, `corne-right`, and `settings-reset`. The upstream reusable
+   workflow merges them into a single `firmware` archive (`.zip`).
 
 4. **Wait for the build.** Check the Actions tab — a green checkmark means
-   the build succeeded.
+   the firmware build succeeded.
 
 5. **Download the `firmware` archive.** Extract the `.uf2` files from the
    downloaded `.zip`.
@@ -150,22 +152,26 @@ use GitHub Actions instead.
 
 After flashing a firmware change, run through this compact checklist:
 
-- [ ] **Base typing** — type a few sentences on the BASE layer. Confirm
-  Colemak-DH letters, punctuation, and outer modifiers work as expected.
-- [ ] **Each changed layer-tap** — for every thumb key you modified, test both
-  the tap (quick press) and hold (press and hold past 220 ms) actions.
-- [ ] **Bluetooth profile switching** — on ADJUST (hold NAV + NUM), cycle through
-  `BT_SEL 0`–`BT_SEL 4` or use `BT_NXT`/`BT_PRV`; confirm the expected host
-  reconnects.
+- [ ] **Base typing** — type a few sentences on BASE. Confirm Colemak-DH,
+  punctuation, and home-row modifiers.
+- [ ] **Functional grammar** — verify A/R/S/T and N/E/I/O modifier positions
+  across NAV, MOUSE, MEDIA, NUM, SYM, and FUN.
+- [ ] **NUM/SYM/FUN** — confirm the 7-8-9 / 4-5-6 / 1-2-3 geometry, shifted
+  symbols, F-grid, and explicit thumb taps.
+- [ ] **NAV/MOUSE/MEDIA** — confirm directions occupy the same N/E/I/O
+  columns, pointer/wheel behavior, clipboard repeat, and transport thumbs.
+- [ ] **Bluetooth profile switching** — on ADJUST, cycle `BT_SEL 0`–`BT_SEL 4`
+  or use `BT_NXT`/`BT_PRV`; confirm the expected host reconnects.
 - [ ] **HOST / AeroSpace** — hold the BASE outer ESC + BACKSPACE combo, then
-  test F13–F20, Shift-F13–F17, and both spatial H/J/K/L clusters.
-- [ ] **GAME** (if applicable) — from NAV, press `&to L_GAME`. Confirm QWERTY
-  layout is active. Exit via the right-thumb `&to L_BASE`.
+  test workspace F13–F17, Shift-F13–F17, Ctrl-F13–F16, Ctrl-Shift-F13–F16,
+  and Shift-F18 resize entry.
+- [ ] **GAME** — enter from ADJUST and confirm full QWERTY, including Z/X/C/V/B
+  and N/M/comma/period/slash. Exit via right outer `&to L_BASE`.
 - [ ] **OLED and power** — confirm the status screen renders on both halves,
   blanks after idle, and wakes; characterize deep-sleep reconnect behavior.
-- [ ] **Recovery path** — confirm the left and right ADJUST bootloader/reset
-  bindings affect the intended half; keep double-reset and settings-reset as
-  fallbacks.
+- [ ] **Recovery path** — confirm left/right ADJUST bootloader/reset bindings
+  affect the intended half; use Studio Restore Stock Settings before
+  `settings-reset`.
 
 ---
 
@@ -173,16 +179,14 @@ After flashing a firmware change, run through this compact checklist:
 
 The canonical AeroSpace configuration is tracked at
 `dotfiles/aerospace.toml`. Install it at
-`~/.config/aerospace/aerospace.toml` by copying or symlinking it; see
-[docs/macos-aerospace.md](macos-aerospace.md). Editing that config does **not**
-require a firmware rebuild or flash.
+`~/.config/aerospace/aerospace.toml` by copying or symlinking it.
 
 - Validate with `aerospace reload-config --dry-run`, then apply with
   `aerospace reload-config`.
-- The Corne HOST layer emits F13–F20, Shift-F13–F17, and Option+H/J/K/L.
-  AeroSpace maps those signals directly; no Colemak remapping is needed on the
-  MacBook keyboard.
-
+- The Corne HOST layer emits F13–F20, Shift-F13–F17, Ctrl+F13–F16, and
+  Ctrl+Shift+F13–F16. AeroSpace maps those semantic signals directly.
+- The laptop keyboard remains standard QWERTY with its separate Option
+  bindings. No Colemak remapping is needed on the MacBook.
 See [docs/macos-aerospace.md](macos-aerospace.md) for installation,
 workspace layout, routing, and troubleshooting.
 
@@ -195,5 +199,5 @@ workspace layout, routing, and troubleshooting.
 | Normal keymap/config change | Edit `config/corne.keymap`, push, flash both halves with `corne-left.uf2` and `corne-right.uf2`. | [docs/setup.md section 5](setup.md#5-first-flash-of-both-halves) |
 | Layer renumber or state mismatch | Flash `settings-reset` on both halves, re-flash the normal images, then re-pair Bluetooth. | [docs/setup.md section 6](setup.md#6-recovery--settings-reset) |
 | Bluetooth failure or won't pair | Flash `settings-reset` on both halves, re-flash normal firmware, then re-pair. | [docs/setup.md section 7](setup.md#7-bluetooth-re-pairing) |
-| Studio edits caused divergence | Flash `settings-reset` to clear on-device overrides, re-flash normal firmware. | [docs/setup.md section 8](setup.md#8-zmk-studio-caveats) |
+| Studio edits caused divergence | Use Studio **Restore Stock Settings** first; use `settings-reset` only if that fails or a full reset is intended. | [docs/setup.md section 8](setup.md#8-zmk-studio-caveats) |
 | AeroSpace bindings not working | Validate or edit `dotfiles/aerospace.toml`, install/reload the user config. No firmware change needed. | [docs/macos-aerospace.md](macos-aerospace.md) |
