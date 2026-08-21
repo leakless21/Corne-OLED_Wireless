@@ -110,11 +110,11 @@
         BASE {
             label = "BASE";
             display-name = "BASE";
-            /* Colemak-DH, symmetric HRM, and thumb layer-taps. */
+            /* Colemak-DH, symmetric HRM, thumb layer-taps, and LM5 momentary MEDIA. */
             bindings = <
                 &kp ESCAPE       &kp Q              &kp W              &kp F              &kp P              &kp B
                 &kp J            &kp L              &kp U              &kp Y              &kp SQT            &kp BACKSPACE
-                &kp TAB          &hml LMETA A       &hml LEFT_ALT R     &hml LCTRL S        &hml LEFT_SHIFT T   &kp G
+                &mo L_MEDIA      &hml LMETA A       &hml LEFT_ALT R     &hml LCTRL S        &hml LEFT_SHIFT T   &kp G
                 &kp M            &hmr RIGHT_SHIFT N &hmr RCTRL E        &hmr RIGHT_ALT I    &hmr RIGHT_GUI O   &kp SEMICOLON
                 &sk LSHFT        &kp Z              &kp X              &kp C              &kp D              &kp V
                 &kp K            &kp H              &kp COMMA           &kp DOT            &kp SLASH          &kp RIGHT_SHIFT
@@ -133,9 +133,9 @@
                 &none            &none             &none             &none             &none             &none
                 &kp LS(LG(Z))    &kp LG(V)         &kp LG(C)         &kp LG(X)         &kp LG(Z)         &none
                 &none            &kp LGUI          &kp LALT          &kp LCTRL         &kp LEFT_SHIFT    &none
-                &none            &kp LEFT          &kp DOWN_ARROW     &kp UP_ARROW      &kp RIGHT         &none
+                &kp CAPS_LOCK    &kp LEFT          &kp DOWN_ARROW     &kp UP_ARROW      &kp RIGHT         &none
                 &none            &none             &none             &none             &none             &none
-                &none            &kp INSERT        &kp HOME          &kp PAGE_DOWN     &kp PAGE_UP       &kp END
+                &kp INSERT       &kp HOME          &kp PAGE_DOWN     &kp PAGE_UP       &kp END           &none
                 &kp ESCAPE       &kp SPACE        &kp TAB            &kp ENTER         &kp BACKSPACE     &kp DELETE
             >;
         };
@@ -148,7 +148,7 @@
                 &none            &none             &none             &none             &none             &none
                 &kp LS(LG(Z))    &kp LG(V)         &kp LG(C)         &kp LG(X)         &kp LG(Z)         &none
                 &none            &kp LGUI          &kp LALT          &kp LCTRL         &kp LEFT_SHIFT    &none
-                &mkp MB5         &mmv MOVE_LEFT    &mmv MOVE_DOWN     &mmv MOVE_UP      &mmv MOVE_RIGHT   &mkp MB4
+                &mkp MB4         &mmv MOVE_LEFT    &mmv MOVE_DOWN     &mmv MOVE_UP      &mmv MOVE_RIGHT   &mkp MB5
                 &none            &none             &none             &none             &none             &none
                 &none            &msc SCRL_LEFT    &msc SCRL_DOWN     &msc SCRL_UP      &msc SCRL_RIGHT   &none
                 &none            &none             &none             &mkp MB2          &mkp MB1          &mkp MB3
@@ -166,7 +166,7 @@
                 &none            &kp K_PREV        &kp K_VOLUME_DOWN  &kp K_VOLUME_UP   &kp K_NEXT        &none
                 &none            &none             &none             &none             &none             &none
                 &none            &none             &none             &none             &none             &none
-                &none            &none             &kp K_STOP        &kp K_PLAY_PAUSE  &kp K_MUTE         &none
+                &none            &none             &none             &kp K_STOP        &kp K_PLAY_PAUSE  &kp K_MUTE
             >;
         };
 
@@ -260,7 +260,7 @@
             bindings = <
                 &bootloader       &sys_reset         &bt BT_CLR          &out OUT_USB        &out OUT_BLE        &ext_power EP_ON
                 &ext_power EP_OFF  &bt BT_NXT         &bt BT_PRV          &to L_GAME          &sys_reset          &bootloader
-                &bt BT_SEL 0      &bt BT_SEL 1        &bt BT_SEL 2        &bt BT_SEL 3        &bt BT_SEL 4        &none
+                &none             &bt BT_SEL 0        &bt BT_SEL 1        &bt BT_SEL 2        &bt BT_SEL 3        &bt BT_SEL 4
                 &none             &none               &none               &none               &none               &none
                 &none             &none               &none               &none               &none               &none
                 &none             &none               &none               &none               &none               &none
