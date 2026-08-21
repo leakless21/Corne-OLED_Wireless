@@ -17,7 +17,7 @@
   - `zmk` (remote `zmkfirmware`) — revision `6e2ef41e022d555b10f116e395832913f71717b3`.
   - `zmk-nice-oled` (remote `mctechnology17`) — revision `46f824abb2bd41f1287c5c68abd14122af6042a3` — OLED display support.
   - `zmk-helpers` (remote `urob`) — revision `95edb8f15ef1d1bd8332810555f8cf5837fbdd27` — key-label and unicode helpers used for visualization/editor labels.
-- The board target is **`nice_nano_v2`** (see `build.yaml`), a common wireless
+- The board target is **`nice_nano//zmk`** (see `build.yaml`), a common wireless
   Corne controller.
 
 ---
@@ -272,13 +272,13 @@ CONFIG_ZMK_POINTING=y
 ## 9. Build targets & artifact workflow
 
 `build.yaml` defines the GitHub Actions matrix. There are **three** named build
-targets, all on `nice_nano_v2`:
+targets, all on `nice_nano//zmk`:
 
 | Board | Shield(s) | Extra | Artifact name |
 |-------|-----------|-------|---------------|
-| `nice_nano_v2` | `corne_left nice_oled` | `snippet: studio-rpc-usb-uart`, `cmake-args: -DCONFIG_ZMK_STUDIO=y` | `corne-left` |
-| `nice_nano_v2` | `corne_right nice_oled` | — | `corne-right` |
-| `nice_nano_v2` | `settings_reset` | — | `settings-reset` |
+| `nice_nano//zmk` | `corne_left nice_oled` | `snippet: studio-rpc-usb-uart`, `cmake-args: -DCONFIG_ZMK_STUDIO=y` | `corne-left` |
+| `nice_nano//zmk` | `corne_right nice_oled` | — | `corne-right` |
+| `nice_nano//zmk` | `settings_reset` | — | `settings-reset` |
 
 - Pushing to the repo (or running the workflow manually) builds these via GitHub
   Actions; download the resulting **`.uf2`** artifacts from the Actions run.

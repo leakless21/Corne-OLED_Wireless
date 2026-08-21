@@ -43,9 +43,9 @@ The `build.yaml` defines these shields:
 
 | Artifact | Board | Shield(s) | Extra |
 |----------|-------|-----------|-------|
-| `corne-left` | `nice_nano_v2` | `corne_left` + `nice_oled` | ZMK Studio RPC snippet enabled |
-| `corne-right` | `nice_nano_v2` | `corne_right` + `nice_oled` | — |
-| `settings-reset` | `nice_nano_v2` | `settings_reset` | — |
+| `corne-left` | `nice_nano//zmk` | `corne_left` + `nice_oled` | ZMK Studio RPC snippet enabled |
+| `corne-right` | `nice_nano//zmk` | `corne_right` + `nice_oled` | — |
+| `settings-reset` | `nice_nano//zmk` | `settings_reset` | — |
 
 ---
 
