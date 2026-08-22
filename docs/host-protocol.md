@@ -40,7 +40,6 @@ This document is the canonical source of truth for the semantic high-function ke
 | `F23` | Cut selected text to clipboard | Karabiner: Cmd+X | AutoHotkey: Ctrl+X |
 | `F24` | Undo last text action | Karabiner: Cmd+Z | AutoHotkey: Ctrl+Z |
 | `Shift+F24` | Redo last undone text action | Karabiner: Cmd+Shift+Z | AutoHotkey: Ctrl+Y |
-
 ---
 
 ## 2. Protocol Producers

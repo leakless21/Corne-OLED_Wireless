@@ -14,15 +14,24 @@ import sys
 from pathlib import Path
 from typing import Set
 
-# Add scripts directory to sys.path for lib imports
-REPO_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(REPO_ROOT / "scripts"))
+# Robust path configuration for local and package execution
+SCRIPTS_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPTS_DIR.parent
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
-from generate_protocol_files import generate_host_protocol_table
-from lib.keymap_parser import parse_keymap_file
-from lib.protocol import ProtocolManifest, load_protocol
-from lib.validation import assert_in, assert_true, fail, load_json, load_yaml
-
+try:
+    from generate_protocol_files import generate_host_protocol_table
+    from lib.keymap_parser import parse_keymap_file
+    from lib.protocol import ProtocolManifest, load_protocol
+    from lib.validation import assert_in, assert_true, fail, load_json, load_yaml
+except ImportError:
+    from scripts.generate_protocol_files import generate_host_protocol_table
+    from scripts.lib.keymap_parser import parse_keymap_file
+    from scripts.lib.protocol import ProtocolManifest, load_protocol
+    from scripts.lib.validation import assert_in, assert_true, fail, load_json, load_yaml
 DOCS_HOST_PROTOCOL_PATH = REPO_ROOT / "docs" / "host-protocol.md"
 CORNE_KEYMAP_PATH = REPO_ROOT / "config" / "corne.keymap"
 SOFLE_KEYMAP_PATH = REPO_ROOT / "config" / "sofle.keymap"

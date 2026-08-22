@@ -12,13 +12,20 @@ import re
 import sys
 from pathlib import Path
 
-# Add scripts directory to sys.path for lib imports
-REPO_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(REPO_ROOT / "scripts"))
+# Robust path configuration for local and package execution
+SCRIPTS_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPTS_DIR.parent
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
-from lib.protocol import ProtocolManifest, load_protocol
-from lib.validation import fail
-
+try:
+    from lib.protocol import ProtocolManifest, load_protocol
+    from lib.validation import fail
+except ImportError:
+    from scripts.lib.protocol import ProtocolManifest, load_protocol
+    from scripts.lib.validation import fail
 DOCS_HOST_PROTOCOL_PATH = REPO_ROOT / "docs" / "host-protocol.md"
 
 

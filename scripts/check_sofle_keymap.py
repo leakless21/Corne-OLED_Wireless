@@ -11,13 +11,20 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-# Add scripts directory to sys.path for lib imports
-REPO_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(REPO_ROOT / "scripts"))
+# Robust path configuration for local and package execution
+SCRIPTS_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPTS_DIR.parent
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
-from lib.keymap_parser import KeyboardConfig, parse_keymap_file
-from lib.validation import assert_eq, assert_in, assert_true, fail
-
+try:
+    from lib.keymap_parser import KeyboardConfig, parse_keymap_file
+    from lib.validation import assert_eq, assert_in, assert_true, fail
+except ImportError:
+    from scripts.lib.keymap_parser import KeyboardConfig, parse_keymap_file
+    from scripts.lib.validation import assert_eq, assert_in, assert_true, fail
 KEYMAP_PATH = REPO_ROOT / "config" / "sofle.keymap"
 CONF_PATH = REPO_ROOT / "config" / "sofle.conf"
 

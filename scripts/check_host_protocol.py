@@ -23,13 +23,20 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Set, Tuple
 
-# Add scripts directory to sys.path for lib imports
-REPO_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(REPO_ROOT / "scripts"))
+# Robust path configuration for local and package execution
+SCRIPTS_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPTS_DIR.parent
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
-from lib.keymap_parser import parse_keymap_file
-from lib.validation import assert_eq, assert_in, assert_true, fail, load_json, load_toml, load_yaml
-
+try:
+    from lib.keymap_parser import parse_keymap_file
+    from lib.validation import assert_eq, assert_in, assert_true, fail, load_json, load_toml, load_yaml
+except ImportError:
+    from scripts.lib.keymap_parser import parse_keymap_file
+    from scripts.lib.validation import assert_eq, assert_in, assert_true, fail, load_json, load_toml, load_yaml
 CORNE_KEYMAP_PATH = REPO_ROOT / "config" / "corne.keymap"
 SOFLE_KEYMAP_PATH = REPO_ROOT / "config" / "sofle.keymap"
 KARABINER_PATH = REPO_ROOT / "hosts" / "macos" / "karabiner.json"
