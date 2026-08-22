@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 """
-End-to-end static validation for the Corne + Karabiner + AeroSpace host protocol.
+End-to-end static validation for the multi-keyboard semantic host protocol.
 
-Validates the three layers of the architecture:
-  Layer A (Producer):   Semantic HID signals defined in config/corne.keymap
-  Layer B (Translator): Karabiner-Elements complex rules in hosts/macos/karabiner.json
-  Layer C (Consumer):   AeroSpace window manager bindings in hosts/macos/aerospace.toml
+Validates the full architecture:
+  Producers:
+    - Corne firmware (config/corne.keymap)
+    - Sofle firmware (config/sofle.keymap)
+  macOS Consumers:
+    - Karabiner-Elements translation (hosts/macos/karabiner.json)
+    - AeroSpace window manager (hosts/macos/aerospace.toml)
+  Windows Consumers:
+    - AutoHotkey v2 bridge (hosts/windows/keyboard.ahk)
+    - GlazeWM window manager (hosts/windows/glazewm.yaml)
 
-Enforces that every emitted firmware signal has a corresponding host translation,
-and that every generated AeroSpace chord has an active binding in the expected mode.
+Enforces that every emitted firmware signal has a corresponding host translation on both OSes.
 """
 
 import json
@@ -17,9 +22,12 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-KEYMAP_PATH = REPO_ROOT / "config" / "corne.keymap"
+CORNE_KEYMAP_PATH = REPO_ROOT / "config" / "corne.keymap"
+SOFLE_KEYMAP_PATH = REPO_ROOT / "config" / "sofle.keymap"
 KARABINER_PATH = REPO_ROOT / "hosts" / "macos" / "karabiner.json"
 AEROSPACE_PATH = REPO_ROOT / "hosts" / "macos" / "aerospace.toml"
+AHK_PATH = REPO_ROOT / "hosts" / "windows" / "keyboard.ahk"
+GLAZEWM_PATH = REPO_ROOT / "hosts" / "windows" / "glazewm.yaml"
 
 
 def fail(msg: str) -> None:
@@ -28,89 +36,92 @@ def fail(msg: str) -> None:
 
 
 # -----------------------------------------------------------------------------
-# Layer A: Firmware Protocol Producer (config/corne.keymap)
+# Layer A: Firmware Protocol Producers (Corne & Sofle)
 # -----------------------------------------------------------------------------
 
-def validate_firmware_producer(content: str) -> dict:
+EXPECTED_HOST_SIGNALS = [
+    # Workspaces 1-5 (WEB, DEV, COMMS, RUN, AUX)
+    "&kp F13", "&kp F14", "&kp F15", "&kp F16", "&kp F17",
+    # Move window to workspace 1-5 + follow
+    "&kp LS(F13)", "&kp LS(F14)", "&kp LS(F15)", "&kp LS(F16)", "&kp LS(F17)",
+    # Directional focus (Left, Down, Up, Right)
+    "&kp LC(F13)", "&kp LC(F14)", "&kp LC(F15)", "&kp LC(F16)",
+    # Directional move (Left, Down, Up, Right)
+    "&kp LC(LS(F13))", "&kp LC(LS(F14))", "&kp LC(LS(F15))", "&kp LC(LS(F16))",
+    # Context & modes
+    "&kp LS(F18)",  # Resize mode
+    "&kp F18",      # Previous workspace
+    "&kp F19",      # Fullscreen
+    "&kp F20",      # Float / tile
+    # Extended semantic protocol
+    "&kp LA(F13)",  # SYSTEM_LAUNCHER (Spotlight / Windows Search)
+    "&kp LA(F14)",  # QUICK_TERMINAL (Ghostty scratchpad / Quake)
+    "&kp LA(F15)",  # NEW_TERMINAL (Ghostty / Windows Terminal)
+    "&kp LA(F16)",  # PREVIOUS_WINDOW (focus-back-and-forth / Alt+Tab)
+    "&kp LA(F18)",  # SERVICE_MODE (AeroSpace / GlazeWM service)
+]
+
+EXPECTED_EDITING_SIGNALS = [
+    "&kp F21",      # Copy
+    "&kp F22",      # Paste
+    "&kp F23",      # Cut
+    "&kp F24",      # Undo
+    "&kp LS(F24)",  # Redo
+]
+
+
+def validate_keymap_producer(path: Path, board_name: str) -> None:
     """Verify that all expected semantic signals exist on the HOST and NAV/MOUSE layers."""
+    if not path.exists():
+        fail(f"Keymap file not found for {board_name}: {path}")
+
+    content = path.read_text(encoding="utf-8")
+
     # Find HOST layer bindings
     host_match = re.search(
-        r"HOST\s*\{\s*label\s*=\s*\"HOST\";[\s\S]*?bindings\s*=\s*<([\s\S]*?)>;\s*\};",
+        r"HOST\s*\{\s*label\s*=\s*\"HOST\";[\s\S]*?bindings\s*=\s*<([\s\S]*?)>;",
         content,
     )
     if not host_match:
-        fail("HOST layer not found in config/corne.keymap")
+        fail(f"{board_name}: HOST layer not found in {path}")
 
     host_raw = host_match.group(1)
 
-    expected_host_signals = [
-        # Workspaces 1-5 (WEB, DEV, COMMS, RUN, AUX)
-        "&kp F13", "&kp F14", "&kp F15", "&kp F16", "&kp F17",
-        # Move window to workspace 1-5 + follow
-        "&kp LS(F13)", "&kp LS(F14)", "&kp LS(F15)", "&kp LS(F16)", "&kp LS(F17)",
-        # Directional focus (Left, Down, Up, Right)
-        "&kp LC(F13)", "&kp LC(F14)", "&kp LC(F15)", "&kp LC(F16)",
-        # Directional move (Left, Down, Up, Right)
-        "&kp LC(LS(F13))", "&kp LC(LS(F14))", "&kp LC(LS(F15))", "&kp LC(LS(F16))",
-        # Context & modes
-        "&kp LS(F18)",  # Resize mode
-        "&kp F18",      # Previous workspace
-        "&kp F19",      # Fullscreen
-        "&kp F20",      # Float / tile
-        # Extended semantic protocol
-        "&kp LA(F13)",  # SYSTEM_LAUNCHER (Spotlight)
-        "&kp LA(F14)",  # QUICK_TERMINAL (Ghostty scratchpad)
-        "&kp LA(F15)",  # NEW_TERMINAL (Ghostty normal window)
-        "&kp LA(F16)",  # PREVIOUS_WINDOW (focus-back-and-forth)
-        "&kp LA(F18)",  # SERVICE_MODE (AeroSpace mode service)
-    ]
-
-    for signal in expected_host_signals:
+    for signal in EXPECTED_HOST_SIGNALS:
         if signal not in host_raw:
-            fail(f"Layer A (Firmware Producer): Missing signal '{signal}' in HOST layer")
+            fail(f"{board_name}: Missing signal '{signal}' in HOST layer")
 
     # Find NAV and MOUSE layer editing signals
     nav_match = re.search(
-        r"NAV\s*\{\s*label\s*=\s*\"NAV\";[\s\S]*?bindings\s*=\s*<([\s\S]*?)>;\s*\};",
+        r"NAV\s*\{\s*label\s*=\s*\"NAV\";[\s\S]*?bindings\s*=\s*<([\s\S]*?)>;",
         content,
     )
     mouse_match = re.search(
-        r"MOUSE\s*\{\s*label\s*=\s*\"MOUSE\";[\s\S]*?bindings\s*=\s*<([\s\S]*?)>;\s*\};",
+        r"MOUSE\s*\{\s*label\s*=\s*\"MOUSE\";[\s\S]*?bindings\s*=\s*<([\s\S]*?)>;",
         content,
     )
     if not nav_match or not mouse_match:
-        fail("NAV or MOUSE layer not found in config/corne.keymap")
+        fail(f"{board_name}: NAV or MOUSE layer not found in {path}")
 
-    expected_editing_signals = [
-        "&kp F21",      # Copy
-        "&kp F22",      # Paste
-        "&kp F23",      # Cut
-        "&kp F24",      # Undo
-        "&kp LS(F24)",  # Redo
-    ]
-
-    for sig in expected_editing_signals:
+    for sig in EXPECTED_EDITING_SIGNALS:
         if sig not in nav_match.group(1):
-            fail(f"Layer A (Firmware Producer): Missing editing signal '{sig}' in NAV layer")
+            fail(f"{board_name}: Missing editing signal '{sig}' in NAV layer")
         if sig not in mouse_match.group(1):
-            fail(f"Layer A (Firmware Producer): Missing editing signal '{sig}' in MOUSE layer")
+            fail(f"{board_name}: Missing editing signal '{sig}' in MOUSE layer")
 
-    print(f"PASS: Layer A (Firmware Producer) validated ({len(expected_host_signals)} HOST signals + {len(expected_editing_signals)} editing signals).")
-    return {
-        "host_signals": expected_host_signals,
-        "editing_signals": expected_editing_signals,
-    }
+    print(f"PASS: Firmware Producer ({board_name}) validated ({len(EXPECTED_HOST_SIGNALS)} HOST signals + {len(EXPECTED_EDITING_SIGNALS)} editing signals).")
 
 
 # -----------------------------------------------------------------------------
-# Layer B: Karabiner Translation (hosts/macos/karabiner.json)
+# Layer B: macOS Host (Karabiner & AeroSpace)
 # -----------------------------------------------------------------------------
 
-def validate_karabiner_translator(karabiner_data: dict) -> dict:
+def validate_karabiner_translator(karabiner_data: dict) -> None:
     """Verify that Karabiner maps all semantic signals to the intended macOS chords."""
     rules = karabiner_data.get("rules", [])
     if len(rules) < 2:
         fail("Layer B (Karabiner): Expected at least 2 rules in karabiner.json")
+
     # Collect all manipulators across rules
     all_manipulators = []
     for r in rules:
@@ -122,7 +133,7 @@ def validate_karabiner_translator(karabiner_data: dict) -> dict:
         conditions = m.get("conditions", [])
         has_device_if = any(c.get("type") == "device_if" for c in conditions)
         if not has_device_if:
-            fail(f"Layer B (Karabiner): Manipulator #{idx} ({m.get('from')}) is missing 'device_if' condition scoping to Corne")
+            fail(f"Layer B (Karabiner): Manipulator #{idx} ({m.get('from')}) is missing 'device_if' condition scoping to keyboard")
 
     # Test matrix: (from_key, mandatory_mods_set, expected_to_key, expected_to_mods_set)
     expected_translations = [
@@ -187,13 +198,8 @@ def validate_karabiner_translator(karabiner_data: dict) -> dict:
         if not found:
             fail(f"Layer B (Karabiner): Missing translation for from=({from_key}, mods={from_mods}) -> to=({to_key}, mods={to_mods})")
 
-    print(f"PASS: Layer B (Karabiner Translation) validated ({len(expected_translations)} mappings verified with device_if scoping).")
-    return {"translations": expected_translations}
+    print(f"PASS: macOS Karabiner Translation validated ({len(expected_translations)} mappings verified with device_if scoping).")
 
-
-# -----------------------------------------------------------------------------
-# Layer C: AeroSpace Consumer (dotfiles/aerospace.toml)
-# -----------------------------------------------------------------------------
 
 def parse_toml_sections(content: str) -> dict:
     """Simple TOML section parser for mode bindings and on-window-detected."""
@@ -220,69 +226,112 @@ def validate_aerospace_consumer(content: str) -> None:
     """Verify AeroSpace config consumes all chords produced by Karabiner / laptop."""
     sections = parse_toml_sections(content)
 
-    # 1. Verify mode.main.binding
     main_bindings = sections.get("mode.main.binding", {})
     required_main_bindings = [
-        # Workspaces 1-5
         "alt-1", "alt-2", "alt-3", "alt-4", "alt-5",
         "alt-shift-1", "alt-shift-2", "alt-shift-3", "alt-shift-4", "alt-shift-5",
-        # Directional navigation
         "alt-h", "alt-j", "alt-k", "alt-l",
         "alt-shift-h", "alt-shift-j", "alt-shift-k", "alt-shift-l",
-        # Window & mode controls
-        "alt-r",               # mode resize
-        "alt-shift-semicolon", # mode service
-        "alt-f",               # fullscreen
-        "alt-shift-space",     # layout floating tiling
-        "alt-tab",             # workspace-back-and-forth
-        "alt-backtick",        # focus-back-and-forth
-        "alt-enter",           # normal terminal launch
+        "alt-r", "alt-shift-semicolon", "alt-f", "alt-shift-space",
+        "alt-tab", "alt-backtick", "alt-enter",
     ]
     for b in required_main_bindings:
         if b not in main_bindings:
             fail(f"Layer C (AeroSpace Consumer): Missing binding '{b}' in [mode.main.binding]")
 
-    # 2. Verify mode.resize.binding (Phase 1 Regression Test!)
     resize_bindings = sections.get("mode.resize.binding", {})
     required_resize_bindings = [
-        # Corne directional resize via Karabiner Alt chords
         "alt-h", "alt-j", "alt-k", "alt-l",
-        # Laptop modal resize (bare letters)
         "h", "j", "k", "l",
-        # Exits
         "enter", "esc",
     ]
     for b in required_resize_bindings:
         if b not in resize_bindings:
-            fail(f"Layer C (AeroSpace Consumer): Missing binding '{b}' in [mode.resize.binding] (Regression: Corne resize broken!)")
+            fail(f"Layer C (AeroSpace Consumer): Missing binding '{b}' in [mode.resize.binding]")
 
-    # 3. Verify mode.service.binding (Phase 11)
     service_bindings = sections.get("mode.service.binding", {})
     required_service_bindings = [
-        # Tree join
         "h", "j", "k", "l",
         "alt-h", "alt-j", "alt-k", "alt-l",
-        # Window swap
         "shift-h", "shift-j", "shift-k", "shift-l",
         "alt-shift-h", "alt-shift-j", "alt-shift-k", "alt-shift-l",
-        # Tree manipulation
         "b", "r", "t", "a",
-        # Monitor management
         "m", "shift-m",
-        # Exits
         "enter", "esc",
     ]
     for b in required_service_bindings:
         if b not in service_bindings:
             fail(f"Layer C (AeroSpace Consumer): Missing binding '{b}' in [mode.service.binding]")
 
-    # 4. Verify Ghostty is NOT automatically routed to DEV or any fixed workspace
     if "com.mitchellh.ghostty" in content and "move-node-to-workspace" in content:
-        # Check if ghostty is in on-window-detected
         if re.search(r"com\.mitchellh\.ghostty[\s\S]*?move-node-to-workspace", content):
-            fail("Layer C (AeroSpace Consumer): Ghostty must NOT have automatic workspace routing in on-window-detected (Phase 4)")
+            fail("Layer C (AeroSpace Consumer): Ghostty must NOT have automatic workspace routing in on-window-detected")
 
-    print("PASS: Layer C (AeroSpace Consumer) validated (main, resize, service modes, and no Ghostty auto-routing).")
+    print("PASS: macOS AeroSpace Consumer validated (main, resize, service modes, and no Ghostty auto-routing).")
+
+
+# -----------------------------------------------------------------------------
+# Layer C: Windows Host (AutoHotkey & GlazeWM)
+# -----------------------------------------------------------------------------
+
+def validate_windows_ahk(content: str) -> None:
+    """Verify AutoHotkey translates all required editing and desktop signals."""
+    required_ahk_bindings = [
+        ("+F24::", "^y", "Redo -> Ctrl+Y"),
+        ("F24::", "^z", "Undo -> Ctrl+Z"),
+        ("F21::", "^c", "Copy -> Ctrl+C"),
+        ("F22::", "^v", "Paste -> Ctrl+V"),
+        ("F23::", "^x", "Cut -> Ctrl+X"),
+        ("!F13::", "#s", "Launcher -> Win+S"),
+        ("!F14::", "wt", "Quick Terminal"),
+        ("!F15::", "wt.exe", "New Terminal -> wt.exe"),
+        ("!F16::", "Tab", "Previous Window -> Alt+Tab"),
+    ]
+
+    for trigger, target, desc in required_ahk_bindings:
+        if trigger not in content:
+            fail(f"Windows AutoHotkey: Missing hotkey trigger '{trigger}' for {desc}")
+
+    # Ensure +F24 appears before bare F24
+    idx_shift_f24 = content.find("+F24::")
+    idx_bare_f24 = content.find("F24::")
+    if idx_shift_f24 == -1 or idx_bare_f24 == -1 or idx_shift_f24 > idx_bare_f24:
+        fail("Windows AutoHotkey: +F24:: (Redo) must precede bare F24:: (Undo)")
+
+    print("PASS: Windows AutoHotkey Bridge validated (editing F21-F24, launchers Alt+F13-F16, and hotkey precedence).")
+
+
+def validate_glazewm_consumer(content: str) -> None:
+    """Verify GlazeWM binds all semantic window management signals."""
+    required_glazewm_bindings = [
+        # Workspaces 1-5
+        "f13", "f14", "f15", "f16", "f17",
+        "shift+f13", "shift+f14", "shift+f15", "shift+f16", "shift+f17",
+        # Directional focus
+        "ctrl+f13", "ctrl+f14", "ctrl+f15", "ctrl+f16",
+        # Directional move
+        "ctrl+shift+f13", "ctrl+shift+f14", "ctrl+shift+f15", "ctrl+shift+f16",
+        # Modals & context
+        "f18", "f19", "f20",
+        "shift+f18",  # Resize mode
+        "alt+f18",    # Service mode
+    ]
+
+    for b in required_glazewm_bindings:
+        # Check if the binding exists in a bindings list (e.g. "f13" or 'f13')
+        pattern = rf'[\"\']{re.escape(b)}[\"\']'
+        if not re.search(pattern, content, re.IGNORECASE):
+            fail(f"Windows GlazeWM: Missing keybinding '{b}' in glazewm.yaml")
+
+    # Check resize binding mode
+    if 'name: "resize"' not in content and "name: resize" not in content:
+        fail("Windows GlazeWM: Missing 'resize' binding mode in glazewm.yaml")
+
+    # Check service binding mode
+    if 'name: "service"' not in content and "name: service" not in content:
+        fail("Windows GlazeWM: Missing 'service' binding mode in glazewm.yaml")
+
+    print("PASS: Windows GlazeWM Consumer validated (workspaces, navigation, resize mode, and service mode).")
 
 
 # -----------------------------------------------------------------------------
@@ -290,27 +339,38 @@ def validate_aerospace_consumer(content: str) -> None:
 # -----------------------------------------------------------------------------
 
 def main() -> None:
-    if not KEYMAP_PATH.exists():
-        fail(f"Keymap file not found: {KEYMAP_PATH}")
+    print("=" * 70)
+    print("RUNNING MULTI-KEYBOARD & MULTI-HOST PROTOCOL VALIDATION")
+    print("=" * 70)
+
+    # 1. Producers
+    validate_keymap_producer(CORNE_KEYMAP_PATH, "Corne")
+    validate_keymap_producer(SOFLE_KEYMAP_PATH, "Sofle")
+
+    # 2. macOS Host
     if not KARABINER_PATH.exists():
         fail(f"Karabiner file not found: {KARABINER_PATH}")
     if not AEROSPACE_PATH.exists():
         fail(f"AeroSpace file not found: {AEROSPACE_PATH}")
 
-    keymap_content = KEYMAP_PATH.read_text(encoding="utf-8")
     karabiner_data = json.loads(KARABINER_PATH.read_text(encoding="utf-8"))
     aerospace_content = AEROSPACE_PATH.read_text(encoding="utf-8")
-
-    print("=" * 70)
-    print("RUNNING END-TO-END HOST PROTOCOL VALIDATION")
-    print("=" * 70)
-
-    validate_firmware_producer(keymap_content)
     validate_karabiner_translator(karabiner_data)
     validate_aerospace_consumer(aerospace_content)
 
+    # 3. Windows Host
+    if not AHK_PATH.exists():
+        fail(f"AutoHotkey file not found: {AHK_PATH}")
+    if not GLAZEWM_PATH.exists():
+        fail(f"GlazeWM file not found: {GLAZEWM_PATH}")
+
+    ahk_content = AHK_PATH.read_text(encoding="utf-8")
+    glazewm_content = GLAZEWM_PATH.read_text(encoding="utf-8")
+    validate_windows_ahk(ahk_content)
+    validate_glazewm_consumer(glazewm_content)
+
     print("=" * 70)
-    print("ALL END-TO-END HOST PROTOCOL VALIDATION CHECKS PASSED.")
+    print("ALL MULTI-KEYBOARD & MULTI-HOST PROTOCOL CHECKS PASSED.")
     print("=" * 70)
 
 

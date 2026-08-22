@@ -5,7 +5,7 @@ on:
   push:
     paths:
       - "config/**"
-      - "dotfiles/**"
+      - "hosts/**"
       - "scripts/**"
       - "build.yaml"
       - "boards/**"
@@ -14,7 +14,7 @@ on:
   pull_request:
     paths:
       - "config/**"
-      - "dotfiles/**"
+      - "hosts/**"
       - "scripts/**"
       - "build.yaml"
       - "boards/**"
@@ -24,7 +24,7 @@ concurrency:
   group: firmware-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  validate-firmware:
+  validate-corne:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,8 +33,21 @@ jobs:
         uses: actions/setup-python@v7
         with:
           python-version: "3.x"
-      - name: Run Keymap Invariant Checks
-        run: python3 scripts/check_keymap.py
+      - name: Run Corne Keymap Invariant Checks
+        run: python3 scripts/check_corne_keymap.py
+
+  validate-sofle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.x"
+      - name: Run Sofle Keymap Invariant Checks
+        run: python3 scripts/check_sofle_keymap.py
+
   validate-host-protocol:
     runs-on: ubuntu-latest
     steps:
@@ -46,6 +59,23 @@ jobs:
           python-version: "3.x"
       - name: Run Host Protocol Validation
         run: python3 scripts/check_host_protocol.py
+
+  validate-build-config:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.x"
+      - name: Run Build & Manifest Validation
+        run: python3 scripts/check_build_config.py
+
   build:
-    needs: [validate-firmware, validate-host-protocol]
+    needs:
+      - validate-corne
+      - validate-sofle
+      - validate-host-protocol
+      - validate-build-config
     uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@6e2ef41e022d555b10f116e395832913f71717b3
