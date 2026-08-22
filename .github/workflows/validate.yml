@@ -10,9 +10,6 @@ on:
       - "scripts/**"
       - "docs/**"
       - "build.yaml"
-      - "pyproject.toml"
-      - "uv.lock"
-      - ".python-version"
       - ".github/workflows/**"
   pull_request:
     paths:
@@ -22,9 +19,6 @@ on:
       - "scripts/**"
       - "docs/**"
       - "build.yaml"
-      - "pyproject.toml"
-      - "uv.lock"
-      - ".python-version"
       - ".github/workflows/**"
 
 concurrency:
@@ -38,22 +32,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v5
+      - name: Set up Python
+        uses: actions/setup-python@v7
         with:
-          enable-cache: true
+          python-version: "3.x"
+
+      - name: Install Validation Dependencies
+        run: pip install --upgrade pyyaml tomli
 
       - name: Run Corne Keymap Invariant Checks
-        run: uv run scripts/check_corne_keymap.py
+        run: python3 scripts/check_corne_keymap.py
 
       - name: Run Sofle Keymap Invariant Checks
-        run: uv run scripts/check_sofle_keymap.py
+        run: python3 scripts/check_sofle_keymap.py
 
       - name: Run Build & Manifest Validation
-        run: uv run scripts/check_build_config.py
+        run: python3 scripts/check_build_config.py
 
       - name: Run Multi-Host Protocol Validation
-        run: uv run scripts/check_host_protocol.py
+        run: python3 scripts/check_host_protocol.py
 
       - name: Run Generated Artifact & Freshness Validation
-        run: uv run scripts/check_generated.py
+        run: python3 scripts/check_generated.py

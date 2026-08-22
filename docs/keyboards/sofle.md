@@ -93,4 +93,4 @@ Because modern Sofle firmware completely overhauls layer numbering, switches to 
 
 * **Sleep Timing:** Idle blank at 30 seconds (`CONFIG_ZMK_IDLE_TIMEOUT=30000`); deep sleep at 15 minutes (`CONFIG_ZMK_IDLE_SLEEP_TIMEOUT=900000`).
 * **External Power Normalization:** `CONFIG_ZMK_RGB_UNDERGLOW_EXT_POWER=n` ensures external power lines remain energized for OLED status screens even when underglow is toggled.
-* **OLED Widgets & Icons:** Workstation-oriented status screen featuring active layer, battery percentage, profile status, and Windows-style modifier indicator icons (`CONFIG_NICE_OLED_WIDGET_MODIFIERS_WINDOWS=y`).
+* **OLED Widgets & Icons:** Workstation-oriented status screen featuring active layer, battery percentage, and Bluetooth profile status.
