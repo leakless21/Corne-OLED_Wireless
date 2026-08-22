@@ -80,7 +80,7 @@ The Corne firmware is completely OS-neutral:
   - **Cut:** Corne sends `F23` $\rightarrow$ macOS `Cmd+X`; Windows `Ctrl+X`.
   - **Undo:** Corne sends `F24` $\rightarrow$ macOS `Cmd+Z`; Windows `Ctrl+Z`.
   - **Redo:** Corne sends `Shift+F24` $\rightarrow$ macOS `Cmd+Shift+Z`; Windows `Ctrl+Y`.
-* On macOS, Karabiner-Elements (`dotfiles/karabiner-corne.json`) provides the editing bridge.
+* On macOS, Karabiner-Elements (`dotfiles/karabiner-corne.json`) provides the host bridge for window management (`F13`–`F20` $\rightarrow$ `Alt` chords) and semantic editing (`F21`–`F24`).
 * On Windows, AutoHotkey v2 (`dotfiles/corne-windows.ahk`) provides the editing bridge.
 * Internal laptop keyboards are never remapped and remain completely standard.
 

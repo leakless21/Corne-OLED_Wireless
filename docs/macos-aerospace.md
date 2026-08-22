@@ -21,8 +21,8 @@ tiling-window-manager setup used alongside this repository, including the
   bindings, semantic F13–F20 / modifier+F-key protocol, and per-app routing.
 - The Corne HOST bridge: how workspace, direction, move, and resize signals
   map to AeroSpace.
-- Separation of responsibility: AeroSpace owns window management (`F13`–`F20`),
-  while Karabiner-Elements owns semantic editing (`F21`–`F24`).
+- Karabiner-Elements host bridge: translating semantic F13–F20 (window management)
+  and F21–F24 (editing) into macOS-native chords without hardware brightness collisions.
 - Installation prerequisites, validation, backups, rollback, and troubleshooting.
 
 **Non-goals**
@@ -296,12 +296,12 @@ semantic F-key signals without changing firmware.
 
 ---
 
-## 7.1 macOS editing bridge (Karabiner-Elements & F21–F24)
+## 7.1 macOS host bridge (Karabiner-Elements & F13–F24)
 
-Window management and text editing are kept strictly decoupled:
+On macOS, Karabiner-Elements provides the hardware bridge for both semantic window management and editing:
 
-* **`F13`–`F20`** (HOST layer) $\rightarrow$ **AeroSpace** (workspaces, focus, move, resize).
-* **`F21`–`F24`** (NAV & MOUSE layers) $\rightarrow$ **Karabiner-Elements** (Copy, Paste, Cut, Undo, Redo).
+* **`F13`–`F20`** (HOST layer) $\rightarrow$ Translated to AeroSpace `Alt` chords (`alt-1`..`alt-5`, `alt-shift-1`..`alt-shift-5`, `alt-h/j/k/l`, etc.). This cleanly bypasses macOS's legacy hardware bindings where raw `F14` and `F15` are intercepted by the system as display brightness down/up controls.
+* **`F21`–`F24`** (NAV & MOUSE layers) $\rightarrow$ Translated to standard macOS clipboard and undo shortcuts (`Cmd+C`, `Cmd+V`, `Cmd+X`, `Cmd+Z`, `Cmd+Shift+Z`).
 
 The repository tracks the canonical Karabiner complex modifications rule file at `dotfiles/karabiner-corne.json`.
 
@@ -313,18 +313,22 @@ The repository tracks the canonical Karabiner complex modifications rule file at
    mkdir -p ~/.config/karabiner/assets/complex_modifications
    cp dotfiles/karabiner-corne.json ~/.config/karabiner/assets/complex_modifications/
    ```
-3. **Enable the rule in Karabiner-Elements:**
+3. **Enable the rules in Karabiner-Elements:**
    - Open **Karabiner-Elements Settings** $\rightarrow$ **Complex Modifications** $\rightarrow$ **Add rule**.
+   - Enable **"Corne F13-F20 Semantic Window Management Bridge"**.
    - Enable **"Corne F21-F24 Semantic Editing"**.
 4. **Verify mapping:**
+   - `F13`–`F17` $\rightarrow$ `Alt+1`–`Alt+5` (Focus workspaces WEB..AUX without brightness adjustments)
+   - `Shift+F13`–`Shift+F17` $\rightarrow$ `Alt+Shift+1`–`Alt+Shift+5` (Move node to workspace)
+   - `Ctrl+F13`–`Ctrl+F16` $\rightarrow$ `Alt+H/J/K/L` (Directional focus)
+   - `Ctrl+Shift+F13`–`Ctrl+Shift+F16` $\rightarrow$ `Alt+Shift+H/J/K/L` (Directional move)
    - `F21` $\rightarrow$ `Command+C` (Copy)
    - `F22` $\rightarrow$ `Command+V` (Paste)
    - `F23` $\rightarrow$ `Command+X` (Cut)
    - `F24` $\rightarrow$ `Command+Z` (Undo)
    - `Shift+F24` $\rightarrow$ `Command+Shift+Z` (Redo)
 
-Because standard MacBook laptop keyboards never emit F21–F24, this configuration does not alter or interfere with normal laptop typing.
-
+Because standard MacBook laptop keyboards never emit F13–F24, this configuration does not alter or interfere with normal laptop typing.
 ## 8. Canonical app routing
 
 The repository-tracked config applies conservative routing only to
@@ -415,17 +419,20 @@ Alfred). Always prefer `--dry-run` before a real reload.
 - Remember only `cmd`/`alt`/`ctrl`/`shift` modifiers are valid; an unsupported
   modifier silently fails to bind.
 
-**Corne HOST keys do nothing in AeroSpace**
+**Corne HOST keys trigger brightness or do nothing**
 
+- **Brightness changes when switching to DEV or COMMS:** In macOS, raw `F14` and
+  `F15` are bound at the system level to brightness down/up. Ensure Karabiner-Elements
+  is installed and running with the `Corne F13-F20 Semantic Window Management Bridge`
+  enabled (Section 7.1). Karabiner intercepts `F13`–`F20` and translates them into
+  AeroSpace `Alt` chords, preventing macOS from receiving raw `F14`/`F15`.
+- **Karabiner permissions:** If Karabiner is running but not intercepting keys, verify
+  **System Settings → Privacy & Security → Input Monitoring** has **Karabiner-Elements**
+  and **Karabiner-Core-Service** enabled, and in Karabiner-Elements under **Devices**,
+  the Corne keyboard has **Modify events** checked.
 - Confirm the keyboard is on the HOST layer (hold the BASE `Tab` thumb
   `LH0` to engage it — see [docs/corne-keymaps.md](corne-keymaps.md)).
-- Confirm the semantic bindings (`f13`–`f20`, `shift-f13`–`shift-f18`,
-  `ctrl-f13`–`ctrl-f16`, and `ctrl-shift-f13`–`ctrl-shift-f16`) are present in
-  `~/.config/aerospace/aerospace.toml`.
-- Run `aerospace reload-config --dry-run` before applying changes.
-- Some macOS apps swallow F-keys or modifier+F-key events; verify with a
-  known-good app first.
-
+- Confirm AeroSpace has `alt-1`..`alt-5` and direction bindings loaded (`aerospace reload-config`).
 **Config edit broke things**
 
 - AeroSpace keeps the last good in-memory config if parsing fails, so the session
