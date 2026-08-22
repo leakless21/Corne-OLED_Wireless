@@ -184,11 +184,15 @@ def test_bootloader_shortcuts(parsed: dict) -> None:
 
     print("PASS: Bootloader routing invariants verified (NAV LT5, NUM RT5, ADJUST mirrored left/right).")
 
-def test_media_bindings(parsed: dict) -> None:
+def test_cross_platform_bindings(parsed: dict) -> None:
     media = parsed["layers"].get("MEDIA")
-    if not media:
-        fail("MEDIA layer missing")
+    nav = parsed["layers"].get("NAV")
+    mouse = parsed["layers"].get("MOUSE")
 
+    if not media or not nav or not mouse:
+        fail("MEDIA, NAV, or MOUSE layer missing")
+
+    # MEDIA assertions
     media_raw = media["raw_bindings"]
     required_media = [
         "&kp C_PREVIOUS",
@@ -214,8 +218,42 @@ def test_media_bindings(parsed: dict) -> None:
         if tok in media_raw:
             fail(f"MEDIA layer contains obsolete Keyboard-page media token: {tok}")
 
-    print("PASS: MEDIA layer Consumer HID media bindings verified.")
+    # NAV and MOUSE assertions
+    required_editing = [
+        "&kp F21",
+        "&kp F22",
+        "&kp F23",
+        "&kp F24",
+        "&kp LS(F24)",
+    ]
+    rejected_editing = [
+        "LG(C)",
+        "LG(V)",
+        "LG(X)",
+        "LG(Z)",
+        "LS(LG(Z))",
+        "C_AC_COPY",
+        "C_AC_PASTE",
+        "C_AC_CUT",
+        "C_AC_UNDO",
+        "C_AC_REDO",
+        "K_COPY",
+        "K_PASTE",
+        "K_CUT",
+        "K_UNDO",
+        "K_REDO",
+    ]
 
+    for layer_name, layer_dict in [("NAV", nav), ("MOUSE", mouse)]:
+        raw = layer_dict["raw_bindings"]
+        for tok in required_editing:
+            if tok not in raw:
+                fail(f"{layer_name} layer missing semantic editing token: {tok}")
+        for tok in rejected_editing:
+            if tok in raw:
+                fail(f"{layer_name} layer contains prohibited editing token: {tok}")
+
+    print("PASS: Cross-platform bindings verified (Consumer media HID, semantic F21-F24 editing on NAV/MOUSE).")
 
 def test_conf_constraints() -> None:
     if not CONF_PATH.exists():
@@ -245,7 +283,7 @@ def main() -> None:
     test_game_layer(parsed)
     test_game_aux_layer(parsed)
     test_bootloader_shortcuts(parsed)
-    test_media_bindings(parsed)
+    test_cross_platform_bindings(parsed)
     test_conf_constraints()
 
     print("\nALL STATIC KEYMAP INVARIANTS PASSED.")

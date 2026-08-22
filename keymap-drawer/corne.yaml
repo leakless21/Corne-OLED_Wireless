@@ -50,11 +50,11 @@ layers:
   - ''
   - ''
   - ''
-  - Sft+Gui+Z
-  - Gui+V
-  - Gui+C
-  - Gui+X
-  - Gui+Z
+  - Redo
+  - Paste
+  - Copy
+  - Cut
+  - Undo
   - ''
   - ''
   - LGUI
@@ -93,11 +93,11 @@ layers:
   - ''
   - ''
   - ''
-  - Sft+Gui+Z
-  - Gui+V
-  - Gui+C
-  - Gui+X
-  - Gui+Z
+  - Redo
+  - Paste
+  - Copy
+  - Cut
+  - Undo
   - ''
   - ''
   - LGUI
