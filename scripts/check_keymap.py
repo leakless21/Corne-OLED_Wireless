@@ -184,6 +184,38 @@ def test_bootloader_shortcuts(parsed: dict) -> None:
 
     print("PASS: Bootloader routing invariants verified (NAV LT5, NUM RT5, ADJUST mirrored left/right).")
 
+def test_media_bindings(parsed: dict) -> None:
+    media = parsed["layers"].get("MEDIA")
+    if not media:
+        fail("MEDIA layer missing")
+
+    media_raw = media["raw_bindings"]
+    required_media = [
+        "&kp C_PREVIOUS",
+        "&kp C_VOLUME_DOWN",
+        "&kp C_VOLUME_UP",
+        "&kp C_NEXT",
+        "&kp C_PLAY_PAUSE",
+        "&kp C_MUTE",
+    ]
+    for tok in required_media:
+        if tok not in media_raw:
+            fail(f"MEDIA layer missing required Consumer HID token: {tok}")
+
+    rejected_media = [
+        "K_PREV",
+        "K_VOLUME_DOWN",
+        "K_VOLUME_UP",
+        "K_NEXT",
+        "K_PLAY_PAUSE",
+        "K_MUTE",
+    ]
+    for tok in rejected_media:
+        if tok in media_raw:
+            fail(f"MEDIA layer contains obsolete Keyboard-page media token: {tok}")
+
+    print("PASS: MEDIA layer Consumer HID media bindings verified.")
+
 
 def test_conf_constraints() -> None:
     if not CONF_PATH.exists():
@@ -213,6 +245,7 @@ def main() -> None:
     test_game_layer(parsed)
     test_game_aux_layer(parsed)
     test_bootloader_shortcuts(parsed)
+    test_media_bindings(parsed)
     test_conf_constraints()
 
     print("\nALL STATIC KEYMAP INVARIANTS PASSED.")
