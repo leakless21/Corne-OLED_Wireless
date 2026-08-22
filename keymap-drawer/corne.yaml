@@ -345,7 +345,7 @@ layers:
   - Prev WS
   - Float
   GAME:
-  - {t: ESCAPE, h: GAME_AUX}
+  - {t: ESCAPE, h: GAME_FN}
   - Q
   - W
   - E
@@ -385,7 +385,7 @@ layers:
   - SPACE
   - LALT
   - ENTER
-  - GAME_AUX
+  - GAME_FN
   - {t: ▽, type: trans}
   ADJUST:
   - '&bootloader'
@@ -430,7 +430,7 @@ layers:
   - ''
   - {type: held}
   - ''
-  GAME_AUX:
+  GAME_FN:
   - {type: held}
   - '1'
   - '2'

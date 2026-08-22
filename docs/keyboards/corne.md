@@ -39,9 +39,9 @@ LB5 LB4 LB3 LB2 LB1 LB0 | RB0 RB1 RB2 RB3 RB4 RB5
 | 5 | `SYM` | Hold `RH0` (Enter) | Shifted NUM symbols on left; mirrored modifiers on right. |
 | 6 | `FUN` | Hold `RH2` (Delete) | F1–F12 function key grid on left; Caps Lock fallback (`RT0`) on right. |
 | 7 | `HOST` | Hold `LH0` (Tab) | Semantic `F13`–`F20` host protocol for window management, launchers, and modal controls. |
-| 8 | `GAME` | Via `ADJUST` | Tap-only QWERTY for gaming; `game_aux_lt` on `LT5`, momentary `RH1` AUX. |
+| 8 | `GAME` | Via `ADJUST` | Tap-only QWERTY for gaming; `game_fn_lt` on `LT5`, momentary `RH1` FN. |
 | 9 | `ADJUST` | Hold `NAV + NUM` | Bluetooth management (`LM4`–`LM0`), power toggles, mirrored reset/bootloaders, Studio unlock. |
-| 10 | `GAME_AUX` | Hold `Esc` / `RH1` | Gaming numbers 1–0, F1–F10, missing symbols, and deliberate exit to `BASE` (`RH2`). |
+| 10 | `GAME_FN` | Hold `Esc` / `RH1` | Gaming numbers 1–0, F1–F10, missing symbols, and deliberate exit to `BASE` (`RH2`). |
 
 ---
 
@@ -59,3 +59,11 @@ LB5 LB4 LB3 LB2 LB1 LB0 | RB0 RB1 RB2 RB3 RB4 RB5
 - `corne-left.uf2` (left half, includes ZMK Studio RPC over USB-UART)
 - `corne-right.uf2` (right half)
 - `settings-reset.uf2` (settings partition wipe utility)
+
+---
+
+## 6. Power & Display Policy
+
+* **Sleep Timing:** Idle blank at 30 seconds (`CONFIG_ZMK_IDLE_TIMEOUT=30000`); deep sleep at 15 minutes (`CONFIG_ZMK_IDLE_SLEEP_TIMEOUT=900000`).
+* **External Power Normalization:** `CONFIG_ZMK_RGB_UNDERGLOW_EXT_POWER=n` ensures external power lines remain energized for OLED status screens even when underglow is toggled.
+* **OLED Widgets:** Compact status screen displaying active layer, battery percentage/charging status, Bluetooth profile, and active modifier indicators (macOS style).

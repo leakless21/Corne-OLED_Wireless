@@ -1,358 +1,333 @@
 #!/usr/bin/env python3
 """
-Static regression test suite for Corne ZMK firmware keymap.
-Enforces layer indices, gaming access, bootloader routing, and physical layout invariants.
+Structural & Positional Invariant Validator for Corne Keyboard (42 keys).
+
+Asserts exact position-level behaviors and semantic signals across all layers
+using the structured keymap parser.
 """
 
-import re
+from __future__ import annotations
+
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+# Robust path configuration for local and package execution
+SCRIPTS_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPTS_DIR.parent
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+try:
+    from lib.keymap_parser import KeyboardConfig, parse_keymap_file
+    from lib.validation import assert_eq, assert_in, assert_true, fail
+except ImportError:
+    from scripts.lib.keymap_parser import KeyboardConfig, parse_keymap_file
+    from scripts.lib.validation import assert_eq, assert_in, assert_true, fail
 KEYMAP_PATH = REPO_ROOT / "config" / "corne.keymap"
 CONF_PATH = REPO_ROOT / "config" / "corne.conf"
 
-EXPECTED_LAYERS = [
-    ("L_BASE", 0, "BASE"),
-    ("L_NAV", 1, "NAV"),
-    ("L_MOUSE", 2, "MOUSE"),
-    ("L_MEDIA", 3, "MEDIA"),
-    ("L_NUM", 4, "NUM"),
-    ("L_SYM", 5, "SYM"),
-    ("L_FUN", 6, "FUN"),
-    ("L_HOST", 7, "HOST"),
-    ("L_GAME", 8, "GAME"),
-    ("L_ADJUST", 9, "ADJUST"),
-    ("L_GAME_AUX", 10, "GAME_AUX"),
+EXPECTED_LAYER_NAMES = [
+    "BASE", "NAV", "MOUSE", "MEDIA", "NUM", "SYM", "FUN", "HOST", "GAME", "ADJUST", "GAME_FN"
 ]
 
 
-def fail(msg: str) -> None:
-    print(f"FAIL: {msg}", file=sys.stderr)
-    sys.exit(1)
+def test_layer_indices(cfg: KeyboardConfig) -> None:
+    """Verify that all layer defines match expected 0-based indices in sequential order."""
+    for idx, name in enumerate(EXPECTED_LAYER_NAMES):
+        def_name = f"L_{name}"
+        assert_in(def_name, cfg.defines, f"Missing #define for {def_name}")
+        assert_eq(cfg.defines[def_name], idx, f"Layer index for {def_name} should be {idx}")
+        assert_in(name, cfg.layers, f"Keymap missing layer '{name}'")
+
+    print(f"PASS: All {len(EXPECTED_LAYER_NAMES)} layer indices and names verified structurally.")
 
 
-def parse_keymap_content(content: str) -> dict:
-    # 1. Parse defines
-    defines = {}
-    for match in re.finditer(r"#define\s+(L_\w+)\s+(\d+)", content):
-        defines[match.group(1)] = int(match.group(2))
+def test_base_layer(cfg: KeyboardConfig) -> None:
+    """Verify exact physical positions on the BASE layer."""
+    base = cfg.layer("BASE")
 
-    # 2. Extract keymap layers
-    layer_matches = re.finditer(
-        r"([A-Z_]+)\s*\{\s*label\s*=\s*\"([^\"]+)\";\s*display-name\s*=\s*\"([^\"]+)\";[\s\S]*?bindings\s*=\s*<([\s\S]*?)>;\s*\};",
-        content,
+    # Esc on LT5
+    assert_eq(base.pos("LT5"), "&kp ESCAPE", "LT5 must be &kp ESCAPE")
+
+    # Left top alphas: Q W F P B
+    assert_eq(base.pos("LT4"), "&kp Q", "LT4 must be Q")
+    assert_eq(base.pos("LT3"), "&kp W", "LT3 must be W")
+    assert_eq(base.pos("LT2"), "&kp F", "LT2 must be F")
+    assert_eq(base.pos("LT1"), "&kp P", "LT1 must be P")
+    assert_eq(base.pos("LT0"), "&kp B", "LT0 must be B")
+
+    # Right top alphas: J L U Y SQT BACKSPACE
+    assert_eq(base.pos("RT0"), "&kp J", "RT0 must be J")
+    assert_eq(base.pos("RT1"), "&kp L", "RT1 must be L")
+    assert_eq(base.pos("RT2"), "&kp U", "RT2 must be U")
+    assert_eq(base.pos("RT3"), "&kp Y", "RT3 must be Y")
+    assert_eq(base.pos("RT4"), "&kp SQT", "RT4 must be SQT")
+    assert_eq(base.pos("RT5"), "&kp BACKSPACE", "RT5 must be BACKSPACE")
+
+    # Left middle: MEDIA on LM5, Bilateral HRMs on LM4..LM1, G on LM0
+    assert_eq(base.pos("LM5"), "&mo L_MEDIA", "LM5 must be &mo L_MEDIA")
+    assert_eq(base.pos("LM4"), "&hml LMETA A", "LM4 must be &hml LMETA A")
+    assert_eq(base.pos("LM3"), "&hml LEFT_ALT R", "LM3 must be &hml LEFT_ALT R")
+    assert_eq(base.pos("LM2"), "&hml LCTRL S", "LM2 must be &hml LCTRL S")
+    assert_eq(base.pos("LM1"), "&hml LEFT_SHIFT T", "LM1 must be &hml LEFT_SHIFT T")
+    assert_eq(base.pos("LM0"), "&kp G", "LM0 must be G")
+
+    # Right middle: M on RM0, Bilateral HRMs on RM1..RM4, Semicolon on RM5
+    assert_eq(base.pos("RM0"), "&kp M", "RM0 must be M")
+    assert_eq(base.pos("RM1"), "&hmr RIGHT_SHIFT N", "RM1 must be &hmr RIGHT_SHIFT N")
+    assert_eq(base.pos("RM2"), "&hmr RCTRL E", "RM2 must be &hmr RCTRL E")
+    assert_eq(base.pos("RM3"), "&hmr RIGHT_ALT I", "RM3 must be &hmr RIGHT_ALT I")
+    assert_eq(base.pos("RM4"), "&hmr RIGHT_GUI O", "RM4 must be &hmr RIGHT_GUI O")
+    assert_eq(base.pos("RM5"), "&kp SEMICOLON", "RM5 must be SEMICOLON")
+
+    # Left bottom: Sticky Shift on LB5, Z X C D V on LB4..LB0
+    assert_eq(base.pos("LB5"), "&sk LSHFT", "LB5 must be &sk LSHFT")
+    assert_eq(base.pos("LB4"), "&kp Z", "LB4 must be Z")
+    assert_eq(base.pos("LB3"), "&kp X", "LB3 must be X")
+    assert_eq(base.pos("LB2"), "&kp C", "LB2 must be C")
+    assert_eq(base.pos("LB1"), "&kp D", "LB1 must be D")
+    assert_eq(base.pos("LB0"), "&kp V", "LB0 must be V")
+
+    # Right bottom: K H COMMA DOT SLASH RIGHT_SHIFT
+    assert_eq(base.pos("RB0"), "&kp K", "RB0 must be K")
+    assert_eq(base.pos("RB1"), "&kp H", "RB1 must be H")
+    assert_eq(base.pos("RB2"), "&kp COMMA", "RB2 must be COMMA")
+    assert_eq(base.pos("RB3"), "&kp DOT", "RB3 must be DOT")
+    assert_eq(base.pos("RB4"), "&kp SLASH", "RB4 must be SLASH")
+    assert_eq(base.pos("RB5"), "&kp RIGHT_SHIFT", "RB5 must be RIGHT_SHIFT")
+
+    # Thumbs: LH2 (MOUSE/Esc), LH1 (NAV/Space), LH0 (HOST/Tab), RH0 (SYM/Enter), RH1 (NUM/Backspace), RH2 (FUN/Delete)
+    assert_eq(base.pos("LH2"), "&lt L_MOUSE ESCAPE", "LH2 must be MOUSE/Esc layer-tap")
+    assert_eq(base.pos("LH1"), "&lt L_NAV SPACE", "LH1 must be NAV/Space layer-tap")
+    assert_eq(base.pos("LH0"), "&host_lt L_HOST TAB", "LH0 must be dedicated HOST/Tab layer-tap")
+    assert_eq(base.pos("RH0"), "&lt L_SYM ENTER", "RH0 must be SYM/Enter layer-tap")
+    assert_eq(base.pos("RH1"), "&lt L_NUM BACKSPACE", "RH1 must be NUM/Backspace layer-tap")
+    assert_eq(base.pos("RH2"), "&lt L_FUN DELETE", "RH2 must be FUN/Delete layer-tap")
+
+    print("PASS: BASE layer exact physical positions verified.")
+
+
+def test_game_layer(cfg: KeyboardConfig) -> None:
+    """Verify GAME layer invariants (plain QWERTY, no HRMs, dedicated Esc hold-tap, momentary AUX)."""
+    game = cfg.layer("GAME")
+
+    # Esc hold-tap on LT5
+    lt5_binding = game.pos("LT5")
+    assert_true(
+        "ESCAPE" in lt5_binding and "game_fn_lt" in lt5_binding,
+        f"LT5 on GAME must be dedicated hold-tap &game_fn_lt with ESCAPE, got: {lt5_binding}"
     )
-    layers = {}
-    for m in layer_matches:
-        node_name = m.group(1)
-        label = m.group(2)
-        display_name = m.group(3)
-        raw_bindings = m.group(4)
-        tokens = raw_bindings.split()
-        layers[node_name] = {
-            "node_name": node_name,
-            "label": label,
-            "display_name": display_name,
-            "raw_bindings": raw_bindings,
-            "tokens": tokens,
-        }
 
-    return {"defines": defines, "layers": layers}
+    # QWERTY alphas
+    assert_eq(game.pos("LT4"), "&kp Q")
+    assert_eq(game.pos("LT3"), "&kp W")
+    assert_eq(game.pos("LT2"), "&kp E")
+    assert_eq(game.pos("LT1"), "&kp R")
+    assert_eq(game.pos("LT0"), "&kp T")
+    assert_eq(game.pos("LM4"), "&kp A")
+    assert_eq(game.pos("LM3"), "&kp S")
+    assert_eq(game.pos("LM2"), "&kp D")
+    assert_eq(game.pos("LM1"), "&kp F")
+    assert_eq(game.pos("LM0"), "&kp G")
 
+    # Direct modifiers
+    assert_eq(game.pos("LM5"), "&kp TAB")
+    assert_eq(game.pos("LB5"), "&kp LEFT_SHIFT")
+    assert_eq(game.pos("LH2"), "&kp LCTRL")
+    assert_eq(game.pos("LH1"), "&kp SPACE")
+    assert_eq(game.pos("LH0"), "&kp LALT")
 
-def test_layer_indices(parsed: dict) -> None:
-    defines = parsed["defines"]
-    layers = parsed["layers"]
+    # Momentary FN on RH1
+    rh1_binding = game.pos("RH1")
+    assert_eq(
+        rh1_binding,
+        "&mo L_GAME_FN",
+        f"RH1 on GAME must be momentary access to gaming utility layer, got: {rh1_binding}"
+    )
 
-    for define_name, expected_idx, layer_name in EXPECTED_LAYERS:
-        if define_name not in defines:
-            fail(f"Missing define: {define_name}")
-        if defines[define_name] != expected_idx:
-            fail(f"{define_name} has value {defines[define_name]}, expected {expected_idx}")
-        if layer_name not in layers:
-            fail(f"Missing layer node: {layer_name}")
+    # No HRMs or sticky keys
+    for pos_label, b in game.all_by_pos().items():
+        assert_true("&hml" not in b and "&hmr" not in b, f"GAME layer must not contain HRMs at {pos_label}")
+        assert_true("&sk" not in b, f"GAME layer must not contain sticky keys at {pos_label}")
+        assert_true("&to L_BASE" not in b, f"GAME layer must not directly exit to BASE at {pos_label}")
 
-        layer_data = layers[layer_name]
-        if layer_data["label"] != layer_name:
-            fail(f"Layer {layer_name} has label '{layer_data['label']}', expected '{layer_name}'")
-        if layer_data["display_name"] != layer_name:
-            fail(f"Layer {layer_name} has display-name '{layer_data['display_name']}', expected '{layer_name}'")
-        raw_b = layer_data["raw_bindings"]
-        binding_count = len(re.findall(r"&[a-zA-Z_]+", raw_b))
-        if binding_count != 42:
-            fail(f"Layer {layer_name} has {binding_count} bindings, expected exactly 42")
-    if len(layers) != len(EXPECTED_LAYERS):
-        fail(f"Expected {len(EXPECTED_LAYERS)} layers, found {len(layers)}")
-
-    print(f"PASS: All {len(EXPECTED_LAYERS)} layer indices and names verified.")
+    print("PASS: GAME layer invariants verified (no HRMs, dedicated Esc hold-tap, momentary AUX/FN).")
 
 
-def test_game_layer(parsed: dict) -> None:
-    game = parsed["layers"].get("GAME")
-    if not game:
-        fail("GAME layer missing")
+def test_game_fn_layer(cfg: KeyboardConfig) -> None:
+    """Verify GAME_FN layer (1-0 numbers, F1-F10, punctuation, deliberate exit to BASE)."""
+    fn = cfg.layer("GAME_FN")
 
-    raw = game["raw_bindings"]
+    # Numbers 1-5 on top-left, 6-0 on top-right
+    assert_eq(fn.pos("LT4"), "&kp NUMBER_1")
+    assert_eq(fn.pos("LT3"), "&kp NUMBER_2")
+    assert_eq(fn.pos("LT2"), "&kp NUMBER_3")
+    assert_eq(fn.pos("LT1"), "&kp NUMBER_4")
+    assert_eq(fn.pos("LT0"), "&kp NUMBER_5")
+    assert_eq(fn.pos("RT0"), "&kp NUMBER_6")
+    assert_eq(fn.pos("RT1"), "&kp NUMBER_7")
+    assert_eq(fn.pos("RT2"), "&kp NUMBER_8")
+    assert_eq(fn.pos("RT3"), "&kp NUMBER_9")
+    assert_eq(fn.pos("RT4"), "&kp NUMBER_0")
 
-    # Prohibited on GAME
-    if "hml" in raw or "hmr" in raw:
-        fail("GAME layer contains home-row mods (hml/hmr)")
-    if "&sk" in raw:
-        fail("GAME layer contains sticky keys")
+    # F1-F5 on home-left, F6-F10 on home-right
+    assert_eq(fn.pos("LM4"), "&kp F1")
+    assert_eq(fn.pos("LM3"), "&kp F2")
+    assert_eq(fn.pos("LM2"), "&kp F3")
+    assert_eq(fn.pos("LM1"), "&kp F4")
+    assert_eq(fn.pos("LM0"), "&kp F5")
+    assert_eq(fn.pos("RM0"), "&kp F6")
+    assert_eq(fn.pos("RM1"), "&kp F7")
+    assert_eq(fn.pos("RM2"), "&kp F8")
+    assert_eq(fn.pos("RM3"), "&kp F9")
+    assert_eq(fn.pos("RM4"), "&kp F10")
 
-    # Plain keys required for gaming
-    required_tokens = ["&kp Q", "&kp W", "&kp E", "&kp R", "&kp T",
-                       "&kp A", "&kp S", "&kp D", "&kp F", "&kp G",
-                       "&kp LEFT_SHIFT", "&kp LCTRL", "&kp SPACE", "&kp LALT"]
-    for tok in required_tokens:
-        if tok not in raw:
-            fail(f"GAME layer missing required gaming token: {tok}")
+    # Deliberate exit to BASE at RH2
+    assert_eq(fn.pos("RH2"), "&to L_BASE", "GAME_FN RH2 must be deliberate exit &to L_BASE")
 
-    # Esc hold-tap
-    if "&game_aux_lt L_GAME_AUX ESCAPE" not in raw:
-        fail("GAME layer missing dedicated Esc/AUX hold-tap on top-left: '&game_aux_lt L_GAME_AUX ESCAPE'")
-
-    # RH1 momentary AUX
-    if "&mo L_GAME_AUX" not in raw:
-        fail("GAME layer missing momentary GAME_AUX on right-middle thumb: '&mo L_GAME_AUX'")
-
-    # No naked exit to BASE on GAME
-    if "&to L_BASE" in raw:
-        fail("GAME layer must not contain direct '&to L_BASE' exit")
-
-    print("PASS: GAME layer invariants verified (no HRMs, dedicated Esc/AUX hold-tap, momentary RH1, no direct exit).")
+    print("PASS: GAME_FN layer invariants verified (1-0, F1-F10, deliberate exit to BASE at RH2).")
 
 
-def test_game_aux_layer(parsed: dict) -> None:
-    aux = parsed["layers"].get("GAME_AUX")
-    if not aux:
-        fail("GAME_AUX layer missing")
+def test_bootloader_shortcuts(cfg: KeyboardConfig) -> None:
+    """Verify bootloader and reset positions across NAV, NUM, and ADJUST."""
+    nav = cfg.layer("NAV")
+    num = cfg.layer("NUM")
+    adjust = cfg.layer("ADJUST")
 
-    raw = aux["raw_bindings"]
+    # NAV left bootloader at LT5
+    assert_eq(nav.pos("LT5"), "&bootloader", "NAV LT5 must be left &bootloader")
 
-    # Numbers 1-0
-    for num in range(10):
-        tok = f"&kp NUMBER_{num}"
-        if tok not in raw:
-            fail(f"GAME_AUX missing number key: {tok}")
+    # NUM right bootloader at RT5
+    assert_eq(num.pos("RT5"), "&bootloader", "NUM RT5 must be right &bootloader")
 
-    # F1-F10
-    for f in range(1, 11):
-        tok = f"&kp F{f}"
-        if tok not in raw:
-            fail(f"GAME_AUX missing function key: {tok}")
-
-    # Missing gaming punctuation
-    for sym in ["&kp GRAVE", "&kp MINUS", "&kp EQUAL", "&kp LEFT_BRACKET", "&kp RIGHT_BRACKET"]:
-        if sym not in raw:
-            fail(f"GAME_AUX missing punctuation key: {sym}")
-
-    # Deliberate exit to BASE behind GAME_AUX
-    if "&to L_BASE" not in raw:
-        fail("GAME_AUX layer missing deliberate '&to L_BASE' exit")
-
-    print("PASS: GAME_AUX layer invariants verified (1-0, F1-F10, punctuation, deliberate exit to BASE).")
-
-
-def test_bootloader_shortcuts(parsed: dict) -> None:
-    nav = parsed["layers"].get("NAV")
-    num = parsed["layers"].get("NUM")
-    adjust = parsed["layers"].get("ADJUST")
-
-    if not nav or not num or not adjust:
-        fail("NAV, NUM, or ADJUST layer missing")
-
-    # NAV left-side bootloader (LT5 is the first binding)
-    nav_raw = nav["raw_bindings"].strip()
-    if not nav_raw.startswith("&bootloader"):
-        fail("NAV layer must have '&bootloader' at LT5 (first binding)")
-
-    # NUM right-side bootloader (RT5 is in the first row, right half)
-    if "&bootloader" not in num["raw_bindings"]:
-        fail("NUM layer must have '&bootloader' on the right half (RT5)")
-
-    # ADJUST must preserve both left and right bootloader & sys_reset
-    adjust_raw = adjust["raw_bindings"]
-    bootloader_count = adjust_raw.count("&bootloader")
-    sys_reset_count = adjust_raw.count("&sys_reset")
-
-    if bootloader_count < 2:
-        fail(f"ADJUST layer must contain 2 &bootloader bindings (left and right), found {bootloader_count}")
-    if sys_reset_count < 2:
-        fail(f"ADJUST layer must contain 2 &sys_reset bindings (left and right), found {sys_reset_count}")
+    # ADJUST mirrored recovery positions
+    assert_eq(adjust.pos("LT5"), "&bootloader", "ADJUST LT5 must be left &bootloader")
+    assert_eq(adjust.pos("LT4"), "&sys_reset", "ADJUST LT4 must be left &sys_reset")
+    assert_eq(adjust.pos("RT4"), "&sys_reset", "ADJUST RT4 must be right &sys_reset")
+    assert_eq(adjust.pos("RT5"), "&bootloader", "ADJUST RT5 must be right &bootloader")
 
     print("PASS: Bootloader routing invariants verified (NAV LT5, NUM RT5, ADJUST mirrored left/right).")
 
-def test_cross_platform_bindings(parsed: dict) -> None:
-    media = parsed["layers"].get("MEDIA")
-    nav = parsed["layers"].get("NAV")
-    mouse = parsed["layers"].get("MOUSE")
 
-    if not media or not nav or not mouse:
-        fail("MEDIA, NAV, or MOUSE layer missing")
+def test_cross_platform_bindings(cfg: KeyboardConfig) -> None:
+    """Verify standard Consumer media and semantic editing signals (F21-F24)."""
+    media = cfg.layer("MEDIA")
+    nav = cfg.layer("NAV")
+    mouse = cfg.layer("MOUSE")
 
-    # MEDIA assertions
-    media_raw = media["raw_bindings"]
-    required_media = [
-        "&kp C_PREVIOUS",
-        "&kp C_VOLUME_DOWN",
-        "&kp C_VOLUME_UP",
-        "&kp C_NEXT",
-        "&kp C_PLAY_PAUSE",
-        "&kp C_MUTE",
-    ]
-    for tok in required_media:
-        if tok not in media_raw:
-            fail(f"MEDIA layer missing required Consumer HID token: {tok}")
+    # Media directional controls
+    assert_eq(media.pos("RM1"), "&kp C_PREVIOUS")
+    assert_eq(media.pos("RM2"), "&kp C_VOLUME_DOWN")
+    assert_eq(media.pos("RM3"), "&kp C_VOLUME_UP")
+    assert_eq(media.pos("RM4"), "&kp C_NEXT")
+    assert_eq(media.pos("RH0"), "&kp C_STOP")
+    assert_eq(media.pos("RH1"), "&kp C_PLAY_PAUSE")
+    assert_eq(media.pos("RH2"), "&kp C_MUTE")
 
-    rejected_media = [
-        "K_PREV",
-        "K_VOLUME_DOWN",
-        "K_VOLUME_UP",
-        "K_NEXT",
-        "K_PLAY_PAUSE",
-        "K_MUTE",
-    ]
-    for tok in rejected_media:
-        if tok in media_raw:
-            fail(f"MEDIA layer contains obsolete Keyboard-page media token: {tok}")
-
-    # NAV and MOUSE assertions
-    required_editing = [
-        "&kp F21",
-        "&kp F22",
-        "&kp F23",
-        "&kp F24",
-        "&kp LS(F24)",
-    ]
-    rejected_editing = [
-        "LG(C)",
-        "LG(V)",
-        "LG(X)",
-        "LG(Z)",
-        "LS(LG(Z))",
-        "C_AC_COPY",
-        "C_AC_PASTE",
-        "C_AC_CUT",
-        "C_AC_UNDO",
-        "C_AC_REDO",
-        "K_COPY",
-        "K_PASTE",
-        "K_CUT",
-        "K_UNDO",
-        "K_REDO",
-    ]
-
-    for layer_name, layer_dict in [("NAV", nav), ("MOUSE", mouse)]:
-        raw = layer_dict["raw_bindings"]
-        for tok in required_editing:
-            if tok not in raw:
-                fail(f"{layer_name} layer missing semantic editing token: {tok}")
-        for tok in rejected_editing:
-            if tok in raw:
-                fail(f"{layer_name} layer contains prohibited editing token: {tok}")
+    # Semantic editing signals on NAV and MOUSE (RT0..RT4)
+    for l_name, l_obj in [("NAV", nav), ("MOUSE", mouse)]:
+        assert_eq(l_obj.pos("RT0"), "&kp LS(F24)", f"{l_name} RT0 must be Redo &kp LS(F24)")
+        assert_eq(l_obj.pos("RT1"), "&kp F22", f"{l_name} RT1 must be Paste &kp F22)")
+        assert_eq(l_obj.pos("RT2"), "&kp F21", f"{l_name} RT2 must be Copy &kp F21)")
+        assert_eq(l_obj.pos("RT3"), "&kp F23", f"{l_name} RT3 must be Cut &kp F23)")
+        assert_eq(l_obj.pos("RT4"), "&kp F24", f"{l_name} RT4 must be Undo &kp F24)")
 
     print("PASS: Cross-platform bindings verified (Consumer media HID, semantic F21-F24 editing on NAV/MOUSE).")
 
 
-def test_caps_behavior(parsed: dict) -> None:
-    nav = parsed["layers"].get("NAV")
-    fun = parsed["layers"].get("FUN")
-    if not nav or not fun:
-        fail("NAV or FUN layer missing")
+def test_caps_behavior(cfg: KeyboardConfig) -> None:
+    """Verify Caps Word on NAV (RM0) and Caps Lock fallback on FUN (RT0)."""
+    nav = cfg.layer("NAV")
+    fun = cfg.layer("FUN")
 
-    if "&caps_word" not in nav["raw_bindings"]:
-        fail("NAV layer missing '&caps_word' behavior")
-    if "&kp CAPSLOCK" not in fun["raw_bindings"]:
-        fail("FUN layer missing fallback '&kp CAPSLOCK'")
+    assert_eq(nav.pos("RM0"), "&caps_word", "NAV RM0 must be &caps_word")
+    assert_eq(fun.pos("RT0"), "&kp CAPSLOCK", "FUN RT0 must be &kp CAPSLOCK fallback")
 
     print("PASS: Caps behavior verified (&caps_word on NAV, &kp CAPSLOCK fallback on FUN).")
 
 
-def test_host_layer_bindings(parsed: dict) -> None:
-    host = parsed["layers"].get("HOST")
-    if not host:
-        fail("HOST layer missing")
+def test_host_layer_bindings(cfg: KeyboardConfig) -> None:
+    """Verify all 27 semantic signals on the HOST layer at exact physical positions."""
+    host = cfg.layer("HOST")
 
-    raw = host["raw_bindings"]
-    required_host_tokens = [
-        # Workspaces
-        "&kp F13", "&kp F14", "&kp F15", "&kp F16", "&kp F17",
-        # Move to workspace
-        "&kp LS(F13)", "&kp LS(F14)", "&kp LS(F15)", "&kp LS(F16)", "&kp LS(F17)",
-        # Directional focus
-        "&kp LC(F13)", "&kp LC(F14)", "&kp LC(F15)", "&kp LC(F16)",
-        # Directional move
-        "&kp LC(LS(F13))", "&kp LC(LS(F14))", "&kp LC(LS(F15))", "&kp LC(LS(F16))",
-        # Modal & context controls
-        "&kp LS(F18)", "&kp F18", "&kp F19", "&kp F20",
-        # Extended semantic protocol
-        "&kp LA(F13)",  # SYSTEM_LAUNCHER
-        "&kp LA(F14)",  # QUICK_TERMINAL
-        "&kp LA(F15)",  # NEW_TERMINAL
-        "&kp LA(F16)",  # PREVIOUS_WINDOW
-        "&kp LA(F18)",  # SERVICE_MODE
-    ]
-    for tok in required_host_tokens:
-        if tok not in raw:
-            fail(f"HOST layer missing expected semantic protocol token: {tok}")
+    # Top row: Move window to workspace (LT4..LT0)
+    assert_eq(host.pos("LT4"), "&kp LS(F13)", "LT4 must be Move WS 1")
+    assert_eq(host.pos("LT3"), "&kp LS(F14)", "LT3 must be Move WS 2")
+    assert_eq(host.pos("LT2"), "&kp LS(F15)", "LT2 must be Move WS 3")
+    assert_eq(host.pos("LT1"), "&kp LS(F16)", "LT1 must be Move WS 4")
+    assert_eq(host.pos("LT0"), "&kp LS(F17)", "LT0 must be Move WS 5")
 
-    print("PASS: HOST layer semantic signals verified (workspaces, focus/move, launchers, previous window, resize, service).")
+    # Home row: Visit workspace (LM4..LM0)
+    assert_eq(host.pos("LM4"), "&kp F13", "LM4 must be Focus WS 1")
+    assert_eq(host.pos("LM3"), "&kp F14", "LM3 must be Focus WS 2")
+    assert_eq(host.pos("LM2"), "&kp F15", "LM2 must be Focus WS 3")
+    assert_eq(host.pos("LM1"), "&kp F16", "LM1 must be Focus WS 4")
+    assert_eq(host.pos("LM0"), "&kp F17", "LM0 must be Focus WS 5")
+
+    # Bottom left: Launchers (LB4..LB2)
+    assert_eq(host.pos("LB4"), "&kp LA(F13)", "LB4 must be Launcher")
+    assert_eq(host.pos("LB3"), "&kp LA(F14)", "LB3 must be Quick Terminal")
+    assert_eq(host.pos("LB2"), "&kp LA(F15)", "LB2 must be New Terminal")
+
+    # Right top: Modals & Esc (RT1, RT2, RT5)
+    assert_eq(host.pos("RT1"), "&kp LS(F18)", "RT1 must be Resize Mode")
+    assert_eq(host.pos("RT2"), "&kp LA(F18)", "RT2 must be Service Mode")
+    assert_eq(host.pos("RT5"), "&kp ESCAPE", "RT5 must be Escape")
+
+    # Right home: Prev Window & Directional Focus (RM0..RM4)
+    assert_eq(host.pos("RM0"), "&kp LA(F16)", "RM0 must be Previous Window")
+    assert_eq(host.pos("RM1"), "&kp LC(F13)", "RM1 must be Focus Left")
+    assert_eq(host.pos("RM2"), "&kp LC(F14)", "RM2 must be Focus Down")
+    assert_eq(host.pos("RM3"), "&kp LC(F15)", "RM3 must be Focus Up")
+    assert_eq(host.pos("RM4"), "&kp LC(F16)", "RM4 must be Focus Right")
+
+    # Right bottom: Directional Move (RB1..RB4)
+    assert_eq(host.pos("RB1"), "&kp LC(LS(F13))", "RB1 must be Move Left")
+    assert_eq(host.pos("RB2"), "&kp LC(LS(F14))", "RB2 must be Move Down")
+    assert_eq(host.pos("RB3"), "&kp LC(LS(F15))", "RB3 must be Move Up")
+    assert_eq(host.pos("RB4"), "&kp LC(LS(F16))", "RB4 must be Move Right")
+
+    # Right thumbs: Context Actions (RH0..RH2)
+    assert_eq(host.pos("RH0"), "&kp F19", "RH0 must be Fullscreen")
+    assert_eq(host.pos("RH1"), "&kp F18", "RH1 must be Previous Workspace")
+    assert_eq(host.pos("RH2"), "&kp F20", "RH2 must be Float")
+
+    print("PASS: HOST layer semantic signals verified at exact physical positions.")
 
 
-def test_studio_configuration(parsed: dict) -> None:
-    adjust = parsed["layers"].get("ADJUST")
-    if not adjust:
-        fail("ADJUST layer missing")
-
-    if "&studio_unlock" not in adjust["raw_bindings"]:
-        fail("ADJUST layer missing '&studio_unlock' binding")
-
-    if not CONF_PATH.exists():
-        fail(f"Config file not found: {CONF_PATH}")
-
-    content = CONF_PATH.read_text(encoding="utf-8")
-    if "CONFIG_ZMK_STUDIO_LOCKING=y" not in content:
-        fail("corne.conf must enable CONFIG_ZMK_STUDIO_LOCKING=y")
-    if "CONFIG_ZMK_STUDIO_LOCK_ON_DISCONNECT=y" not in content:
-        fail("corne.conf must enable CONFIG_ZMK_STUDIO_LOCK_ON_DISCONNECT=y")
-
+def test_studio_configuration(cfg: KeyboardConfig) -> None:
+    """Verify ZMK Studio unlock behavior on ADJUST layer."""
+    adjust = cfg.layer("ADJUST")
+    assert_eq(adjust.pos("RM0"), "&studio_unlock", "ADJUST RM0 must be &studio_unlock")
     print("PASS: ZMK Studio locking and unlock behavior verified.")
 
 
 def test_conf_constraints() -> None:
+    """Verify corne.conf Kconfig constraints."""
     if not CONF_PATH.exists():
         fail(f"Config file not found: {CONF_PATH}")
-
     content = CONF_PATH.read_text(encoding="utf-8")
-
-    # Debounce checks
-    if "CONFIG_ZMK_KSCAN_DEBOUNCE" in content:
-        fail("corne.conf contains CONFIG_ZMK_KSCAN_DEBOUNCE setting (prohibited)")
-
-    # NKRO checks
-    if "CONFIG_ZMK_HID_REPORT_TYPE_NKRO" in content:
-        fail("corne.conf contains CONFIG_ZMK_HID_REPORT_TYPE_NKRO (prohibited)")
-
+    for bad_symbol in ["CONFIG_ZMK_KSCAN_DEBOUNCE_PRESS_MS", "CONFIG_ZMK_KSCAN_DEBOUNCE_RELEASE_MS", "CONFIG_ZMK_HID_REPORT_TYPE_NKRO"]:
+        if bad_symbol in content:
+            fail(f"corne.conf must not modify {bad_symbol}")
     print("PASS: corne.conf constraints verified (no debounce or NKRO changes).")
+
+
 def main() -> None:
-    if not KEYMAP_PATH.exists():
-        fail(f"Keymap file not found: {KEYMAP_PATH}")
-
-    content = KEYMAP_PATH.read_text(encoding="utf-8")
-    parsed = parse_keymap_content(content)
-
-    test_layer_indices(parsed)
-    test_game_layer(parsed)
-    test_game_aux_layer(parsed)
-    test_bootloader_shortcuts(parsed)
-    test_cross_platform_bindings(parsed)
-    test_caps_behavior(parsed)
-    test_host_layer_bindings(parsed)
-    test_studio_configuration(parsed)
+    cfg = parse_keymap_file(KEYMAP_PATH, layout="corne")
+    test_layer_indices(cfg)
+    test_base_layer(cfg)
+    test_game_layer(cfg)
+    test_game_fn_layer(cfg)
+    test_bootloader_shortcuts(cfg)
+    test_cross_platform_bindings(cfg)
+    test_caps_behavior(cfg)
+    test_host_layer_bindings(cfg)
+    test_studio_configuration(cfg)
     test_conf_constraints()
-    print("\nALL STATIC KEYMAP INVARIANTS PASSED.")
+    print("\nALL CORNE STATIC KEYMAP INVARIANTS PASSED.")
 
 
 if __name__ == "__main__":

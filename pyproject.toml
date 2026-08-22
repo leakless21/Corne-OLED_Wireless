@@ -1,0 +1,14 @@
+[project]
+name = "corne-keeb"
+version = "0.1.0"
+description = "ZMK configuration, validation suites, and host protocol tooling for Corne and Sofle keyboards"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pyyaml>=6.0.2",
+]
+
+[dependency-groups]
+dev = [
+    "keymap-drawer>=0.23.0",
+]

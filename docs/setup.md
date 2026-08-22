@@ -32,20 +32,35 @@ This repository is a unified **ZMK firmware** configuration with shared semantic
 
 ---
 
-## 3. First Flash & Migration Procedure
+## 3. Four Distinct Flashing & Recovery Operations
 
-### Clean Migration / Reset (Mandatory for Sofle Migration)
-1. Turn off power switches on both halves (or disconnect batteries).
-2. Connect the **left half** via USB-C.
-3. Put the controller into bootloader mode (double-press physical reset button on nice!nano v2).
-4. Drag and drop `settings-reset.uf2` onto the `NICENANO` USB drive. The board wipes its settings partition and halts.
-5. Double-press reset again to enter bootloader mode.
-6. Drag and drop `corne-left.uf2` or `sofle-left.uf2`. The controller reboots with new firmware.
-7. Disconnect left half.
-8. Connect the **right half** via USB-C and repeat steps 3–6 with `settings-reset.uf2` followed by `corne-right.uf2` or `sofle-right.uf2`.
-9. Power on both halves.
-10. Remove any stale Bluetooth pairing from your host computer and re-pair.
+### A. Normal Firmware Update (Central Only)
+For routine Git keymap edits:
+1. Double-press physical reset on the **left (central)** half to enter bootloader mode.
+2. Drag and drop `corne-left.uf2` or `sofle-left.uf2` onto the `NICENANO` USB volume.
 
+### B. Flash Both Halves
+Required when modifying split settings, peripheral display configs, rotary encoders, or dependencies:
+1. Flash the **left half** with `corne-left.uf2` or `sofle-left.uf2`.
+2. Connect the **right half** via USB-C and flash with `corne-right.uf2` or `sofle-right.uf2`.
+
+### C. Settings Reset (Full Flash Wipe)
+Used for corrupted Bluetooth bonding or major migrations:
+1. Power off both halves.
+2. Connect **left half** via USB-C $\rightarrow$ enter bootloader $\rightarrow$ flash `settings-reset.uf2` $\rightarrow$ wait 5s.
+3. Enter bootloader $\rightarrow$ flash `corne-left.uf2` or `sofle-left.uf2`.
+4. Connect **right half** via USB-C $\rightarrow$ enter bootloader $\rightarrow$ flash `settings-reset.uf2` $\rightarrow$ wait 5s.
+5. Enter bootloader $\rightarrow$ flash `corne-right.uf2` or `sofle-right.uf2`.
+6. Power on both halves simultaneously to establish split connection.
+7. Forget keyboard in host Bluetooth settings $\rightarrow$ re-pair fresh.
+
+### D. Studio Reset ("Restore Stock Settings")
+Used to clear runtime overrides applied via ZMK Studio:
+1. Hold `NAV + NUM` $\rightarrow$ `ADJUST` $\rightarrow$ press `studio_unlock` (`RM0`).
+2. Open ZMK Studio and connect to keyboard.
+3. Click **"Restore Stock Settings"** to revert all keys to the compiled Git firmware.
+
+For detailed diagnostic flowcharts, see [docs/troubleshooting.md](troubleshooting.md).
 ---
 
 ## 4. Bluetooth Pairing & Switching

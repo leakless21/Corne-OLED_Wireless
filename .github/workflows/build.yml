@@ -5,77 +5,45 @@ on:
   push:
     paths:
       - "config/**"
-      - "hosts/**"
-      - "scripts/**"
-      - "build.yaml"
       - "boards/**"
       - "zephyr/**"
+      - "build.yaml"
       - ".github/workflows/build.yml"
   pull_request:
     paths:
       - "config/**"
-      - "hosts/**"
-      - "scripts/**"
-      - "build.yaml"
       - "boards/**"
       - "zephyr/**"
+      - "build.yaml"
       - ".github/workflows/build.yml"
+
 concurrency:
   group: firmware-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
 jobs:
-  validate-corne:
+  validate-pre-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-      - name: Set up Python
-        uses: actions/setup-python@v7
-        with:
-          python-version: "3.x"
-      - name: Run Corne Keymap Invariant Checks
-        run: python3 scripts/check_corne_keymap.py
 
-  validate-sofle:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
           python-version: "3.x"
-      - name: Run Sofle Keymap Invariant Checks
-        run: python3 scripts/check_sofle_keymap.py
 
-  validate-host-protocol:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-      - name: Set up Python
-        uses: actions/setup-python@v7
-        with:
-          python-version: "3.x"
-      - name: Run Host Protocol Validation
-        run: python3 scripts/check_host_protocol.py
+      - name: Install Validation Dependencies
+        run: pip install --upgrade pyyaml tomli
 
-  validate-build-config:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-      - name: Set up Python
-        uses: actions/setup-python@v7
-        with:
-          python-version: "3.x"
-      - name: Run Build & Manifest Validation
-        run: python3 scripts/check_build_config.py
+      - name: Run Keymap, Manifest & Protocol Invariant Checks
+        run: |
+          python3 scripts/check_corne_keymap.py
+          python3 scripts/check_sofle_keymap.py
+          python3 scripts/check_build_config.py
+          python3 scripts/check_host_protocol.py
+          python3 scripts/check_generated.py
 
   build:
-    needs:
-      - validate-corne
-      - validate-sofle
-      - validate-host-protocol
-      - validate-build-config
+    needs: validate-pre-build
     uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@6e2ef41e022d555b10f116e395832913f71717b3

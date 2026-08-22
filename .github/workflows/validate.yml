@@ -1,0 +1,56 @@
+name: Validate configuration & protocol
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "config/**"
+      - "protocol/**"
+      - "hosts/**"
+      - "scripts/**"
+      - "docs/**"
+      - "build.yaml"
+      - ".github/workflows/**"
+  pull_request:
+    paths:
+      - "config/**"
+      - "protocol/**"
+      - "hosts/**"
+      - "scripts/**"
+      - "docs/**"
+      - "build.yaml"
+      - ".github/workflows/**"
+
+concurrency:
+  group: validate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.x"
+
+      - name: Install Validation Dependencies
+        run: pip install --upgrade pyyaml tomli
+
+      - name: Run Corne Keymap Invariant Checks
+        run: python3 scripts/check_corne_keymap.py
+
+      - name: Run Sofle Keymap Invariant Checks
+        run: python3 scripts/check_sofle_keymap.py
+
+      - name: Run Build & Manifest Validation
+        run: python3 scripts/check_build_config.py
+
+      - name: Run Multi-Host Protocol Validation
+        run: python3 scripts/check_host_protocol.py
+
+      - name: Run Generated Artifact & Freshness Validation
+        run: python3 scripts/check_generated.py

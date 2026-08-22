@@ -49,7 +49,7 @@ LB5 LB4 LB3 LB2 LB1 LB0 LEC │ REC RB0 RB1 RB2 RB3 RB4 RB5
 | 8 | `GAME` | Via `ADJUST` | Complete standalone QWERTY layout with physical number row and direct modifiers. Deliberate exit to `BASE` via right encoder press (`REC`). |
 | 9 | `ADJUST` | Hold `NAV + NUM` | Bluetooth management, power toggles, mirrored reset/bootloaders, Studio unlock, and GAME entry. |
 
-> **No `BUTTON` or `GAME_AUX`:** The obsolete `BUTTON` layer was removed. Sofle has a physical number row, eliminating the need for Corne's `GAME_AUX` layer.
+> **No `BUTTON` or `GAME_FN`:** The obsolete `BUTTON` layer was removed. Sofle has a physical number row, eliminating the need for Corne's `GAME_FN` layer.
 
 ---
 
@@ -86,3 +86,11 @@ Because modern Sofle firmware completely overhauls layer numbering, switches to 
 1. Flash `settings-reset.uf2` to **both** halves.
 2. Flash `sofle-left.uf2` and `sofle-right.uf2`.
 3. Forget previous Bluetooth pairing on your host device and re-pair cleanly.
+
+---
+
+## 7. Power & Display Policy
+
+* **Sleep Timing:** Idle blank at 30 seconds (`CONFIG_ZMK_IDLE_TIMEOUT=30000`); deep sleep at 15 minutes (`CONFIG_ZMK_IDLE_SLEEP_TIMEOUT=900000`).
+* **External Power Normalization:** `CONFIG_ZMK_RGB_UNDERGLOW_EXT_POWER=n` ensures external power lines remain energized for OLED status screens even when underglow is toggled.
+* **OLED Widgets & Icons:** Workstation-oriented status screen featuring active layer, battery percentage, and Bluetooth profile status.

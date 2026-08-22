@@ -1,0 +1,334 @@
+# Semantic HID Protocol Specification v1
+# Canonical contract between firmware keymaps and host operating system adapters.
+version: 1
+name: "Semantic HID Protocol v1"
+
+actions:
+  # ===========================================================================
+  # Workspace Switching (F13–F17)
+  # ===========================================================================
+  workspace_1:
+    signal:
+      key: F13
+    category: workspace
+    description: "Switch to workspace 1 (WEB)"
+    host_implementations:
+      macos: "AeroSpace: alt-1 (Workspace 1)"
+      windows: "GlazeWM: focus --workspace 1"
+
+  workspace_2:
+    signal:
+      key: F14
+    category: workspace
+    description: "Switch to workspace 2 (DEV)"
+    host_implementations:
+      macos: "AeroSpace: alt-2 (Workspace 2)"
+      windows: "GlazeWM: focus --workspace 2"
+
+  workspace_3:
+    signal:
+      key: F15
+    category: workspace
+    description: "Switch to workspace 3 (COMMS)"
+    host_implementations:
+      macos: "AeroSpace: alt-3 (Workspace 3)"
+      windows: "GlazeWM: focus --workspace 3"
+
+  workspace_4:
+    signal:
+      key: F16
+    category: workspace
+    description: "Switch to workspace 4 (RUN)"
+    host_implementations:
+      macos: "AeroSpace: alt-4 (Workspace 4)"
+      windows: "GlazeWM: focus --workspace 4"
+
+  workspace_5:
+    signal:
+      key: F17
+    category: workspace
+    description: "Switch to workspace 5 (AUX)"
+    host_implementations:
+      macos: "AeroSpace: alt-5 (Workspace 5)"
+      windows: "GlazeWM: focus --workspace 5"
+
+  # ===========================================================================
+  # Move Window to Workspace and Follow (Shift + F13–F17)
+  # ===========================================================================
+  move_workspace_1:
+    signal:
+      key: F13
+      modifiers: [shift]
+    category: window_management
+    description: "Move active window to workspace 1 and follow"
+    host_implementations:
+      macos: "AeroSpace: alt-shift-1 (Move to 1 and follow)"
+      windows: "GlazeWM: move --workspace 1; focus --workspace 1"
+
+  move_workspace_2:
+    signal:
+      key: F14
+      modifiers: [shift]
+    category: window_management
+    description: "Move active window to workspace 2 and follow"
+    host_implementations:
+      macos: "AeroSpace: alt-shift-2 (Move to 2 and follow)"
+      windows: "GlazeWM: move --workspace 2; focus --workspace 2"
+
+  move_workspace_3:
+    signal:
+      key: F15
+      modifiers: [shift]
+    category: window_management
+    description: "Move active window to workspace 3 and follow"
+    host_implementations:
+      macos: "AeroSpace: alt-shift-3 (Move to 3 and follow)"
+      windows: "GlazeWM: move --workspace 3; focus --workspace 3"
+
+  move_workspace_4:
+    signal:
+      key: F16
+      modifiers: [shift]
+    category: window_management
+    description: "Move active window to workspace 4 and follow"
+    host_implementations:
+      macos: "AeroSpace: alt-shift-4 (Move to 4 and follow)"
+      windows: "GlazeWM: move --workspace 4; focus --workspace 4"
+
+  move_workspace_5:
+    signal:
+      key: F17
+      modifiers: [shift]
+    category: window_management
+    description: "Move active window to workspace 5 and follow"
+    host_implementations:
+      macos: "AeroSpace: alt-shift-5 (Move to 5 and follow)"
+      windows: "GlazeWM: move --workspace 5; focus --workspace 5"
+
+  # ===========================================================================
+  # Directional Window Focus (Ctrl + F13–F16)
+  # ===========================================================================
+  focus_left:
+    signal:
+      key: F13
+      modifiers: [ctrl]
+    category: navigation
+    description: "Focus window to the left"
+    host_implementations:
+      macos: "AeroSpace: alt-h (Focus left)"
+      windows: "GlazeWM: focus --direction left"
+
+  focus_down:
+    signal:
+      key: F14
+      modifiers: [ctrl]
+    category: navigation
+    description: "Focus window below"
+    host_implementations:
+      macos: "AeroSpace: alt-j (Focus down)"
+      windows: "GlazeWM: focus --direction down"
+
+  focus_up:
+    signal:
+      key: F15
+      modifiers: [ctrl]
+    category: navigation
+    description: "Focus window above"
+    host_implementations:
+      macos: "AeroSpace: alt-k (Focus up)"
+      windows: "GlazeWM: focus --direction up"
+
+  focus_right:
+    signal:
+      key: F16
+      modifiers: [ctrl]
+    category: navigation
+    description: "Focus window to the right"
+    host_implementations:
+      macos: "AeroSpace: alt-l (Focus right)"
+      windows: "GlazeWM: focus --direction right"
+
+  # ===========================================================================
+  # Directional Window Move (Ctrl + Shift + F13–F16)
+  # ===========================================================================
+  move_left:
+    signal:
+      key: F13
+      modifiers: [ctrl, shift]
+    category: window_management
+    description: "Move active window to the left"
+    host_implementations:
+      macos: "AeroSpace: alt-shift-h (Move left)"
+      windows: "GlazeWM: move --direction left"
+
+  move_down:
+    signal:
+      key: F14
+      modifiers: [ctrl, shift]
+    category: window_management
+    description: "Move active window down"
+    host_implementations:
+      macos: "AeroSpace: alt-shift-j (Move down)"
+      windows: "GlazeWM: move --direction down"
+
+  move_up:
+    signal:
+      key: F15
+      modifiers: [ctrl, shift]
+    category: window_management
+    description: "Move active window up"
+    host_implementations:
+      macos: "AeroSpace: alt-shift-k (Move up)"
+      windows: "GlazeWM: move --direction up"
+
+  move_right:
+    signal:
+      key: F16
+      modifiers: [ctrl, shift]
+    category: window_management
+    description: "Move active window to the right"
+    host_implementations:
+      macos: "AeroSpace: alt-shift-l (Move right)"
+      windows: "GlazeWM: move --direction right"
+
+  # ===========================================================================
+  # Context, Modals & Window Controls
+  # ===========================================================================
+  previous_workspace:
+    signal:
+      key: F18
+    category: workspace
+    description: "Focus previous / recent workspace"
+    host_implementations:
+      macos: "AeroSpace: alt-tab (workspace-back-and-forth)"
+      windows: "GlazeWM: focus --recent-workspace"
+
+  resize_mode:
+    signal:
+      key: F18
+      modifiers: [shift]
+    category: modal
+    description: "Enter directional resize modal mode"
+    host_implementations:
+      macos: "AeroSpace: alt-r (mode resize)"
+      windows: "GlazeWM: wm-enable-binding-mode --name resize"
+
+  service_mode:
+    signal:
+      key: F18
+      modifiers: [alt]
+    category: modal
+    description: "Enter WM management / service mode"
+    host_implementations:
+      macos: "AeroSpace: alt-shift-semicolon (mode service)"
+      windows: "GlazeWM: wm-enable-binding-mode --name service"
+
+  fullscreen_toggle:
+    signal:
+      key: F19
+    category: window_management
+    description: "Toggle active window fullscreen"
+    host_implementations:
+      macos: "AeroSpace: alt-f (fullscreen)"
+      windows: "GlazeWM: toggle-fullscreen"
+
+  float_toggle:
+    signal:
+      key: F20
+    category: window_management
+    description: "Toggle active window float / tile"
+    host_implementations:
+      macos: "AeroSpace: alt-shift-space (layout floating tiling)"
+      windows: "GlazeWM: toggle-floating --centered"
+
+  # ===========================================================================
+  # Desktop Actions & Launchers
+  # ===========================================================================
+  system_launcher:
+    signal:
+      key: F13
+      modifiers: [alt]
+    category: launcher
+    description: "Summon system search / launcher (Spotlight / Windows Search)"
+    host_implementations:
+      macos: "Karabiner: Cmd+Space (Spotlight)"
+      windows: "AutoHotkey: Win+S (Windows Search)"
+
+  quick_terminal:
+    signal:
+      key: F14
+      modifiers: [alt]
+    category: launcher
+    description: "Toggle quick dropdown scratchpad terminal (Quake mode)"
+    host_implementations:
+      macos: "Karabiner: Ctrl+` (Ghostty Quick Terminal)"
+      windows: "AutoHotkey: Windows Terminal _quake dropdown"
+
+  new_terminal:
+    signal:
+      key: F15
+      modifiers: [alt]
+    category: launcher
+    description: "Launch new independent terminal window"
+    host_implementations:
+      macos: "Karabiner: Alt+Enter (Ghostty new window)"
+      windows: "AutoHotkey: wt.exe new window"
+
+  previous_window:
+    signal:
+      key: F16
+      modifiers: [alt]
+    category: navigation
+    description: "Switch to previous active window across workspaces"
+    host_implementations:
+      macos: "Karabiner: Alt+` (AeroSpace focus-back-and-forth)"
+      windows: "AutoHotkey: Alt+Tab (Previous Window)"
+
+  # ===========================================================================
+  # Semantic Clipboard & Editing (NAV / MOUSE)
+  # ===========================================================================
+  copy:
+    signal:
+      key: F21
+    category: editing
+    description: "Copy selected text to clipboard"
+    host_implementations:
+      macos: "Karabiner: Cmd+C"
+      windows: "AutoHotkey: Ctrl+C"
+
+  paste:
+    signal:
+      key: F22
+    category: editing
+    description: "Paste text from clipboard"
+    host_implementations:
+      macos: "Karabiner: Cmd+V"
+      windows: "AutoHotkey: Ctrl+V"
+
+  cut:
+    signal:
+      key: F23
+    category: editing
+    description: "Cut selected text to clipboard"
+    host_implementations:
+      macos: "Karabiner: Cmd+X"
+      windows: "AutoHotkey: Ctrl+X"
+
+  undo:
+    signal:
+      key: F24
+    category: editing
+    description: "Undo last text action"
+    host_implementations:
+      macos: "Karabiner: Cmd+Z"
+      windows: "AutoHotkey: Ctrl+Z"
+
+  redo:
+    signal:
+      key: F24
+      modifiers: [shift]
+    category: editing
+    description: "Redo last undone text action"
+    host_implementations:
+      macos: "Karabiner: Cmd+Shift+Z"
+      windows: "AutoHotkey: Ctrl+Y"

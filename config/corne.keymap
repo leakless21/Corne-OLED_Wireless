@@ -26,7 +26,7 @@
 #define L_HOST 7
 #define L_GAME 8
 #define L_ADJUST 9
-#define L_GAME_AUX 10
+#define L_GAME_FN 10
 
 &sk {
     release-after-ms = <1000>;
@@ -91,10 +91,10 @@
             bindings = <&mo>, <&kp>;
         };
         /*
-         * Dedicated GAME Esc/AUX hold-tap for fast left-hand chord resolution
+         * Dedicated GAME Esc/FN hold-tap for fast left-hand chord resolution
          * during gaming (e.g. hold Esc + Q/W/E/R/T for 1-5).
          */
-        game_aux_lt: game_aux_lt {
+        game_fn_lt: game_fn_lt {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
             flavor = "hold-preferred";
@@ -261,17 +261,17 @@
             label = "GAME";
             display-name = "GAME";
             /*
-             * Plain tap-only QWERTY for gaming with hold-tap Esc/AUX on LT5,
-             * momentary GAME_AUX on RH1, and protected BASE exit on GAME_AUX RH2.
+             * Plain tap-only QWERTY for gaming with hold-tap Esc/FN on LT5,
+             * momentary GAME_FN on RH1, and protected BASE exit on GAME_FN RH2.
              */
             bindings = <
-                &game_aux_lt L_GAME_AUX ESCAPE &kp Q              &kp W              &kp E              &kp R              &kp T
+                &game_fn_lt L_GAME_FN ESCAPE &kp Q              &kp W              &kp E              &kp R              &kp T
                 &kp Y            &kp U              &kp I              &kp O              &kp P              &kp BACKSPACE
                 &kp TAB          &kp A              &kp S              &kp D              &kp F              &kp G
                 &kp H            &kp J              &kp K              &kp L              &kp SEMICOLON      &kp ENTER
                 &kp LEFT_SHIFT   &kp Z              &kp X              &kp C              &kp V              &kp B
                 &kp N            &kp M              &kp COMMA           &kp DOT            &kp SLASH          &kp RIGHT_SHIFT
-                &kp LCTRL        &kp SPACE          &kp LALT            &kp ENTER         &mo L_GAME_AUX     &trans
+                &kp LCTRL        &kp SPACE          &kp LALT            &kp ENTER         &mo L_GAME_FN      &trans
             >;
         };
 
@@ -292,11 +292,11 @@
                 &none             &none               &none               &none               &none               &none
             >;
         };
-        GAME_AUX {
-            label = "GAME_AUX";
-            display-name = "GAME_AUX";
+        GAME_FN {
+            label = "GAME_FN";
+            display-name = "GAME_FN";
             /*
-             * Auxiliary gaming layer over GAME. Numbers 1-0 on top row,
+             * Auxiliary gaming utility layer over GAME. Numbers 1-0 on top row,
              * F1-F10 on home row, common gaming punctuation on bottom row.
              * Deliberate exit to BASE on RH2; other positions fall through (&trans) to GAME.
              */

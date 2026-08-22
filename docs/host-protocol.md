@@ -8,39 +8,38 @@ This document is the canonical source of truth for the semantic high-function ke
 
 | Signal | Semantic Action | macOS Host (Karabiner + AeroSpace + Ghostty + Spotlight) | Windows Host (GlazeWM + AutoHotkey + Windows Terminal + Search) |
 |---|---|---|---|
-| `F13` | Workspace slot 1 (WEB) | `workspace WEB` (`Alt+1`) | `focus --workspace 1` (`f13`) |
-| `F14` | Workspace slot 2 (DEV) | `workspace DEV` (`Alt+2`) | `focus --workspace 2` (`f14`) |
-| `F15` | Workspace slot 3 (COMMS) | `workspace COMMS` (`Alt+3`) | `focus --workspace 3` (`f15`) |
-| `F16` | Workspace slot 4 (RUN) | `workspace RUN` (`Alt+4`) | `focus --workspace 4` (`f16`) |
-| `F17` | Workspace slot 5 (AUX) | `workspace AUX` (`Alt+5`) | `focus --workspace 5` (`f17`) |
-| `Shift+F13` | Move window to slot 1 + follow | `move-node-to-workspace WEB; workspace WEB` (`Alt+Shift+1`) | `move --workspace 1; focus --workspace 1` (`shift+f13`) |
-| `Shift+F14` | Move window to slot 2 + follow | `move-node-to-workspace DEV; workspace DEV` (`Alt+Shift+2`) | `move --workspace 2; focus --workspace 2` (`shift+f14`) |
-| `Shift+F15` | Move window to slot 3 + follow | `move-node-to-workspace COMMS; workspace COMMS` (`Alt+Shift+3`) | `move --workspace 3; focus --workspace 3` (`shift+f15`) |
-| `Shift+F16` | Move window to slot 4 + follow | `move-node-to-workspace RUN; workspace RUN` (`Alt+Shift+4`) | `move --workspace 4; focus --workspace 4` (`shift+f16`) |
-| `Shift+F17` | Move window to slot 5 + follow | `move-node-to-workspace AUX; workspace AUX` (`Alt+Shift+5`) | `move --workspace 5; focus --workspace 5` (`shift+f17`) |
-| `Ctrl+F13` | Directional focus ← | `focus left` (`Alt+H`) | `focus left` (`ctrl+f13`) |
-| `Ctrl+F14` | Directional focus ↓ | `focus down` (`Alt+J`) | `focus down` (`ctrl+f14`) |
-| `Ctrl+F15` | Directional focus ↑ | `focus up` (`Alt+K`) | `focus up` (`ctrl+f15`) |
-| `Ctrl+F16` | Directional focus → | `focus right` (`Alt+L`) | `focus right` (`ctrl+f16`) |
-| `Ctrl+Shift+F13` | Directional move ← | `move left` (`Alt+Shift+H`) | `move left` (`ctrl+shift+f13`) |
-| `Ctrl+Shift+F14` | Directional move ↓ | `move down` (`Alt+Shift+J`) | `move down` (`ctrl+shift+f14`) |
-| `Ctrl+Shift+F15` | Directional move ↑ | `move up` (`Alt+Shift+K`) | `move up` (`ctrl+shift+f15`) |
-| `Ctrl+Shift+F16` | Directional move → | `move right` (`Alt+Shift+L`) | `move right` (`ctrl+shift+f16`) |
-| `F18` | Previous workspace | `workspace-back-and-forth` (`Alt+Tab`) | `focus --recent-workspace` (`f18`) |
-| `Shift+F18` | Resize mode | `mode resize` (`Alt+R`) | `enable-binding-mode --name resize` (`shift+f18`) |
-| `Alt+F18` | Service mode | `mode service` (`Alt+Shift+;`) | `enable-binding-mode --name service` (`alt+f18`) |
-| `F19` | Fullscreen toggle | `fullscreen` (`Alt+F`) | `toggle-fullscreen` (`f19`) |
-| `F20` | Float / tile toggle | `layout floating tiling` (`Alt+Shift+Space`) | `toggle-floating --centered` (`f20`) |
-| `Alt+F13` | System launcher | Spotlight search (`Cmd+Space`) | Windows Search (`Win+S`) |
-| `Alt+F14` | Quick terminal | Ghostty scratchpad toggle (`Ctrl+```) | Windows Terminal Quake toggle (`Ctrl+Alt+```) |
-| `Alt+F15` | New terminal | New Ghostty window in workspace (`Alt+Enter`) | Launch `wt.exe` |
-| `Alt+F16` | Previous window | `focus-back-and-forth` (`Alt+```) | `Alt+Tab` |
-| `F21` | Copy | `Cmd+C` | `Ctrl+C` |
-| `F22` | Paste | `Cmd+V` | `Ctrl+V` |
-| `F23` | Cut | `Cmd+X` | `Ctrl+X` |
-| `F24` | Undo | `Cmd+Z` | `Ctrl+Z` |
-| `Shift+F24` | Redo | `Cmd+Shift+Z` | `Ctrl+Y` |
-
+| `F13` | Switch to workspace 1 (WEB) | AeroSpace: alt-1 (Workspace 1) | GlazeWM: focus --workspace 1 |
+| `F14` | Switch to workspace 2 (DEV) | AeroSpace: alt-2 (Workspace 2) | GlazeWM: focus --workspace 2 |
+| `F15` | Switch to workspace 3 (COMMS) | AeroSpace: alt-3 (Workspace 3) | GlazeWM: focus --workspace 3 |
+| `F16` | Switch to workspace 4 (RUN) | AeroSpace: alt-4 (Workspace 4) | GlazeWM: focus --workspace 4 |
+| `F17` | Switch to workspace 5 (AUX) | AeroSpace: alt-5 (Workspace 5) | GlazeWM: focus --workspace 5 |
+| `Shift+F13` | Move active window to workspace 1 and follow | AeroSpace: alt-shift-1 (Move to 1 and follow) | GlazeWM: move --workspace 1; focus --workspace 1 |
+| `Shift+F14` | Move active window to workspace 2 and follow | AeroSpace: alt-shift-2 (Move to 2 and follow) | GlazeWM: move --workspace 2; focus --workspace 2 |
+| `Shift+F15` | Move active window to workspace 3 and follow | AeroSpace: alt-shift-3 (Move to 3 and follow) | GlazeWM: move --workspace 3; focus --workspace 3 |
+| `Shift+F16` | Move active window to workspace 4 and follow | AeroSpace: alt-shift-4 (Move to 4 and follow) | GlazeWM: move --workspace 4; focus --workspace 4 |
+| `Shift+F17` | Move active window to workspace 5 and follow | AeroSpace: alt-shift-5 (Move to 5 and follow) | GlazeWM: move --workspace 5; focus --workspace 5 |
+| `Ctrl+F13` | Focus window to the left | AeroSpace: alt-h (Focus left) | GlazeWM: focus --direction left |
+| `Ctrl+F14` | Focus window below | AeroSpace: alt-j (Focus down) | GlazeWM: focus --direction down |
+| `Ctrl+F15` | Focus window above | AeroSpace: alt-k (Focus up) | GlazeWM: focus --direction up |
+| `Ctrl+F16` | Focus window to the right | AeroSpace: alt-l (Focus right) | GlazeWM: focus --direction right |
+| `Ctrl+Shift+F13` | Move active window to the left | AeroSpace: alt-shift-h (Move left) | GlazeWM: move --direction left |
+| `Ctrl+Shift+F14` | Move active window down | AeroSpace: alt-shift-j (Move down) | GlazeWM: move --direction down |
+| `Ctrl+Shift+F15` | Move active window up | AeroSpace: alt-shift-k (Move up) | GlazeWM: move --direction up |
+| `Ctrl+Shift+F16` | Move active window to the right | AeroSpace: alt-shift-l (Move right) | GlazeWM: move --direction right |
+| `F18` | Focus previous / recent workspace | AeroSpace: alt-tab (workspace-back-and-forth) | GlazeWM: focus --recent-workspace |
+| `Shift+F18` | Enter directional resize modal mode | AeroSpace: alt-r (mode resize) | GlazeWM: wm-enable-binding-mode --name resize |
+| `Alt+F18` | Enter WM management / service mode | AeroSpace: alt-shift-semicolon (mode service) | GlazeWM: wm-enable-binding-mode --name service |
+| `F19` | Toggle active window fullscreen | AeroSpace: alt-f (fullscreen) | GlazeWM: toggle-fullscreen |
+| `F20` | Toggle active window float / tile | AeroSpace: alt-shift-space (layout floating tiling) | GlazeWM: toggle-floating --centered |
+| `Alt+F13` | Summon system search / launcher (Spotlight / Windows Search) | Karabiner: Cmd+Space (Spotlight) | AutoHotkey: Win+S (Windows Search) |
+| `Alt+F14` | Toggle quick dropdown scratchpad terminal (Quake mode) | Karabiner: Ctrl+` (Ghostty Quick Terminal) | AutoHotkey: Windows Terminal _quake dropdown |
+| `Alt+F15` | Launch new independent terminal window | Karabiner: Alt+Enter (Ghostty new window) | AutoHotkey: wt.exe new window |
+| `Alt+F16` | Switch to previous active window across workspaces | Karabiner: Alt+` (AeroSpace focus-back-and-forth) | AutoHotkey: Alt+Tab (Previous Window) |
+| `F21` | Copy selected text to clipboard | Karabiner: Cmd+C | AutoHotkey: Ctrl+C |
+| `F22` | Paste text from clipboard | Karabiner: Cmd+V | AutoHotkey: Ctrl+V |
+| `F23` | Cut selected text to clipboard | Karabiner: Cmd+X | AutoHotkey: Ctrl+X |
+| `F24` | Undo last text action | Karabiner: Cmd+Z | AutoHotkey: Ctrl+Z |
+| `Shift+F24` | Redo last undone text action | Karabiner: Cmd+Shift+Z | AutoHotkey: Ctrl+Y |
 ---
 
 ## 2. Protocol Producers
