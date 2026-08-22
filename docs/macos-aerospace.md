@@ -21,6 +21,8 @@ tiling-window-manager setup used alongside this repository, including the
   bindings, semantic F13–F20 / modifier+F-key protocol, and per-app routing.
 - The Corne HOST bridge: how workspace, direction, move, and resize signals
   map to AeroSpace.
+- Separation of responsibility: AeroSpace owns window management (`F13`–`F20`),
+  while Karabiner-Elements owns semantic editing (`F21`–`F24`).
 - Installation prerequisites, validation, backups, rollback, and troubleshooting.
 
 **Non-goals**
@@ -29,8 +31,8 @@ tiling-window-manager setup used alongside this repository, including the
   from the [official AeroSpace documentation](https://nikitabobko.github.io/AeroSpace/guide).
 - It does not modify ZMK firmware. Firmware changes are a separate workflow
   documented in [docs/corne-keymaps.md](corne-keymaps.md).
+- It does not make AeroSpace responsible for generating Copy/Paste/Undo/Redo shortcuts.
 - It does not make the firmware encode macOS-specific Option+H/J/K/L chords.
-
 ---
 
 ## 2. Installation & Accessibility
@@ -293,6 +295,35 @@ laptop fallbacks in AeroSpace. A Windows/GlazeWM adapter can assign the same
 semantic F-key signals without changing firmware.
 
 ---
+
+## 7.1 macOS editing bridge (Karabiner-Elements & F21–F24)
+
+Window management and text editing are kept strictly decoupled:
+
+* **`F13`–`F20`** (HOST layer) $\rightarrow$ **AeroSpace** (workspaces, focus, move, resize).
+* **`F21`–`F24`** (NAV & MOUSE layers) $\rightarrow$ **Karabiner-Elements** (Copy, Paste, Cut, Undo, Redo).
+
+The repository tracks the canonical Karabiner complex modifications rule file at `dotfiles/karabiner-corne.json`.
+
+### Karabiner setup
+
+1. **Install Karabiner-Elements** from <https://karabiner-elements.pqrs.org/>.
+2. **Copy or link the rule file** to Karabiner's complex modifications directory:
+   ```sh
+   mkdir -p ~/.config/karabiner/assets/complex_modifications
+   cp dotfiles/karabiner-corne.json ~/.config/karabiner/assets/complex_modifications/
+   ```
+3. **Enable the rule in Karabiner-Elements:**
+   - Open **Karabiner-Elements Settings** $\rightarrow$ **Complex Modifications** $\rightarrow$ **Add rule**.
+   - Enable **"Corne F21-F24 Semantic Editing"**.
+4. **Verify mapping:**
+   - `F21` $\rightarrow$ `Command+C` (Copy)
+   - `F22` $\rightarrow$ `Command+V` (Paste)
+   - `F23` $\rightarrow$ `Command+X` (Cut)
+   - `F24` $\rightarrow$ `Command+Z` (Undo)
+   - `Shift+F24` $\rightarrow$ `Command+Shift+Z` (Redo)
+
+Because standard MacBook laptop keyboards never emit F21–F24, this configuration does not alter or interfere with normal laptop typing.
 
 ## 8. Canonical app routing
 

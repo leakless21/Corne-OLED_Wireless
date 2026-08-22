@@ -75,18 +75,19 @@ RH2 (right outer):  tap Delete     hold FUN
   documented beside the binding (e.g. GAME_AUX falling through to GAME).
 - Same-side bootloader access: `NAV` carries the left controller bootloader at `LT5`;
   `NUM` carries the right controller bootloader at `RT5`. `ADJUST` retains mirrored fallback controls.
-- HOST emits semantic high-function-key signals. Host configuration decides
+- HOST emits semantic high-function-key signals (F13–F20). Host configuration decides
   whether those signals mean AeroSpace, GlazeWM, or another window manager.
+- NAV and MOUSE emit semantic high-function-key signals (F21–F24) for editing actions
+  (Copy, Paste, Cut, Undo, Redo). Host bridges translate them to native OS shortcuts.
 - ADJUST is the only layer for destructive or device-management actions; Bluetooth
   profiles occupy the five-column core (`LM4`–`LM0`).
-## Layer grammar
 
 | Layer | Left-hand role | Right-hand role | Explicit thumb role |
 | --- | --- | --- | --- |
 | BASE | Colemak-DH and HRMs; LM5 holds MEDIA | Colemak-DH and HRMs | Six layer-taps (MOUSE, NAV, HOST, SYM, NUM, FUN) |
-| NAV | Cmd/Alt/Ctrl/Shift; `LT5` left bootloader | Caps Lock, clipboard, cursor, line/page | Esc/Space/Tab and Enter/Bspc/Delete |
-| MOUSE | Cmd/Alt/Ctrl/Shift | MB4 (Back), MB5 (Fwd), clipboard, pointer, scroll | Right/left/middle click |
-| MEDIA | Cmd/Alt/Ctrl/Shift | Prev, volume, next | Stop/play/pause/mute (right thumbs only) |
+| NAV | Cmd/Alt/Ctrl/Shift; `LT5` left bootloader | Caps Lock, semantic editing (F21–F24), cursor, line/page | Esc/Space/Tab and Enter/Bspc/Delete |
+| MOUSE | Cmd/Alt/Ctrl/Shift | MB4 (Back), MB5 (Fwd), semantic editing (F21–F24), pointer, scroll | Right/left/middle click |
+| MEDIA | Cmd/Alt/Ctrl/Shift | Consumer HID prev, volume, next | Stop/play/pause/mute (right thumbs only) |
 | NUM | Numpad geometry | Shift/Ctrl/Alt/Cmd; `RT5` right bootloader | `.`, `0`, `-` |
 | SYM | Shifted NUM geometry | Shift/Ctrl/Alt/Cmd | `(`, `)`, `_` |
 | FUN | F-key geometry | Shift/Ctrl/Alt/Cmd | App, Space, Tab |
@@ -95,25 +96,47 @@ RH2 (right outer):  tap Delete     hold FUN
 | GAME_AUX | Numbers 1–5, F1–F5, symbols (`` ` ``, `-`, `=`, `[`, `]`) | Numbers 6–0, F6–F10 | Fall-through to GAME, RH2 exits to BASE |
 | ADJUST | Bluetooth in core (`LM4`–`LM0`), power/reset | Output/power/reset/GAME entry | None |
 
-## HOST protocol
+## Host-independent firmware & semantic protocol
 
-The firmware protocol is intentionally independent of macOS key choices:
+The firmware maintains a strict separation between portable HID behaviors and host-dependent behaviors:
 
-| Signal | Meaning in the reference AeroSpace adapter |
-| --- | --- |
-| `F13`–`F17` | Focus WEB/DEV/COMMS/RUN/AUX |
-| `Shift+F13`–`Shift+F17` | Move the window to WEB/DEV/COMMS/RUN/AUX and follow |
-| `Ctrl+F13`–`Ctrl+F16` | Focus left/down/up/right |
-| `Ctrl+Shift+F13`–`Ctrl+Shift+F16` | Move the window left/down/up/right |
-| `Shift+F18` | Enter resize mode |
-| `F18` | Previous workspace |
-| `F19` | Fullscreen |
-| `F20` | Toggle floating/tiling |
+1. **Standard portable HID behaviors stay in firmware:**
+   - Letters, numbers, symbols, standard modifiers.
+   - Arrow keys, Home/End, Page Up/Down, Insert/Delete.
+   - Mouse movement, wheel scrolling, buttons.
+   - Function keys F1–F12.
+   - Gaming keys.
+   - Portable Consumer-page media controls (`C_PREVIOUS`, `C_VOLUME_DOWN`, `C_VOLUME_UP`, `C_NEXT`, `C_PLAY_PAUSE`, `C_MUTE`, `C_STOP`).
+
+2. **OS-specific desktop shortcuts do not live in firmware:**
+   - Firmware emits high-function-key semantic signals (`F13`–`F24`).
+   - macOS and Windows translate those signals locally through host bridges (Karabiner-Elements, AutoHotkey, AeroSpace, GlazeWM).
+   - Internal laptop keyboards remain completely conventional and untouched.
+
+3. **Consumer Application Control (`C_AC_*`) warning:**
+   - Although USB HID defines Consumer / Application Control usages such as `C_AC_COPY`, `C_AC_PASTE`, `C_AC_CUT`, `C_AC_UNDO`, and `C_AC_REDO` (and Keyboard-page equivalents like `K_COPY`), current OS implementations (Windows and macOS) do not provide reliable, consistent desktop-wide support.
+   - The firmware explicitly avoids `C_AC_*` and `K_*` editing codes in favor of the host-bridge protocol (`F21`–`F24`).
+
+### Protocol specification
+
+| Signal | Semantic Action | macOS Reference (AeroSpace / Karabiner) | Windows Reference (AutoHotkey / GlazeWM) |
+| --- | --- | --- | --- |
+| `F13`–`F17` | Workspace focus (1–5) | Focus WEB/DEV/COMMS/RUN/AUX | Focus workspace 1–5 |
+| `Shift+F13`–`Shift+F17` | Move window to workspace (1–5) | Move window to WEB..AUX and follow | Move window to workspace 1–5 |
+| `Ctrl+F13`–`Ctrl+F16` | Directional focus (← ↓ ↑ →) | Focus left/down/up/right | Focus left/down/up/right |
+| `Ctrl+Shift+F13`–`Ctrl+Shift+F16` | Directional window move | Move left/down/up/right | Move left/down/up/right |
+| `Shift+F18` | Resize mode | Enter resize mode | Enter resize mode |
+| `F18` | Previous workspace | Previous workspace | Previous workspace |
+| `F19` | Fullscreen | Fullscreen toggle | Fullscreen toggle |
+| `F20` | Float toggle | Floating/tiling toggle | Floating/tiling toggle |
+| `F21` | Copy | `Command+C` | `Ctrl+C` |
+| `F22` | Paste | `Command+V` | `Ctrl+V` |
+| `F23` | Cut | `Command+X` | `Ctrl+X` |
+| `F24` | Undo | `Command+Z` | `Ctrl+Z` |
+| `Shift+F24` | Redo | `Command+Shift+Z` | `Ctrl+Y` |
 
 In AeroSpace resize mode, the same `Ctrl+F13`–`Ctrl+F16` direction signals are
-interpreted as resize commands. A Windows adapter may assign the same semantic
-signals to GlazeWM without changing firmware.
-
+interpreted as resize commands.
 ## Change control
 
 Before changing a shared layer family:

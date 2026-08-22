@@ -252,8 +252,34 @@ Use Studio for quick experiments. For durable changes, edit
 firmware, use **Restore Stock Settings** before considering `settings-reset`.
 
 ---
+## 9. Host Platform Setup (macOS & Windows)
 
-## 9. Links to Other Guides
+The Corne keyboard emits host-agnostic semantic signals for editing (`F21`–`F24`) and window management (`F13`–`F20`). Basic typing, media controls, and mouse features work without any host tools, but desktop editing and tiling window management use lightweight host bridges.
+
+### macOS setup
+
+1. **Editing bridge (Karabiner-Elements):**
+   - Install [Karabiner-Elements](https://karabiner-elements.pqrs.org/).
+   - Copy the rule file from `dotfiles/karabiner-corne.json` into `~/.config/karabiner/assets/complex_modifications/`.
+   - Enable **"Corne F21-F24 Semantic Editing"** in Karabiner Settings $\rightarrow$ Complex Modifications.
+   - Translates `F21`–`F24` and `Shift+F24` to `Cmd+C`, `Cmd+V`, `Cmd+X`, `Cmd+Z`, `Cmd+Shift+Z`.
+2. **Window management (AeroSpace):**
+   - Install [AeroSpace](https://nikitabobko.github.io/AeroSpace/).
+   - Symlink or copy `dotfiles/aerospace.toml` to `~/.config/aerospace/aerospace.toml`.
+   - See [docs/macos-aerospace.md](macos-aerospace.md) for full configuration and application routing.
+
+### Windows setup
+
+1. **Editing bridge (AutoHotkey v2):**
+   - Install [AutoHotkey v2](https://www.autohotkey.com/).
+   - Run `dotfiles/corne-windows.ahk` (or place a shortcut to it in your Windows Startup folder `shell:startup`).
+   - Translates `F21`–`F24` and `Shift+F24` to `Ctrl+C`, `Ctrl+V`, `Ctrl+X`, `Ctrl+Z`, `Ctrl+Y`.
+2. **Window management:**
+   - Can be mapped to a tiling window manager such as GlazeWM when window management integration is configured on the host.
+
+---
+
+## 10. Links to Other Guides
 
 - **Layout contract and physical invariants:**
   [docs/layout-principles.md](layout-principles.md)
@@ -265,7 +291,7 @@ firmware, use **Restore Stock Settings** before considering `settings-reset`.
 
 ---
 
-## 10. What This Guide Does Not Cover
+## 11. What This Guide Does Not Cover
 
 - **Local builds.** Building ZMK locally requires a West workspace and toolchain
   setup that is not documented here. Use the GitHub Actions workflow instead.

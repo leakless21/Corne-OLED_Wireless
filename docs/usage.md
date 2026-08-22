@@ -43,10 +43,10 @@ the **MEDIA** layer (`&mo L_MEDIA`).
 
 | Layer | How to reach | What it provides |
 |-------|-------------|------------------|
-| **NAV** | Hold left-space thumb (`LH1`) | macOS Cmd clipboard chords, Caps Lock, arrows, text navigation, line/page movement, and explicit editing thumbs. |
+| **NAV** | Hold left-space thumb (`LH1`) | Semantic editing (Copy / Paste / Cut / Undo / Redo via F21–F24), Caps Lock, arrows, text navigation, line/page movement, and explicit editing thumbs. |
 | **HOST** | Hold left-tab thumb (`LH0`) | Host-agnostic F13–F20 workspace signals (home row), move-to-workspace (top row), directional focus/move, and context thumbs. See [docs/macos-aerospace.md](macos-aerospace.md). |
-| **MOUSE** | Hold left-escape thumb (`LH2`) | NAV-aligned clipboard, pointer movement, wheel movement, left modifiers, and MB4 (Back) / MB5 (Forward) side buttons. |
-| **MEDIA** | Hold outer-left home key (`LM5`) | NAV-aligned previous/volume/next controls with right-thumb stop/play/mute controls. |
+| **MOUSE** | Hold left-escape thumb (`LH2`) | NAV-aligned semantic editing (F21–F24), pointer movement, wheel movement, left modifiers, and MB4 (Back) / MB5 (Forward) side buttons. |
+| **MEDIA** | Hold outer-left home key (`LM5`) | NAV-aligned Consumer HID previous/volume/next controls with right-thumb stop/play/mute controls. |
 | **NUM** | Hold right-backspace thumb (`RH1`) | Standard spatial numpad and punctuation on the left; Shift/Ctrl/Alt/Cmd on the right. |
 | **SYM** | Hold right-enter thumb (`RH0`) | Shifted NUM geometry with `(`, `)`, and `_` on the left thumbs. |
 | **FUN** | Hold right-delete thumb (`RH2`) | NUM-aligned F1–F12 grid with mirrored modifiers and App/Space/Tab thumbs. |
@@ -68,8 +68,24 @@ organized strictly by usage frequency:
 5. **Move window directionally**: Hold `Tab` + press right bottom direction (`K`/`H`/`,`/`.` columns → Move `←`, `↓`, `↑`, `→`).
 6. **Context actions**: Hold `Tab` + right inner thumb `RH0` (Fullscreen), right outer thumb `RH2` (Float/tile), right top `RT1` (Resize mode), or `RT5` (Esc).
 
+### Cross-platform editing & OS neutrality
 
-### Daily GAME & GAME_AUX workflow
+The Corne firmware is completely OS-neutral:
+
+* Physical muscle memory is identical on macOS and Windows without switching firmware layouts or toggling layers.
+* Basic typing, Colemak-DH, home-row modifiers, numpad, symbols, function keys, mouse navigation, and media controls work directly over standard USB/Bluetooth HID on any operating system without background tools.
+* Desktop editing commands use semantic `F21`–`F24` signals:
+  - **Copy:** Corne sends `F21` $\rightarrow$ macOS translates `F21` $\rightarrow$ `Cmd+C`; Windows translates `F21` $\rightarrow$ `Ctrl+C`.
+  - **Paste:** Corne sends `F22` $\rightarrow$ macOS `Cmd+V`; Windows `Ctrl+V`.
+  - **Cut:** Corne sends `F23` $\rightarrow$ macOS `Cmd+X`; Windows `Ctrl+X`.
+  - **Undo:** Corne sends `F24` $\rightarrow$ macOS `Cmd+Z`; Windows `Ctrl+Z`.
+  - **Redo:** Corne sends `Shift+F24` $\rightarrow$ macOS `Cmd+Shift+Z`; Windows `Ctrl+Y`.
+* On macOS, Karabiner-Elements (`dotfiles/karabiner-corne.json`) provides the editing bridge.
+* On Windows, AutoHotkey v2 (`dotfiles/corne-windows.ahk`) provides the editing bridge.
+* Internal laptop keyboards are never remapped and remain completely standard.
+
+---
+
 
 1. **Enter GAME:** Hold `NAV` (`LH1`) + `NUM` (`RH1`) to enter ADJUST, then press `GAME` (`RT3`).
 2. **Left-hand mouse gaming (numbers 1–5):** Hold top-left `Escape` (`LT5`) with your left hand:
@@ -187,8 +203,10 @@ After flashing a firmware change, run through this compact checklist:
   symbols, F-grid, and explicit thumb taps.
 - [ ] **NAV/MOUSE/MEDIA** — confirm directions occupy the same N/E/I/O
   columns; NAV has Caps Lock at RM0 and Insert/Home/PgDn/PgUp/End at RB0–RB4;
-  MOUSE has MB4 (Back) at RM0 and MB5 (Forward) at RM5; MEDIA is engaged via
-  holding LM5 with transport controls on right thumbs only.
+  MOUSE has MB4 (Back) at RM0 and MB5 (Forward) at RM5; NAV and MOUSE provide
+  semantic editing (Copy=F21, Paste=F22, Cut=F23, Undo=F24, Redo=Shift+F24);
+  MEDIA is engaged via holding LM5 with Consumer HID transport controls
+  (Prev, Vol−, Vol+, Next on home row; Stop, Play/Pause, Mute on thumbs).
 - [ ] **Bluetooth profile switching** — on ADJUST, cycle `BT_SEL 0`–`BT_SEL 4`
   in the five-column core (`LM4`–`LM0`) or use `BT_NXT`/`BT_PRV`; confirm host reconnects.
 - [ ] **HOST / AeroSpace** — hold the left `Tab` thumb (`LH0`), then test

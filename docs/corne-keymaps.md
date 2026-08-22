@@ -32,9 +32,9 @@ refer to these indices:
 | Index | Layer name (`label` / `display-name`) | Purpose |
 |-------|----------------------------------------|---------|
 | 0 | `BASE` | Primary Colemak-DH layer with bilateral home-row modifiers, LM5 momentary MEDIA, and six thumb layer-taps. |
-| 1 | `NAV` | macOS Cmd clipboard, Caps Lock, cursor navigation, line/page navigation, explicit editing thumbs, and same-side left bootloader (`LT5`). |
-| 2 | `MOUSE` | NAV-aligned pointer movement and scrolling, left modifiers, clipboard, MB4/MB5 side buttons, and thumb clicks. |
-| 3 | `MEDIA` | NAV-aligned previous/volume/next controls with right-thumb stop/play/mute controls. |
+| 1 | `NAV` | Semantic editing shortcuts (Copy / Paste / Cut / Undo / Redo via F21–F24), Caps Lock, cursor navigation, line/page navigation, explicit editing thumbs, and same-side left bootloader (`LT5`). |
+| 2 | `MOUSE` | NAV-aligned pointer movement and scrolling, left modifiers, semantic editing (Copy / Paste / Cut / Undo / Redo), MB4/MB5 side buttons, and thumb clicks. |
+| 3 | `MEDIA` | NAV-aligned Consumer HID previous/volume/next controls with right-thumb stop/play/mute controls. |
 | 4 | `NUM` | Standard spatial numpad and punctuation on the left, mirrored modifiers on the right, and same-side right bootloader (`RT5`). |
 | 5 | `SYM` | Shifted NUM geometry with direct programming symbols on the thumbs. |
 | 6 | `FUN` | NUM-aligned F-key grid with mirrored modifiers and App/Space/Tab thumbs. |
@@ -303,7 +303,7 @@ Pointing is enabled (`CONFIG_ZMK_POINTING=y`) and used by the MOUSE layer:
 
 - **Mouse modifiers** (`LGUI`, `LALT`, `LCTRL`, `LEFT_SHIFT`) occupy the
   physical `A R S T` home positions.
-- **Clipboard** is duplicated in the right top row, matching NAV.
+- **Semantic editing** (Copy, Paste, Cut, Undo, Redo via F21–F24) is duplicated in the right top row, matching NAV.
 - **Pointer movement** occupies the right-hand home-row direction positions.
 - **Mouse wheel** occupies the matching right-hand bottom-row positions.
 - **MB4/MB5** occupy the right-hand home-row positions (`RM0` = MB4 Back, `RM5` = MB5 Forward).
@@ -447,11 +447,26 @@ input delivery, and deep-sleep behavior on this hardware.
 
 ---
 
-## 14. Corne HOST → host adapter integration
+## 14. Semantic host integration (HOST & Editing)
 
-HOST emits F13–F20, Shift-F13–F17, Ctrl+F13–F16, and
-Ctrl+Shift+F13–F16. The reference macOS adapter is tracked at
-`dotfiles/aerospace.toml`; its resize mode interprets Ctrl+F13–F16 as resize
-directions. The protocol deliberately does not encode Option+H/J/K/L, so a
-future Windows/GlazeWM adapter can assign the same semantic signals without a
-firmware change.
+The firmware uses semantic high-function keys to keep physical muscle memory identical across operating systems:
+
+1. **Window management (`F13`–`F20`):**
+   - Emitted from the HOST layer.
+   - macOS: Managed by AeroSpace (`dotfiles/aerospace.toml`).
+   - Windows: Can be mapped to GlazeWM or another tiling window manager.
+   - Emits `F13`–`F20`, `Shift-F13`–`Shift-F17`, `Ctrl+F13`–`Ctrl+F16`, and `Ctrl+Shift+F13`–`Ctrl+Shift+F16`.
+
+2. **Cross-platform editing (`F21`–`F24`):**
+   - Emitted from NAV and MOUSE (`RT0`–`RT4`).
+   - `F21` = Copy (`Command+C` on macOS / `Ctrl+C` on Windows)
+   - `F22` = Paste (`Command+V` on macOS / `Ctrl+V` on Windows)
+   - `F23` = Cut (`Command+X` on macOS / `Ctrl+X` on Windows)
+   - `F24` = Undo (`Command+Z` on macOS / `Ctrl+Z` on Windows)
+   - `Shift+F24` = Redo (`Command+Shift+Z` on macOS / `Ctrl+Y` on Windows)
+   - macOS adapter: Karabiner-Elements (`dotfiles/karabiner-corne.json`).
+   - Windows adapter: AutoHotkey v2 (`dotfiles/corne-windows.ahk`).
+
+3. **Consumer media (`C_*`):**
+   - Emitted directly from the MEDIA layer using portable Consumer HID codes (`C_PREVIOUS`, `C_VOLUME_DOWN`, `C_VOLUME_UP`, `C_NEXT`, `C_PLAY_PAUSE`, `C_MUTE`, `C_STOP`).
+   - Works natively on both macOS and Windows without extra host configuration.
