@@ -3,29 +3,34 @@
 # shield arrays, for more control, add individual board + shield combinations
 # to the `include` property. You can also use the `cmake-args` property to
 # pass flags to the build command and `artifact-name` to assign a name to
-# distinguish build outputs from each other:
-#
-# board: [ "nice_nano@2.0.0//zmk" ]
-# shield: [ "corne_left", "corne_right" ]
-# include:
-#   - board: bdn9_rev2
-#   - board: nice_nano@2.0.0//zmk
-#     shield: reviung41
-#   - board: nice_nano@2.0.0//zmk
-#     shield: corne_left
-#     cmake-args: -DCONFIG_ZMK_USB_LOGGING=y
-#     artifact-name: corne_left_with_logging
-#
+# distinguish build outputs from each other.
 ---
 include:
+  # Corne central
   - board: nice_nano@2.0.0//zmk
     shield: corne_left nice_oled
     snippet: studio-rpc-usb-uart
     cmake-args: -DCONFIG_ZMK_STUDIO=y
     artifact-name: corne-left
+
+  # Corne peripheral
   - board: nice_nano@2.0.0//zmk
     shield: corne_right nice_oled
     artifact-name: corne-right
+
+  # Sofle central
+  - board: nice_nano@2.0.0//zmk
+    shield: sofle_left nice_oled
+    snippet: studio-rpc-usb-uart
+    cmake-args: -DCONFIG_ZMK_STUDIO=y
+    artifact-name: sofle-left
+
+  # Sofle peripheral
+  - board: nice_nano@2.0.0//zmk
+    shield: sofle_right nice_oled
+    artifact-name: sofle-right
+
+  # Settings reset recovery firmware
   - board: nice_nano@2.0.0//zmk
     shield: settings_reset
     artifact-name: settings-reset
