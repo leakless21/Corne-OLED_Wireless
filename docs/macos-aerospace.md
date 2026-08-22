@@ -357,8 +357,16 @@ Karabiner-Elements translates Corne semantic signals into standard macOS chords 
 3. **Enable the rules in Karabiner Settings → Complex Modifications → Add rule:**
    - "Corne F13-F20 Semantic Window Management Bridge"
    - "Corne F21-F24 Semantic Editing"
-4. **Device Scoping with Karabiner-EventViewer:**
-   To lock rules strictly to your Corne hardware (preventing accidental triggers from other keyboards), open **Karabiner-EventViewer → Devices**, find your Corne controller (both USB and Bluetooth entries), and note its `vendor_id` and `product_id`.
+4. **Enable "Modify events" for the Corne keyboard (Critical):**
+   Because the Corne firmware has pointing/mouse support enabled (`CONFIG_ZMK_POINTING=y`),
+   macOS and Karabiner treat the keyboard as a composite pointing+keyboard device.
+   Karabiner ignores pointing devices by default.
+   - Open **Karabiner-Elements Settings → Devices**.
+   - Locate **Corne (ZMK Project)** in the device list.
+   - Ensure **"Modify events"** is toggled **ON** (`ignore: false`).
+   - Without this toggle, Karabiner will not grab the keyboard and F13–F24 events will bypass translation.
+5. **Device Scoping with Karabiner-EventViewer:**
+   To lock rules strictly to your Corne hardware (preventing accidental triggers from other keyboards), open **Karabiner-EventViewer → Devices**, find your Corne controller (both USB and Bluetooth entries), and note its `vendor_id` (`7504`) and `product_id` (`24926`).
    In `dotfiles/karabiner-corne.json`, each manipulator contains:
    ```json
    "conditions": [
@@ -374,7 +382,6 @@ Karabiner-Elements translates Corne semantic signals into standard macOS chords 
      }
    ]
    ```
-
 ### 7.4 Ghostty Terminal Configuration
 
 Install the tracked Ghostty configuration at `~/.config/ghostty/config`:
