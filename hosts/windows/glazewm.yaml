@@ -1,0 +1,135 @@
+# Canonical GlazeWM configuration for the semantic keyboard protocol.
+# Install this file at %USERPROFILE%/.glzr/glazewm/config.yaml; see docs/hosts/windows.md.
+
+general:
+  # Whether to automatically focus windows underlying the cursor.
+  focus_follows_cursor: false
+
+  # Whether to switch to the workspace of an active application when focusing it.
+  cursor_follows_focus: false
+
+gaps:
+  inner_gap: 8px
+  outer_gap: 8px
+
+workspaces:
+  - name: "1"
+    display_name: "WEB"
+  - name: "2"
+    display_name: "DEV"
+  - name: "3"
+    display_name: "COMMS"
+  - name: "4"
+    display_name: "RUN"
+  - name: "5"
+    display_name: "AUX"
+
+window_rules:
+  # Auto-routing for hard-purpose applications
+  - command: "set-floating"
+    match:
+      - window_class: "Taskmgr"
+      - window_class: "ControlPanel"
+
+keybindings:
+  # ===========================================================================
+  # Workspace Switching (F13-F17) & Window Movement (Shift+F13-F17)
+  # ===========================================================================
+  - command: "focus --workspace 1"
+    bindings: ["f13", "alt+1"]
+  - command: "focus --workspace 2"
+    bindings: ["f14", "alt+2"]
+  - command: "focus --workspace 3"
+    bindings: ["f15", "alt+3"]
+  - command: "focus --workspace 4"
+    bindings: ["f16", "alt+4"]
+  - command: "focus --workspace 5"
+    bindings: ["f17", "alt+5"]
+
+  - command: "move --workspace 1; focus --workspace 1"
+    bindings: ["shift+f13", "alt+shift+1"]
+  - command: "move --workspace 2; focus --workspace 2"
+    bindings: ["shift+f14", "alt+shift+2"]
+  - command: "move --workspace 3; focus --workspace 3"
+    bindings: ["shift+f15", "alt+shift+3"]
+  - command: "move --workspace 4; focus --workspace 4"
+    bindings: ["shift+f16", "alt+shift+4"]
+  - command: "move --workspace 5; focus --workspace 5"
+    bindings: ["shift+f17", "alt+shift+5"]
+
+  # ===========================================================================
+  # Directional Navigation & Window Moving
+  # ===========================================================================
+  - command: "focus left"
+    bindings: ["ctrl+f13", "alt+h"]
+  - command: "focus down"
+    bindings: ["ctrl+f14", "alt+j"]
+  - command: "focus up"
+    bindings: ["ctrl+f15", "alt+k"]
+  - command: "focus right"
+    bindings: ["ctrl+f16", "alt+l"]
+
+  - command: "move left"
+    bindings: ["ctrl+shift+f13", "alt+shift+h"]
+  - command: "move down"
+    bindings: ["ctrl+shift+f14", "alt+shift+j"]
+  - command: "move up"
+    bindings: ["ctrl+shift+f15", "alt+shift+k"]
+  - command: "move right"
+    bindings: ["ctrl+shift+f16", "alt+shift+l"]
+
+  # ===========================================================================
+  # Context, Modals & Window Controls
+  # ===========================================================================
+  # Previous workspace
+  - command: "focus --recent-workspace"
+    bindings: ["f18", "alt+tab"]
+
+  # Fullscreen toggle
+  - command: "toggle-fullscreen"
+    bindings: ["f19", "alt+f"]
+
+  # Float / Tile toggle
+  - command: "toggle-floating --centered"
+    bindings: ["f20", "alt+shift+space"]
+
+  # Enter Resize Mode
+  - command: "enable-binding-mode --name resize"
+    bindings: ["shift+f18", "alt+r"]
+
+  # Enter Service Mode
+  - command: "enable-binding-mode --name service"
+    bindings: ["alt+f18", "alt+shift+semicolon"]
+
+binding_modes:
+  # ===========================================================================
+  # Resize Mode
+  # ===========================================================================
+  - name: "resize"
+    keybindings:
+      - command: "resize width -50px"
+        bindings: ["ctrl+f13", "alt+h", "h"]
+      - command: "resize height +50px"
+        bindings: ["ctrl+f14", "alt+j", "j"]
+      - command: "resize height -50px"
+        bindings: ["ctrl+f15", "alt+k", "k"]
+      - command: "resize width +50px"
+        bindings: ["ctrl+f16", "alt+l", "l"]
+      - command: "disable-binding-mode --name resize"
+        bindings: ["escape", "enter"]
+
+  # ===========================================================================
+  # Service Mode (WM Management & Monitor Movement)
+  # ===========================================================================
+  - name: "service"
+    keybindings:
+      - command: "move-workspace-to-monitor --next; disable-binding-mode --name service"
+        bindings: ["ctrl+f16", "alt+l", "l"]
+      - command: "move-workspace-to-monitor --prev; disable-binding-mode --name service"
+        bindings: ["ctrl+f13", "alt+h", "h"]
+      - command: "wm-reload-config; disable-binding-mode --name service"
+        bindings: ["f19", "r"]
+      - command: "wm-redraw; disable-binding-mode --name service"
+        bindings: ["f20", "b"]
+      - command: "disable-binding-mode --name service"
+        bindings: ["escape", "enter"]

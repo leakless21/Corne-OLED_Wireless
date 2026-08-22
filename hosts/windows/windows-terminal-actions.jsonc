@@ -1,0 +1,14 @@
+// Windows Terminal Action Snippet for Quick Terminal (Quake Mode)
+// Merge this object into the "actions" array of your Windows Terminal settings.json.
+// Access settings.json via Windows Terminal -> Settings -> Open JSON file (bottom left).
+[
+  {
+    "command": {
+      "action": "globalSummon",
+      "name": "_quake",
+      "dropdownDuration": 0,
+      "toggleVisibility": true
+    },
+    "keys": "ctrl+alt+`"
+  }
+]
