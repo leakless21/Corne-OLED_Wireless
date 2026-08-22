@@ -231,43 +231,41 @@ needed.
 
 ## 8. ZMK Studio Caveats
 
-ZMK Studio is **enabled** in this configuration (`CONFIG_ZMK_STUDIO=y`) and
-allows live keymap editing over USB-UART on the left half.
+ZMK Studio is **enabled with locking** in this configuration (`CONFIG_ZMK_STUDIO=y`,
+`CONFIG_ZMK_STUDIO_LOCKING=y`, `CONFIG_ZMK_STUDIO_LOCK_ON_DISCONNECT=y`) to ensure
+the Git-tracked `config/corne.keymap` remains the canonical source of truth.
 
 ### What to know
 
-- Studio edits persist to on-device settings, not to the Git-tracked
-  `config/corne.keymap`. The Git file remains the canonical source of truth.
-- **Restore Stock Settings** is the normal way to discard Studio overrides and
-  return to firmware-defined bindings.
-- `settings-reset` is the destructive fallback: it clears Studio overrides,
-  Bluetooth bonds, split state, output selection, and external-power state.
-- Studio connects over USB-UART on the left half via the
-  `studio-rpc-usb-uart` snippet; the right half relies on the global config.
+- **Studio Unlock:** To unlock Studio for live editing over USB-UART, hold NAV + NUM to activate
+  the `ADJUST` layer, then press the `Unlock` key on `RM0` (`&studio_unlock`).
+- Studio edits persist to on-device settings, not to the Git-tracked `config/corne.keymap`.
+- **Restore Stock Settings:** If you flash a newly updated keymap and your changes do not appear,
+  an old Studio runtime configuration is overriding firmware. In ZMK Studio, click **Restore Stock Settings**
+  to clear the on-device override and return to Git-authored bindings without clearing Bluetooth bonds.
+- `settings-reset` is the destructive fallback: it clears Studio overrides, Bluetooth bonds,
+  split state, output selection, and external-power state.
 
 ### Practical recommendation
 
-Use Studio for quick experiments. For durable changes, edit
-`config/corne.keymap` directly and commit it. When returning from Studio to Git
-firmware, use **Restore Stock Settings** before considering `settings-reset`.
-
----
+Use Studio for quick experiments. For durable changes, edit `config/corne.keymap` directly and commit it.
+When returning from Studio to Git firmware, use **Restore Stock Settings** before considering `settings-reset`.
 ## 9. Host Platform Setup (macOS & Windows)
 
 The Corne keyboard emits host-agnostic semantic signals for editing (`F21`–`F24`) and window management (`F13`–`F20`). Basic typing, media controls, and mouse features work without any host tools, but desktop editing and tiling window management use lightweight host bridges.
 
 ### macOS setup
 
-1. **Editing bridge (Karabiner-Elements):**
+1. **Host Bridge (Karabiner-Elements):**
    - Install [Karabiner-Elements](https://karabiner-elements.pqrs.org/).
    - Copy the rule file from `dotfiles/karabiner-corne.json` into `~/.config/karabiner/assets/complex_modifications/`.
-   - Enable **"Corne F21-F24 Semantic Editing"** in Karabiner Settings $\rightarrow$ Complex Modifications.
-   - Translates `F21`–`F24` and `Shift+F24` to `Cmd+C`, `Cmd+V`, `Cmd+X`, `Cmd+Z`, `Cmd+Shift+Z`.
-2. **Window management (AeroSpace):**
-   - Install [AeroSpace](https://nikitabobko.github.io/AeroSpace/).
-   - Symlink or copy `dotfiles/aerospace.toml` to `~/.config/aerospace/aerospace.toml`.
-   - See [docs/macos-aerospace.md](macos-aerospace.md) for full configuration and application routing.
-
+   - Enable **"Corne F13-F20 Semantic Window Management Bridge"** and **"Corne F21-F24 Semantic Editing"**.
+   - Translates Corne high-function keys into macOS `Alt` and `Cmd` chords with `device_if` scoping.
+2. **Window Management & Terminal (AeroSpace & Ghostty):**
+   - Install [AeroSpace](https://nikitabobko.github.io/AeroSpace/) and [Ghostty](https://ghostty.org/).
+   - Install `dotfiles/aerospace.toml` to `~/.config/aerospace/aerospace.toml`.
+   - Install `dotfiles/ghostty.config` to `~/.config/ghostty/config`.
+   - See [docs/macos-aerospace.md](macos-aerospace.md) for full configuration, Quick Terminal, and application routing.
 ### Windows setup
 
 1. **Editing bridge (AutoHotkey v2):**

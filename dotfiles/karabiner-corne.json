@@ -2,10 +2,20 @@
   "title": "Corne Semantic Host Bridge (F13-F20 Window Management & F21-F24 Editing)",
   "rules": [
     {
-      "description": "Corne F13-F20 Semantic Window Management Bridge (F13-F20 -> AeroSpace Alt chords)",
+      "description": "Corne F13-F20 Semantic Window Management Bridge (F13-F20 -> AeroSpace / macOS chords)",
       "manipulators": [
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f13",
             "modifiers": {
@@ -30,6 +40,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f14",
             "modifiers": {
@@ -54,6 +74,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f15",
             "modifiers": {
@@ -78,6 +108,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f16",
             "modifiers": {
@@ -102,6 +142,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f13",
             "modifiers": {
@@ -124,6 +174,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f14",
             "modifiers": {
@@ -146,6 +206,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f15",
             "modifiers": {
@@ -168,6 +238,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f16",
             "modifiers": {
@@ -190,6 +270,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f13",
             "modifiers": {
@@ -213,6 +303,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f14",
             "modifiers": {
@@ -236,6 +336,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f15",
             "modifiers": {
@@ -259,6 +369,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f16",
             "modifiers": {
@@ -282,6 +402,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f17",
             "modifiers": {
@@ -305,6 +435,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f18",
             "modifiers": {
@@ -327,6 +467,177 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
+          "from": {
+            "key_code": "f13",
+            "modifiers": {
+              "mandatory": [
+                "option"
+              ],
+              "optional": [
+                "caps_lock"
+              ]
+            }
+          },
+          "to": [
+            {
+              "key_code": "spacebar",
+              "modifiers": [
+                "left_command"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
+          "from": {
+            "key_code": "f14",
+            "modifiers": {
+              "mandatory": [
+                "option"
+              ],
+              "optional": [
+                "caps_lock"
+              ]
+            }
+          },
+          "to": [
+            {
+              "key_code": "grave_accent_and_tilde",
+              "modifiers": [
+                "left_control"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
+          "from": {
+            "key_code": "f15",
+            "modifiers": {
+              "mandatory": [
+                "option"
+              ],
+              "optional": [
+                "caps_lock"
+              ]
+            }
+          },
+          "to": [
+            {
+              "key_code": "return_or_enter",
+              "modifiers": [
+                "left_alt"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
+          "from": {
+            "key_code": "f16",
+            "modifiers": {
+              "mandatory": [
+                "option"
+              ],
+              "optional": [
+                "caps_lock"
+              ]
+            }
+          },
+          "to": [
+            {
+              "key_code": "grave_accent_and_tilde",
+              "modifiers": [
+                "left_alt"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
+          "from": {
+            "key_code": "f18",
+            "modifiers": {
+              "mandatory": [
+                "option"
+              ],
+              "optional": [
+                "caps_lock"
+              ]
+            }
+          },
+          "to": [
+            {
+              "key_code": "semicolon",
+              "modifiers": [
+                "left_alt",
+                "left_shift"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f13",
             "modifiers": {
@@ -346,6 +657,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f14",
             "modifiers": {
@@ -365,6 +686,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f15",
             "modifiers": {
@@ -384,6 +715,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f16",
             "modifiers": {
@@ -403,6 +744,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f17",
             "modifiers": {
@@ -422,6 +773,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f18",
             "modifiers": {
@@ -441,6 +802,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f19",
             "modifiers": {
@@ -460,6 +831,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f20",
             "modifiers": {
@@ -485,6 +866,16 @@
       "manipulators": [
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f24",
             "modifiers": {
@@ -508,6 +899,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f24",
             "modifiers": {
@@ -527,6 +928,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f21",
             "modifiers": {
@@ -546,6 +957,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f22",
             "modifiers": {
@@ -565,6 +986,16 @@
         },
         {
           "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true
+                }
+              ]
+            }
+          ],
           "from": {
             "key_code": "f23",
             "modifiers": {

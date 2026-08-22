@@ -255,6 +255,72 @@ def test_cross_platform_bindings(parsed: dict) -> None:
 
     print("PASS: Cross-platform bindings verified (Consumer media HID, semantic F21-F24 editing on NAV/MOUSE).")
 
+
+def test_caps_behavior(parsed: dict) -> None:
+    nav = parsed["layers"].get("NAV")
+    fun = parsed["layers"].get("FUN")
+    if not nav or not fun:
+        fail("NAV or FUN layer missing")
+
+    if "&caps_word" not in nav["raw_bindings"]:
+        fail("NAV layer missing '&caps_word' behavior")
+    if "&kp CAPSLOCK" not in fun["raw_bindings"]:
+        fail("FUN layer missing fallback '&kp CAPSLOCK'")
+
+    print("PASS: Caps behavior verified (&caps_word on NAV, &kp CAPSLOCK fallback on FUN).")
+
+
+def test_host_layer_bindings(parsed: dict) -> None:
+    host = parsed["layers"].get("HOST")
+    if not host:
+        fail("HOST layer missing")
+
+    raw = host["raw_bindings"]
+    required_host_tokens = [
+        # Workspaces
+        "&kp F13", "&kp F14", "&kp F15", "&kp F16", "&kp F17",
+        # Move to workspace
+        "&kp LS(F13)", "&kp LS(F14)", "&kp LS(F15)", "&kp LS(F16)", "&kp LS(F17)",
+        # Directional focus
+        "&kp LC(F13)", "&kp LC(F14)", "&kp LC(F15)", "&kp LC(F16)",
+        # Directional move
+        "&kp LC(LS(F13))", "&kp LC(LS(F14))", "&kp LC(LS(F15))", "&kp LC(LS(F16))",
+        # Modal & context controls
+        "&kp LS(F18)", "&kp F18", "&kp F19", "&kp F20",
+        # Extended semantic protocol
+        "&kp LA(F13)",  # SYSTEM_LAUNCHER
+        "&kp LA(F14)",  # QUICK_TERMINAL
+        "&kp LA(F15)",  # NEW_TERMINAL
+        "&kp LA(F16)",  # PREVIOUS_WINDOW
+        "&kp LA(F18)",  # SERVICE_MODE
+    ]
+    for tok in required_host_tokens:
+        if tok not in raw:
+            fail(f"HOST layer missing expected semantic protocol token: {tok}")
+
+    print("PASS: HOST layer semantic signals verified (workspaces, focus/move, launchers, previous window, resize, service).")
+
+
+def test_studio_configuration(parsed: dict) -> None:
+    adjust = parsed["layers"].get("ADJUST")
+    if not adjust:
+        fail("ADJUST layer missing")
+
+    if "&studio_unlock" not in adjust["raw_bindings"]:
+        fail("ADJUST layer missing '&studio_unlock' binding")
+
+    if not CONF_PATH.exists():
+        fail(f"Config file not found: {CONF_PATH}")
+
+    content = CONF_PATH.read_text(encoding="utf-8")
+    if "CONFIG_ZMK_STUDIO_LOCKING=y" not in content:
+        fail("corne.conf must enable CONFIG_ZMK_STUDIO_LOCKING=y")
+    if "CONFIG_ZMK_STUDIO_LOCK_ON_DISCONNECT=y" not in content:
+        fail("corne.conf must enable CONFIG_ZMK_STUDIO_LOCK_ON_DISCONNECT=y")
+
+    print("PASS: ZMK Studio locking and unlock behavior verified.")
+
+
 def test_conf_constraints() -> None:
     if not CONF_PATH.exists():
         fail(f"Config file not found: {CONF_PATH}")
@@ -270,8 +336,6 @@ def test_conf_constraints() -> None:
         fail("corne.conf contains CONFIG_ZMK_HID_REPORT_TYPE_NKRO (prohibited)")
 
     print("PASS: corne.conf constraints verified (no debounce or NKRO changes).")
-
-
 def main() -> None:
     if not KEYMAP_PATH.exists():
         fail(f"Keymap file not found: {KEYMAP_PATH}")
@@ -284,8 +348,10 @@ def main() -> None:
     test_game_aux_layer(parsed)
     test_bootloader_shortcuts(parsed)
     test_cross_platform_bindings(parsed)
+    test_caps_behavior(parsed)
+    test_host_layer_bindings(parsed)
+    test_studio_configuration(parsed)
     test_conf_constraints()
-
     print("\nALL STATIC KEYMAP INVARIANTS PASSED.")
 
 

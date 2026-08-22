@@ -32,15 +32,15 @@ refer to these indices:
 | Index | Layer name (`label` / `display-name`) | Purpose |
 |-------|----------------------------------------|---------|
 | 0 | `BASE` | Primary Colemak-DH layer with bilateral home-row modifiers, LM5 momentary MEDIA, and six thumb layer-taps. |
-| 1 | `NAV` | Semantic editing shortcuts (Copy / Paste / Cut / Undo / Redo via F21–F24), Caps Lock, cursor navigation, line/page navigation, explicit editing thumbs, and same-side left bootloader (`LT5`). |
+| 1 | `NAV` | Semantic editing shortcuts (Copy / Paste / Cut / Undo / Redo via F21–F24), Caps Word (`&caps_word` on `RM0`), cursor navigation, line/page navigation, explicit editing thumbs, and same-side left bootloader (`LT5`). |
 | 2 | `MOUSE` | NAV-aligned pointer movement and scrolling, left modifiers, semantic editing (Copy / Paste / Cut / Undo / Redo), MB4/MB5 side buttons, and thumb clicks. |
 | 3 | `MEDIA` | NAV-aligned Consumer HID previous/volume/next controls with right-thumb stop/play/mute controls. |
 | 4 | `NUM` | Standard spatial numpad and punctuation on the left, mirrored modifiers on the right, and same-side right bootloader (`RT5`). |
 | 5 | `SYM` | Shifted NUM geometry with direct programming symbols on the thumbs. |
-| 6 | `FUN` | NUM-aligned F-key grid with mirrored modifiers and App/Space/Tab thumbs. |
-| 7 | `HOST` | Host-agnostic F13–F20 workspace protocol, move-to-workspace, and Ctrl+F directional signals. |
+| 6 | `FUN` | NUM-aligned F-key grid with mirrored modifiers, `RT0` Caps Lock fallback, and App/Space/Tab thumbs. |
+| 7 | `HOST` | Host-agnostic F13–F20 workspace protocol, move-to-workspace, directional focus/move, Launchers, Previous Window, Resize, and Service mode. |
 | 8 | `GAME` | Full plain tap-only QWERTY for gaming; dedicated left-hand Esc/AUX hold-tap, momentary RH1 AUX, and protected exit. |
-| 9 | `ADJUST` | Conditional device administration, mirrored reset/bootloader, plus deliberate GAME entry. |
+| 9 | `ADJUST` | Conditional device administration, mirrored reset/bootloader, Studio Unlock (`&studio_unlock` on `RM0`), plus deliberate GAME entry. |
 | 10 | `GAME_AUX` | Auxiliary gaming layer over GAME: numbers 1–0, F1–F10, missing symbols, and deliberate exit to BASE (`RH2`). |
 > **`BUTTON` is gone.** The previous `BUTTON` layer (index 3) was removed in
 > the earlier migration; `MEDIA` now occupies index 3 and the remaining layer
@@ -139,15 +139,14 @@ The layer organizes controls by usage frequency:
 |------------|--------------------|-----------------|--------|
 | Workspace focus | left home core (`LM4`–`LM0`) | `F13`–`F17` | Visit WEB / DEV / COMMS / RUN / AUX |
 | Move to workspace | left top core (`LT4`–`LT0`) | `Shift-F13`–`Shift-F17` | Move window to workspace + follow |
+| Launchers & Terminal | left bottom core (`LB4`–`LB2`) | `Alt+F13`–`Alt+F15` | Launcher (Spotlight), Quick Terminal (Ghostty dropdown), New Terminal (Ghostty) |
+| Previous Window | right home inner (`RM0`) | `Alt+F16` | Toggle focus between last two windows (`focus-back-and-forth`) |
 | Window focus | right home core (`RM1`–`RM4`) | `Ctrl+F13`–`Ctrl+F16` | Focus Left / Down / Up / Right |
 | Window move | right bottom core (`RB1`–`RB4`) | `Ctrl+Shift+F13`–`Ctrl+Shift+F16` | Move window Left / Down / Up / Right |
-| Resize mode | right top (`RT1`) | `Shift+F18` | Enter resize mode |
+| Resize mode | right top (`RT1`) | `Shift+F18` | Enter AeroSpace resize mode |
+| Service mode | right top (`RT2`) | `Alt+F18` | Enter AeroSpace service mode |
 | Esc | right top (`RT5`) | `ESCAPE` | Dismiss mode / escape |
 | Context actions | right thumbs (`RH0`–`RH2`) | `F19`, `F18`, `F20` | Fullscreen (`RH0`), Previous WS (`RH1`), Float (`RH2`) |
-
-The firmware emits semantic protocol keys. AeroSpace, GlazeWM, or another host
-adapter assigns their meaning. The macOS adapter also keeps ordinary
-Option+H/J/K/L for the laptop keyboard.
 ---
 
 ### 3.4 GAME and GAME_AUX layouts
@@ -331,19 +330,23 @@ CONFIG_ZMK_IDLE_TIMEOUT=30000
 CONFIG_ZMK_SLEEP=y
 CONFIG_ZMK_IDLE_SLEEP_TIMEOUT=900000
 CONFIG_ZMK_STUDIO=y
+CONFIG_ZMK_STUDIO_LOCKING=y
+CONFIG_ZMK_STUDIO_LOCK_ON_DISCONNECT=y
 CONFIG_ZMK_POINTING=y
 ```
 
 The display blanks after 30 seconds and deep sleep begins after 15 minutes.
-These values remain a baseline until battery drain, wake reliability, BLE
-reconnect latency, and OLED wake behavior are measured on hardware.
+Studio locking is enabled (`CONFIG_ZMK_STUDIO_LOCKING=y`, `CONFIG_ZMK_STUDIO_LOCK_ON_DISCONNECT=y`)
+to enforce that the Git-tracked `config/corne.keymap` remains authoritative.
+When runtime experimentation in ZMK Studio is desired, holding NAV + NUM activates ADJUST,
+where the `&studio_unlock` key on `RM0` unlocks Studio for live tuning.
 
-ZMK Studio edits persist to device settings and can override later firmware
-keymap changes. To return from an experiment to Git-tracked firmware, first use
-**Restore Stock Settings** in Studio. This clears Studio-specific overrides
-without clearing Bluetooth bonds. Use `settings-reset` only when that recovery
-path fails or a full settings/Bluetooth reset is intentional.
-
+**Important Studio Source-of-Truth Workflow:**
+ZMK Studio runtime changes persist in on-device storage independently of newly flashed
+firmware images. If you edit `config/corne.keymap`, flash new firmware, and wonder why
+your changes do not appear, an active Studio runtime override is active on the device.
+To restore the Git-authored firmware keymap, use **Restore Stock Settings** in ZMK Studio.
+This clears runtime overrides without clearing Bluetooth bonds.
 The current ZMK power defaults and display options are documented at
 <https://zmk.dev/docs/config/power> and
 <https://zmk.dev/docs/config/displays>. Deep-sleep behavior deserves physical

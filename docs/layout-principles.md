@@ -85,17 +85,16 @@ RH2 (right outer):  tap Delete     hold FUN
 | Layer | Left-hand role | Right-hand role | Explicit thumb role |
 | --- | --- | --- | --- |
 | BASE | Colemak-DH and HRMs; LM5 holds MEDIA | Colemak-DH and HRMs | Six layer-taps (MOUSE, NAV, HOST, SYM, NUM, FUN) |
-| NAV | Cmd/Alt/Ctrl/Shift; `LT5` left bootloader | Caps Lock, semantic editing (F21–F24), cursor, line/page | Esc/Space/Tab and Enter/Bspc/Delete |
+| NAV | Cmd/Alt/Ctrl/Shift; `LT5` left bootloader | Caps Word, semantic editing (F21–F24), cursor, line/page | Esc/Space/Tab and Enter/Bspc/Delete |
 | MOUSE | Cmd/Alt/Ctrl/Shift | MB4 (Back), MB5 (Fwd), semantic editing (F21–F24), pointer, scroll | Right/left/middle click |
 | MEDIA | Cmd/Alt/Ctrl/Shift | Consumer HID prev, volume, next | Stop/play/pause/mute (right thumbs only) |
 | NUM | Numpad geometry | Shift/Ctrl/Alt/Cmd; `RT5` right bootloader | `.`, `0`, `-` |
 | SYM | Shifted NUM geometry | Shift/Ctrl/Alt/Cmd | `(`, `)`, `_` |
-| FUN | F-key geometry | Shift/Ctrl/Alt/Cmd | App, Space, Tab |
-| HOST | Workspace focus (home) & move (top) | Directional focus (home) & move (bottom) | Fullscreen, Previous WS, Float (right thumbs) |
+| FUN | F-key geometry | Shift/Ctrl/Alt/Cmd, `RT0` Caps Lock fallback | App, Space, Tab |
+| HOST | Workspace focus (home) & move (top), Launch/QTerm/Term (bottom) | Directional focus (home) & move (bottom), Prev Win (`RM0`), Resize (`RT1`), Service (`RT2`), Esc (`RT5`) | Fullscreen, Previous WS, Float (right thumbs) |
 | GAME | Plain tap-only QWERTY; `LT5` Esc/AUX hold-tap | Plain tap-only QWERTY | Ctrl/Space/Alt and Enter/AUX/transparent |
 | GAME_AUX | Numbers 1–5, F1–F5, symbols (`` ` ``, `-`, `=`, `[`, `]`) | Numbers 6–0, F6–F10 | Fall-through to GAME, RH2 exits to BASE |
-| ADJUST | Bluetooth in core (`LM4`–`LM0`), power/reset | Output/power/reset/GAME entry | None |
-
+| ADJUST | Bluetooth in core (`LM4`–`LM0`), power/reset | Output/power/reset/GAME entry, Studio Unlock (`RM0`) | None |
 ## Host-independent firmware & semantic protocol
 
 The firmware maintains a strict separation between portable HID behaviors and host-dependent behaviors:
@@ -119,25 +118,29 @@ The firmware maintains a strict separation between portable HID behaviors and ho
 
 ### Protocol specification
 
-| Signal | Semantic Action | macOS Reference (AeroSpace / Karabiner) | Windows Reference (AutoHotkey / GlazeWM) |
+| Signal | Semantic Action | macOS Reference (AeroSpace / Karabiner / Ghostty / Spotlight) | Windows Reference (AutoHotkey / GlazeWM) |
 | --- | --- | --- | --- |
-| `F13`–`F17` | Workspace focus (1–5) | Focus WEB/DEV/COMMS/RUN/AUX | Focus workspace 1–5 |
-| `Shift+F13`–`Shift+F17` | Move window to workspace (1–5) | Move window to WEB..AUX and follow | Move window to workspace 1–5 |
-| `Ctrl+F13`–`Ctrl+F16` | Directional focus (← ↓ ↑ →) | Focus left/down/up/right | Focus left/down/up/right |
-| `Ctrl+Shift+F13`–`Ctrl+Shift+F16` | Directional window move | Move left/down/up/right | Move left/down/up/right |
-| `Shift+F18` | Resize mode | Enter resize mode | Enter resize mode |
-| `F18` | Previous workspace | Previous workspace | Previous workspace |
-| `F19` | Fullscreen | Fullscreen toggle | Fullscreen toggle |
-| `F20` | Float toggle | Floating/tiling toggle | Floating/tiling toggle |
+| `F13`–`F17` | Workspace focus (1–5) | Focus WEB/DEV/COMMS/RUN/AUX (`Alt+1..5`) | Focus workspace 1–5 |
+| `Shift+F13`–`Shift+F17` | Move window to workspace (1–5) | Move window to WEB..AUX and follow (`Alt+Shift+1..5`) | Move window to workspace 1–5 |
+| `Ctrl+F13`–`Ctrl+F16` | Directional focus (← ↓ ↑ →) | Focus left/down/up/right (`Alt+H/J/K/L`) | Focus left/down/up/right |
+| `Ctrl+Shift+F13`–`Ctrl+Shift+F16` | Directional window move | Move left/down/up/right (`Alt+Shift+H/J/K/L`) | Move left/down/up/right |
+| `Shift+F18` | Resize mode | Enter AeroSpace resize mode (`Alt+R`) | Enter resize mode |
+| `Alt+F18` | Service mode | Enter AeroSpace service mode (`Alt+Shift+;`) | Enter service / command mode |
+| `F18` | Previous workspace | Previous workspace (`Alt+Tab`) | Previous workspace |
+| `Alt+F16` | Previous window | Previous window (`Alt+``` / `focus-back-and-forth`) | Previous window |
+| `F19` | Fullscreen | Fullscreen toggle (`Alt+F`) | Fullscreen toggle |
+| `F20` | Float toggle | Floating/tiling toggle (`Alt+Shift+Space`) | Floating/tiling toggle |
+| `Alt+F13` | System Launcher | System launcher / Spotlight (`Cmd+Space`) | Windows Search / PowerToys Run |
+| `Alt+F14` | Quick Terminal | Dropdown / scratchpad terminal (`Ctrl+``` toggle) | Terminal toggle |
+| `Alt+F15` | New Terminal | Create normal terminal in current workspace (`Alt+Enter`) | Open terminal window |
 | `F21` | Copy | `Command+C` | `Ctrl+C` |
 | `F22` | Paste | `Command+V` | `Ctrl+V` |
 | `F23` | Cut | `Command+X` | `Ctrl+X` |
 | `F24` | Undo | `Command+Z` | `Ctrl+Z` |
 | `Shift+F24` | Redo | `Command+Shift+Z` | `Ctrl+Y` |
 
-In AeroSpace resize mode, the same `Ctrl+F13`–`Ctrl+F16` direction signals are
-interpreted as resize commands.
-## Change control
+In AeroSpace resize mode, directional signals (`Alt+H/J/K/L` via Karabiner or `H/J/K/L` on laptop) are
+interpreted as resize commands. In AeroSpace service mode, directional commands perform tree joins or window swaps.
 
 Before changing a shared layer family:
 

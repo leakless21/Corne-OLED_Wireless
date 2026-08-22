@@ -43,17 +43,16 @@ the **MEDIA** layer (`&mo L_MEDIA`).
 
 | Layer | How to reach | What it provides |
 |-------|-------------|------------------|
-| **NAV** | Hold left-space thumb (`LH1`) | Semantic editing (Copy / Paste / Cut / Undo / Redo via F21–F24), Caps Lock, arrows, text navigation, line/page movement, and explicit editing thumbs. |
-| **HOST** | Hold left-tab thumb (`LH0`) | Host-agnostic F13–F20 workspace signals (home row), move-to-workspace (top row), directional focus/move, and context thumbs. See [docs/macos-aerospace.md](macos-aerospace.md). |
+| **NAV** | Hold left-space thumb (`LH1`) | Caps Word (`&caps_word` on `RM0`), semantic editing (Copy / Paste / Cut / Undo / Redo via F21–F24), arrows, text navigation, line/page movement, and explicit editing thumbs. |
+| **HOST** | Hold left-tab thumb (`LH0`) | Host-agnostic F13–F20 workspace signals (home row), move-to-workspace (top row), directional focus/move, Launchers, Previous Window, Resize, and Service mode. See [docs/macos-aerospace.md](macos-aerospace.md). |
 | **MOUSE** | Hold left-escape thumb (`LH2`) | NAV-aligned semantic editing (F21–F24), pointer movement, wheel movement, left modifiers, and MB4 (Back) / MB5 (Forward) side buttons. |
 | **MEDIA** | Hold outer-left home key (`LM5`) | NAV-aligned Consumer HID previous/volume/next controls with right-thumb stop/play/mute controls. |
 | **NUM** | Hold right-backspace thumb (`RH1`) | Standard spatial numpad and punctuation on the left; Shift/Ctrl/Alt/Cmd on the right. |
 | **SYM** | Hold right-enter thumb (`RH0`) | Shifted NUM geometry with `(`, `)`, and `_` on the left thumbs. |
-| **FUN** | Hold right-delete thumb (`RH2`) | NUM-aligned F1–F12 grid with mirrored modifiers and App/Space/Tab thumbs. |
+| **FUN** | Hold right-delete thumb (`RH2`) | NUM-aligned F1–F12 grid with mirrored modifiers, `RT0` Caps Lock fallback, and App/Space/Tab thumbs. |
 | **GAME** | Hold NAV + NUM, then press GAME in ADJUST | Full plain tap-only QWERTY for gaming; hold Esc or RH1 for auxiliary keys. Exit via GAME_AUX + right outer thumb (`RH2`). |
 | **GAME_AUX** | Hold GAME `Esc` (left hand) or `RH1` (two-handed) | Auxiliary gaming numbers 1–0, F1–F10, missing symbols, and deliberate exit to BASE (`RH2`). |
-| **ADJUST** | Hold NAV + NUM simultaneously | Five Bluetooth profiles in core (`LM4`–`LM0`), output/power state, mirrored reset/bootloader, and deliberate GAME entry. |
-> **Verify, don't assume.** Exact positions live in `config/corne.keymap`;
+| **ADJUST** | Hold NAV + NUM simultaneously | Five Bluetooth profiles in core (`LM4`–`LM0`), output/power state, mirrored reset/bootloader, Studio Unlock (`RM0`), and deliberate GAME entry. |
 > shared physical rules are recorded in [layout-principles.md](layout-principles.md).
 
 ### Daily HOST & AeroSpace workflow
@@ -62,13 +61,13 @@ HOST is entered directly by holding the **Tab thumb (`LH0`)**. Its controls are
 organized strictly by usage frequency:
 
 1. **Visit workspace (most frequent)**: Hold `Tab` + press home-row key (`A`/`R`/`S`/`T`/`G` columns → `WEB`, `DEV`, `COMMS`, `RUN`, `AUX`).
-2. **Focus adjacent window**: Hold `Tab` + press right home direction (`N`/`E`/`I`/`O` columns → Focus `←`, `↓`, `↑`, `→`).
-3. **Previous workspace**: Hold `Tab` + tap right middle thumb (`RH1` → Previous WS).
-4. **Move window to workspace**: Hold `Tab` + press top-row key (`Q`/`W`/`F`/`P`/`B` columns → Move to `WEB`, `DEV`, `COMMS`, `RUN`, `AUX` and follow).
-5. **Move window directionally**: Hold `Tab` + press right bottom direction (`K`/`H`/`,`/`.` columns → Move `←`, `↓`, `↑`, `→`).
-6. **Context actions**: Hold `Tab` + right inner thumb `RH0` (Fullscreen), right outer thumb `RH2` (Float/tile), right top `RT1` (Resize mode), or `RT5` (Esc).
-
-### Cross-platform editing & OS neutrality
+2. **Previous window (instant flip)**: Hold `Tab` + press right home inner key (`RM0` → Previous Window / `focus-back-and-forth`).
+3. **Focus adjacent window**: Hold `Tab` + press right home direction (`N`/`E`/`I`/`O` columns → Focus `←`, `↓`, `↑`, `→`).
+4. **Previous workspace**: Hold `Tab` + tap right middle thumb (`RH1` → Previous WS).
+5. **Move window to workspace**: Hold `Tab` + press top-row key (`Q`/`W`/`F`/`P`/`B` columns → Move to `WEB`, `DEV`, `COMMS`, `RUN`, `AUX` and follow).
+6. **Move window directionally**: Hold `Tab` + press right bottom direction (`K`/`H`/`,`/`.` columns → Move `←`, `↓`, `↑`, `→`).
+7. **Launchers & Terminals**: Hold `Tab` + press left bottom keys (`Z` column → Spotlight Launcher; `X` column → Ghostty Quick Terminal dropdown; `C` column → New Ghostty window in current workspace).
+8. **Modal states & context**: Hold `Tab` + `RT1` (Resize mode), `RT2` (Service mode / tree surgery), `RT5` (Esc), `RH0` (Fullscreen), or `RH2` (Float/tile).
 
 The Corne firmware is completely OS-neutral:
 
@@ -80,10 +79,9 @@ The Corne firmware is completely OS-neutral:
   - **Cut:** Corne sends `F23` $\rightarrow$ macOS `Cmd+X`; Windows `Ctrl+X`.
   - **Undo:** Corne sends `F24` $\rightarrow$ macOS `Cmd+Z`; Windows `Ctrl+Z`.
   - **Redo:** Corne sends `Shift+F24` $\rightarrow$ macOS `Cmd+Shift+Z`; Windows `Ctrl+Y`.
-* On macOS, Karabiner-Elements (`dotfiles/karabiner-corne.json`) provides the host bridge for window management (`F13`–`F20` $\rightarrow$ `Alt` chords) and semantic editing (`F21`–`F24`).
-* On Windows, AutoHotkey v2 (`dotfiles/corne-windows.ahk`) provides the editing bridge.
+* On macOS, Karabiner-Elements (`dotfiles/karabiner-corne.json`) provides the host bridge for window management (`F13`–`F20` $\rightarrow$ `Alt` chords), launchers, and semantic editing (`F21`–`F24`).
+* On Windows, AutoHotkey v2 (`dotfiles/corne-windows.ahk`) provides the editing bridge. Full GlazeWM host integration is protocol-defined and pending.
 * Internal laptop keyboards are never remapped and remain completely standard.
-
 ---
 
 

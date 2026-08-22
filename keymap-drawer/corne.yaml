@@ -62,7 +62,7 @@ layers:
   - LCTRL
   - LEFT SHIFT
   - ''
-  - CAPSLOCK
+  - Caps Word
   - LEFT
   - DOWN ARROW
   - UP ARROW
@@ -265,7 +265,7 @@ layers:
   - F8
   - F9
   - PRINTSCREEN
-  - ''
+  - CAPSLOCK
   - ''
   - ''
   - ''
@@ -310,7 +310,7 @@ layers:
   - Move→AUX
   - ''
   - Resize
-  - ''
+  - Service
   - ''
   - ''
   - ESCAPE
@@ -320,16 +320,16 @@ layers:
   - COMMS
   - RUN
   - AUX
-  - ''
+  - Prev Win
   - Focus ←
   - Focus ↓
   - Focus ↑
   - Focus →
   - ''
   - ''
-  - ''
-  - ''
-  - ''
+  - Launch
+  - QTerm
+  - Term
   - ''
   - ''
   - ''
@@ -341,8 +341,8 @@ layers:
   - ''
   - ''
   - {type: held}
-  - Fullscreen
-  - Previous WS
+  - Full
+  - Prev WS
   - Float
   GAME:
   - {t: ESCAPE, h: GAME_AUX}
@@ -406,7 +406,7 @@ layers:
   - {t: BT, h: '2'}
   - {t: BT, h: '3'}
   - {t: BT, h: '4'}
-  - ''
+  - Unlock
   - ''
   - ''
   - ''

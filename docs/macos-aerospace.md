@@ -17,23 +17,28 @@ tiling-window-manager setup used alongside this repository, including the
 
 **In scope**
 
-- Documenting the canonical AeroSpace configuration: workspace layout, key
-  bindings, semantic F13–F20 / modifier+F-key protocol, and per-app routing.
-- The Corne HOST bridge: how workspace, direction, move, and resize signals
-  map to AeroSpace.
-- Karabiner-Elements host bridge: translating semantic F13–F20 (window management)
-  and F21–F24 (editing) into macOS-native chords without hardware brightness collisions.
+- Documenting the canonical macOS power-user configuration: workspace layout,
+  key bindings, semantic F13–F24 protocol, Ghostty terminal integration, and app routing.
+- Canonical macOS signal path:
+  ```text
+  Corne firmware (semantic HID)
+      ↓ F13-F24
+  Karabiner-Elements (device-scoped bridge)
+      ↓ standard macOS chords
+  AeroSpace / Ghostty / Spotlight / macOS
+  ```
+- AeroSpace modal hierarchy: `main`, `resize`, and `service` modes.
+- Independent application launching vs workspace switching: `WEB` only switches to WEB;
+  terminals and applications launch independently.
+- Ghostty Quick Terminal (`Ctrl+``` dropdown) and normal terminal launch (`Alt+Enter`).
+- Karabiner-Elements host bridge with `device_if` scoping.
 - Installation prerequisites, validation, backups, rollback, and troubleshooting.
 
 **Non-goals**
 
-- This guide does not ship or modify AeroSpace itself. Install it separately
-  from the [official AeroSpace documentation](https://nikitabobko.github.io/AeroSpace/guide).
-- It does not modify ZMK firmware. Firmware changes are a separate workflow
-  documented in [docs/corne-keymaps.md](corne-keymaps.md).
-- It does not make AeroSpace responsible for generating Copy/Paste/Undo/Redo shortcuts.
-- It does not make the firmware encode macOS-specific Option+H/J/K/L chords.
----
+- It does not couple workspace switching with application launching (no auto-launching on workspace visit).
+- It does not encode macOS-specific Option/Command shortcuts directly in ZMK firmware.
+- It does not require third-party ricing bars, daemons, or Raycast.
 
 ## 2. Installation & Accessibility
 
@@ -202,31 +207,30 @@ On the default keyboard, use `Option` (`⌥`) for every `Alt` binding below. mac
 `Option-Tab` is reserved for switching between the previous and current
 workspace.
 
-| Action            | Command                                      | Suggested binding        |
-|-------------------|----------------------------------------------|--------------------------|
-| Focus direction   | `focus left/down/up/right`                   | `Alt-H/J/K/L`            |
-| Move window       | `move left/down/up/right`                    | `Alt-Shift-H/J/K/L`      |
-| Resize            | `mode resize`, then width/height commands   | `Alt-R`, then `H/J/K/L`  |
-| Fullscreen        | `fullscreen`                                 | `Alt-F`                  |
-| Toggle floating   | `layout floating tiling`                     | `Alt-Shift-Space`        |
-| Previous workspace| `workspace-back-and-forth`                  | `Alt-Tab`                |
+| Action            | Command                                      | Laptop binding           | Corne HOST binding |
+|-------------------|----------------------------------------------|--------------------------|--------------------|
+| Focus direction   | `focus left/down/up/right`                   | `Alt-H/J/K/L`            | `Ctrl-F13`–`Ctrl-F16` (`RM1`–`RM4`) |
+| Move window       | `move left/down/up/right`                    | `Alt-Shift-H/J/K/L`      | `Ctrl-Shift-F13`–`Ctrl-Shift-F16` (`RB1`–`RB4`) |
+| Resize mode       | `mode resize`                                | `Alt-R`                  | `Shift-F18` (`RT1`) |
+| Service mode      | `mode service`                               | `Alt-Shift-Semicolon`    | `Alt-F18` (`RT2`) |
+| Fullscreen        | `fullscreen`                                 | `Alt-F`                  | `F19` (`RH0`) |
+| Toggle floating   | `layout floating tiling`                     | `Alt-Shift-Space`        | `F20` (`RH2`) |
+| Previous workspace| `workspace-back-and-forth`                  | `Alt-Tab`                | `F18` (`RH1`) |
+| Previous window   | `focus-back-and-forth`                       | `Alt-` `                 | `Alt-F16` (`RM0`) |
+| System Launcher   | Spotlight search / launch                    | `Cmd-Space`              | `Alt-F13` (`LB4`) |
+| Quick Terminal    | Ghostty dropdown toggle                      | `Ctrl-` `                | `Alt-F14` (`LB3`) |
+| New Terminal      | New Ghostty window in current workspace      | `Alt-Enter`              | `Alt-F15` (`LB2`) |
 
 Behavior notes:
 
 - **Focus** moves the cursor between tiled windows within the current workspace.
-- **Move** relocates the focused window within the tree (or, with
-  `move-node-to-workspace`, sends it to another workspace — see bindings above).
-- **Resize** enters a temporary resize mode. Use `H/J/K/L` to change width or
-  height by 50 pixels, then `Enter` or `Esc` to return to the main mode.
-- **Fullscreen** toggles AeroSpace's built-in fullscreen for the focused window
-  (distinct from macOS native fullscreen; use `macos-native-fullscreen` if you
-  specifically need the macOS version).
-- **Floating** takes a window out of the tiling grid so it can be freely
-  positioned; toggling returns it to tiling.
-- **Previous workspace** (`workspace-back-and-forth`) jumps to the last-focused
-  workspace and toggles back — handy for quick context switches.
-
----
+- **Previous window** (`focus-back-and-forth`) toggles focus back and forth between the two most recently focused windows (e.g. editor ↔ terminal, browser ↔ docs).
+- **Previous workspace** (`workspace-back-and-forth`) jumps to the last-focused workspace and toggles back.
+- **Move** relocates the focused window within the tree (or, with `move-node-to-workspace`, sends it to another workspace).
+- **Resize** enters a temporary resize mode. Use `H/J/K/L` (laptop) or the Corne directional cluster (`Alt-H/J/K/L` via Karabiner) to adjust dimensions by 50 pixels, then `Enter` or `Esc` to return to main mode.
+- **Service mode** enters a command palette for structural tree surgery operations (joining, swapping, balancing sizes, monitor management). One-shot operations automatically return to main mode.
+- **Fullscreen** toggles AeroSpace's built-in fullscreen for the focused window.
+- **Floating** takes a window out of the tiling grid so it can be freely positioned; toggling returns it to tiling.
 
 ## 7. Corne HOST bridge: semantic F13–F20 protocol
 
@@ -264,71 +268,123 @@ ctrl-shift-f14 = 'move down'
 ctrl-shift-f15 = 'move up'
 ctrl-shift-f16 = 'move right'
 ```
+The canonical macOS path translates Corne semantic signals via Karabiner into standard macOS chords, which AeroSpace and Ghostty consume. Direct F-key bindings in `dotfiles/aerospace.toml` are retained purely as a legacy/direct fallback for environments running without Karabiner.
 
-The direction geometry is shared with NAV and MOUSE:
+| Corne HOST signal | Karabiner chord | AeroSpace / macOS Action | Purpose |
+|-------------------|-----------------|--------------------------|---------|
+| `F13`–`F17` | `Alt-1`–`Alt-5` | `workspace WEB..AUX` | Switch to workspace |
+| `Shift-F13`–`Shift-F17` | `Alt-Shift-1`–`Alt-Shift-5` | `move-node-to-workspace ...; workspace ...` | Move window to workspace + follow |
+| `Ctrl-F13`–`Ctrl-F16` | `Alt-H/J/K/L` | `focus left/down/up/right` | Focus adjacent window |
+| `Ctrl-Shift-F13`–`Ctrl-Shift-F16` | `Alt-Shift-H/J/K/L` | `move left/down/up/right` | Move window directionally |
+| `Shift-F18` | `Alt-R` | `mode resize` | Enter resize mode |
+| `Alt-F18` | `Alt-Shift-Semicolon` | `mode service` | Enter service mode |
+| `F18` | `Alt-Tab` | `workspace-back-and-forth` | Previous workspace |
+| `Alt-F16` | `Alt-` ` | `focus-back-and-forth` | Previous window |
+| `F19` | `Alt-F` | `fullscreen` | Fullscreen toggle |
+| `F20` | `Alt-Shift-Space` | `layout floating tiling` | Float/tile toggle |
+| `Alt-F13` | `Cmd-Space` | Spotlight Launcher | General application launch & search |
+| `Alt-F14` | `Ctrl-` ` | Ghostty Quick Terminal | Toggle drop-down scratchpad terminal |
+| `Alt-F15` | `Alt-Enter` | New Ghostty Window | Create normal terminal in current workspace |
 
-| Corne HOST signal | AeroSpace binding | Action |
-|-------------------|-------------------|--------|
-| `F13`–`F17` | `f13`–`f17` | Focus WEB/DEV/COMMS/RUN/AUX |
-| `Shift-F13`–`Shift-F17` | `shift-f13`–`shift-f17` | Move window + follow |
-| `Shift-F18` | `shift-f18` | Enter resize mode |
-| `F18` | `f18` | Previous workspace |
-| `F19` | `f19` | Fullscreen |
-| `F20` | `f20` | Toggle floating |
-| `Ctrl-F13`–`Ctrl-F16` | `ctrl-f13`–`ctrl-f16` | Focus left/down/up/right |
-| `Ctrl-Shift-F13`–`Ctrl-Shift-F16` | `ctrl-shift-f13`–`ctrl-shift-f16` | Move left/down/up/right |
+### 7.1 Resize mode
 
-Resize mode reuses `Ctrl-F13`–`Ctrl-F16`:
+In resize mode (`[mode.resize.binding]`), both bare letters (laptop) and Alt chords (Corne via Karabiner) are accepted:
 
 ```toml
 [mode.resize.binding]
-ctrl-f13 = 'resize width -50'
-ctrl-f14 = 'resize height +50'
-ctrl-f15 = 'resize height -50'
-ctrl-f16 = 'resize width +50'
+alt-h = 'resize width -50'
+alt-j = 'resize height +50'
+alt-k = 'resize height -50'
+alt-l = 'resize width +50'
+h = 'resize width -50'
+j = 'resize height +50'
+k = 'resize height -50'
+l = 'resize width +50'
 enter = 'mode main'
 esc = 'mode main'
 ```
 
-The firmware protocol does not encode Option+H/J/K/L. Those remain separate
-laptop fallbacks in AeroSpace. A Windows/GlazeWM adapter can assign the same
-semantic F-key signals without changing firmware.
+### 7.2 Service mode
 
----
+Service mode (`[mode.service.binding]`) provides structural tree surgery operations without cluttering daily keys:
 
-## 7.1 macOS host bridge (Karabiner-Elements & F13–F24)
+```toml
+[mode.service.binding]
+# Tree joining (one-shot -> returns to main)
+h = ['join-with left', 'mode main']
+j = ['join-with down', 'mode main']
+k = ['join-with up', 'mode main']
+l = ['join-with right', 'mode main']
+alt-h = ['join-with left', 'mode main']
+alt-j = ['join-with down', 'mode main']
+alt-k = ['join-with up', 'mode main']
+alt-l = ['join-with right', 'mode main']
 
-On macOS, Karabiner-Elements provides the hardware bridge for both semantic window management and editing:
+# Window swapping (one-shot -> returns to main)
+shift-h = ['swap left', 'mode main']
+shift-j = ['swap down', 'mode main']
+shift-k = ['swap up', 'mode main']
+shift-l = ['swap right', 'mode main']
+alt-shift-h = ['swap left', 'mode main']
+alt-shift-j = ['swap down', 'mode main']
+alt-shift-k = ['swap up', 'mode main']
+alt-shift-l = ['swap right', 'mode main']
 
-* **`F13`–`F20`** (HOST layer) $\rightarrow$ Translated to AeroSpace `Alt` chords (`alt-1`..`alt-5`, `alt-shift-1`..`alt-shift-5`, `alt-h/j/k/l`, etc.). This cleanly bypasses macOS's legacy hardware bindings where raw `F14` and `F15` are intercepted by the system as display brightness down/up controls.
-* **`F21`–`F24`** (NAV & MOUSE layers) $\rightarrow$ Translated to standard macOS clipboard and undo shortcuts (`Cmd+C`, `Cmd+V`, `Cmd+X`, `Cmd+Z`, `Cmd+Shift+Z`).
+# Tree manipulation
+b = ['balance-sizes', 'mode main']
+r = ['flatten-workspace-tree', 'mode main']
+t = ['layout tiles', 'mode main']
+a = ['layout accordion', 'mode main']
 
-The repository tracks the canonical Karabiner complex modifications rule file at `dotfiles/karabiner-corne.json`.
+# Monitor management
+m = ['move-node-to-monitor --focus-follows-window next', 'mode main']
+shift-m = ['move-workspace-to-monitor --wrap-around next', 'mode main']
 
-### Karabiner setup
+enter = 'mode main'
+esc = 'mode main'
+```
+
+### 7.3 Karabiner setup and device scoping
+
+Karabiner-Elements translates Corne semantic signals into standard macOS chords while scoping them via `device_if` conditions so other connected keyboards are unaffected.
 
 1. **Install Karabiner-Elements** from <https://karabiner-elements.pqrs.org/>.
-2. **Copy or link the rule file** to Karabiner's complex modifications directory:
+2. **Copy the rule file:**
    ```sh
    mkdir -p ~/.config/karabiner/assets/complex_modifications
    cp dotfiles/karabiner-corne.json ~/.config/karabiner/assets/complex_modifications/
    ```
-3. **Enable the rules in Karabiner-Elements:**
-   - Open **Karabiner-Elements Settings** $\rightarrow$ **Complex Modifications** $\rightarrow$ **Add rule**.
-   - Enable **"Corne F13-F20 Semantic Window Management Bridge"**.
-   - Enable **"Corne F21-F24 Semantic Editing"**.
-4. **Verify mapping:**
-   - `F13`–`F17` $\rightarrow$ `Alt+1`–`Alt+5` (Focus workspaces WEB..AUX without brightness adjustments)
-   - `Shift+F13`–`Shift+F17` $\rightarrow$ `Alt+Shift+1`–`Alt+Shift+5` (Move node to workspace)
-   - `Ctrl+F13`–`Ctrl+F16` $\rightarrow$ `Alt+H/J/K/L` (Directional focus)
-   - `Ctrl+Shift+F13`–`Ctrl+Shift+F16` $\rightarrow$ `Alt+Shift+H/J/K/L` (Directional move)
-   - `F21` $\rightarrow$ `Command+C` (Copy)
-   - `F22` $\rightarrow$ `Command+V` (Paste)
-   - `F23` $\rightarrow$ `Command+X` (Cut)
-   - `F24` $\rightarrow$ `Command+Z` (Undo)
-   - `Shift+F24` $\rightarrow$ `Command+Shift+Z` (Redo)
+3. **Enable the rules in Karabiner Settings → Complex Modifications → Add rule:**
+   - "Corne F13-F20 Semantic Window Management Bridge"
+   - "Corne F21-F24 Semantic Editing"
+4. **Device Scoping with Karabiner-EventViewer:**
+   To lock rules strictly to your Corne hardware (preventing accidental triggers from other keyboards), open **Karabiner-EventViewer → Devices**, find your Corne controller (both USB and Bluetooth entries), and note its `vendor_id` and `product_id`.
+   In `dotfiles/karabiner-corne.json`, each manipulator contains:
+   ```json
+   "conditions": [
+     {
+       "type": "device_if",
+       "identifiers": [
+         {
+           "vendor_id": 7504,
+           "product_id": 24926,
+           "is_keyboard": true
+         }
+       ]
+     }
+   ]
+   ```
 
-Because standard MacBook laptop keyboards never emit F13–F24, this configuration does not alter or interfere with normal laptop typing.
+### 7.4 Ghostty Terminal Configuration
+
+Install the tracked Ghostty configuration at `~/.config/ghostty/config`:
+```sh
+mkdir -p ~/.config/ghostty
+cp dotfiles/ghostty.config ~/.config/ghostty/config
+```
+This configures:
+* **Global Quick Terminal:** `Ctrl+``` toggles a top dropdown scratchpad terminal from anywhere.
+* **Normal Terminal Launch:** `Alt+Enter` (laptop) or `HOST + Term` (`Alt-F15`) spawns an independent Ghostty window in the active workspace.
 ## 8. Canonical app routing
 
 The repository-tracked config applies conservative routing only to
@@ -337,7 +393,7 @@ hard-purpose applications:
 ```toml
 on-window-detected = [
     {
-        if = 'test %{app-bundle-id} = dev.zed.Zed || test %{app-bundle-id} = com.mitchellh.ghostty',
+        if = 'test %{app-bundle-id} = dev.zed.Zed',
         run = ['move-node-to-workspace DEV'],
     },
     {
@@ -351,6 +407,8 @@ on-window-detected = [
 ]
 ```
 
+* **Ghostty (`com.mitchellh.ghostty`) is intentionally unrouted:** Terminal windows are contextual (`DEV` for git/editor shells, `RUN` for watchers/logs, `AUX` for SSH/commands). Unrouted terminals open where invoked and do not pull the Quick Terminal into `DEV`.
+* **Workspace switching and app launching are strictly separate:** Switching to `WEB` does not launch Zen; switching to `DEV` does not launch Zed. Application launching is an independent action via Spotlight (`Cmd-Space`) or terminal shortcuts (`Alt-Enter`).
 Finder (`com.apple.finder`) and Obsidian (`md.obsidian`) are intentionally
 unrestricted so contextual windows open where they are invoked. If a new
 application deserves hard routing, add it to `dotfiles/aerospace.toml` only
