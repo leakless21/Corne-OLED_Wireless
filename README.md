@@ -1,88 +1,132 @@
-# Corne ZMK Firmware
+# Keyboard Config
 
-ZMK firmware configuration for a Corne split keyboard on **nice\_nano\_v2**
-controllers with **nice\_oled** displays. The GitHub Actions workflow builds
-`.uf2` firmware images that you flash over USB.
+> Personal ZMK keyboard configuration with shared semantic host integration for macOS and Windows.
 
-## Quick Start
+---
 
-1. Fork / clone this repo.
-2. Edit `config/corne.keymap` (see [docs/setup.md](docs/setup.md) for first
-   flash, recovery, and Bluetooth re-pairing; [docs/usage.md](docs/usage.md)
-   for daily use and the firmware change workflow).
-3. Push — GitHub Actions builds `corne-left.uf2`, `corne-right.uf2`, and
-   `settings-reset.uf2`, then merges them into a single downloadable
-   `firmware` archive (`.zip`) on the Actions run.
-4. Download the archive, extract the `.uf2` files, flash both halves
-   (see guide), and start typing.
-
-## Prerequisites
-
-- **Hardware:** Corne split keyboard with two nice\_nano\_v2 controllers and
-  nice\_oled displays.
-- **GitHub account** (to run the Actions workflow and download artifacts).
-- **USB-C cable** for each half during flashing.
-- **Bluetooth-capable host** (macOS, Linux, Windows, etc.) for wireless use
-  after the initial flash. macOS is specifically required for the AeroSpace
-  tiling-window-manager guide.
-
-## Cross-Platform Compatibility Matrix
-
-| Feature | macOS | Windows | Extra host config |
-| --- | --- | --- | --- |
-| Typing | Yes | Yes | No |
-| Colemak-DH / HRM | Yes | Yes | No |
-| Caps Word (`&caps_word`) | Yes | Yes | No |
-| NUM/SYM/FUN | Yes | Yes | No |
-| Navigation | Yes | Yes | No |
-| Mouse | Yes | Yes | No |
-| Media | Yes | Yes | No |
-| Gaming | Yes | Yes | No |
-| Semantic Editing (F21–F24) | Yes (`Cmd+C/V/X/Z`) | Yes (`Ctrl+C/V/X/Z/Y`) | Yes (Karabiner on macOS, AutoHotkey on Windows) |
-| HOST window management | AeroSpace (`Alt` chords) | Protocol defined (GlazeWM adapter pending) | Yes (AeroSpace + Karabiner on macOS) |
-| System Launcher | Spotlight (`Cmd+Space`) | Windows Search / PowerToys | Yes (Karabiner on macOS) |
-| Terminal Integration | Ghostty (`Ctrl+`` Quick / `Alt+Enter` Normal) | Windows Terminal (pending) | Yes (Ghostty + AeroSpace on macOS) |
-| Device management | Yes | Yes | No |
-
-## Architecture & Responsibility Boundaries
+## 1. Top-Level Architecture
 
 ```text
-Corne firmware
-    ↓ semantic HID signals (F13-F24)
-Karabiner-Elements (device-scoped)
-    ↓ macOS-safe chords
-AeroSpace / macOS / Ghostty / Spotlight
+Corne ─┐
+       ├── Semantic Keyboard Protocol (F13–F24) ─┬── macOS   (Karabiner + AeroSpace + Ghostty)
+Sofle ─┘                                        └── Windows (AutoHotkey + GlazeWM + Windows Terminal)
 ```
 
-* **Firmware owns:** Letters, symbols, numbers, Consumer media HID, pointer/wheel navigation, Caps Word, and the OS-neutral semantic `F13`–`F24` protocol.
-* **Karabiner owns:** Translating Corne semantic signals into standard macOS chords, scoped cleanly via `device_if` conditions.
-* **AeroSpace owns:** Virtual workspaces (`WEB`, `DEV`, `COMMS`, `RUN`, `AUX`), directional focus/move, resize mode, and structural service mode.
-* **Ghostty owns:** Contextual terminal windows, Quick Terminal (`Ctrl+``` dropdown), and independent window creation (`Alt+Enter`).
-* **Spotlight owns:** General-purpose application launching, file search, and system actions (`Cmd+Space`).
-* **Workspace switching and app launching are strictly independent concepts:** `WEB` only switches to WEB; `DEV` only switches to DEV; apps do not launch as side-effects of workspace switching.
+Both keyboards share a single, OS-neutral design language:
+* Portable Colemak-DH base layer with modern bilateral home-row mods.
+* Standardized 6-layer thumb model (NAV, MOUSE, HOST, SYM, NUM, FUN).
+* Directional home-row navigation (`← ↓ ↑ →` on `N E I O`).
+* Semantic `F13`–`F24` signals for window management, launchers, and desktop editing.
+* Complete separation between firmware typing semantics and OS-level host adapters.
 
-## Documentation
+---
 
-| Guide | What it covers |
-|-------|---------------|
-| [docs/setup.md](docs/setup.md) | Initial setup: first flash, Studio locking and recovery, full settings reset, Bluetooth re-pairing, and host platform setup. |
-| [docs/usage.md](docs/usage.md) | Daily use, cross-platform OS neutrality, semantic editing, development workflow, and physical smoke-test checklist. |
-| [docs/corne-keymaps.md](docs/corne-keymaps.md) | Keymap reference: all 11 layers, geometry, home-row mods, pointing, OLED/Studio settings, and diagram workflow. |
-| [docs/layout-principles.md](docs/layout-principles.md) | Physical layout contract: host-independent firmware, shared modifier/direction columns, layer geometry, and semantic protocol. |
-| [docs/macos-aerospace.md](docs/macos-aerospace.md) | macOS AeroSpace, Ghostty & Karabiner setup: semantic HOST protocol, editing bridge, workspace bindings, app routing, and troubleshooting. |
-| `dotfiles/aerospace.toml` | Repository-tracked AeroSpace adapter for the firmware HOST protocol. |
-| `dotfiles/karabiner-corne.json` | Repository-tracked Karabiner-Elements complex modifications for macOS host bridge (F13–F24) with device scoping. |
-| `dotfiles/ghostty.config` | Repository-tracked Ghostty configuration with global Quick Terminal binding. |
-| `dotfiles/corne-windows.ahk` | Repository-tracked AutoHotkey v2 script for Windows editing bridge (F21–F24). |
-| `keymap-drawer/corne.svg` | Generated visual keymap reference; regenerated by the pinned draw workflow. |
+## 2. Keyboard Comparison Matrix
 
-- Firmware artifacts are **`.uf2`** files (not `.urf2`). The GitHub Actions
-  workflow builds them individually, then the upstream reusable workflow merges
-  them into a single `firmware` archive for download.
-- The keymap editor (visual) is available at
-  <https://nickcoutsos.github.io/keymap-editor/>.
-- The boards (`nice_nano_v2`, shields `corne_left`/`corne_right`) are
-  **upstream** ZMK targets. This repo only contains the keymap, config, and
-  build definitions.
-- Local builds are **not** covered by this guide. Use the GitHub Actions
-  workflow instead.
+| Property | Corne | Sofle v2 |
+|---|---|---|
+| **Firmware Framework** | ZMK | ZMK |
+| **Physical Layout** | 42 keys (3×6 + 3 thumbs) | 60 keys (6×4 + 5 thumbs) |
+| **Alpha Base** | Colemak-DH | Colemak-DH |
+| **Home-Row Mods** | Modern bilateral (`hml`/`hmr`) | Modern bilateral (`hml`/`hmr`) |
+| **HOST Layer** | Yes (`F13`–`F20`) | Yes (`F13`–`F20`) |
+| **Number Row** | Virtual (`NUM` layer) | Dedicated physical row |
+| **Rotary Encoders** | No | 2× EC11 encoders + push switches |
+| **Gaming Model** | `GAME` + `GAME_AUX` | Single complete `GAME` layer |
+| **ZMK Studio** | Enabled with locking | Enabled with locking |
+| **Primary Host** | macOS | Windows |
+| **Cross-Platform** | Yes | Yes |
+
+---
+
+## 3. Host Integration Matrix
+
+| Feature | Firmware Signal | macOS Adapter | Windows Adapter |
+|---|---|---|---|
+| **Workspaces 1–5** | `F13`–`F17` | AeroSpace `Alt-1..5` | GlazeWM `f13..f17` |
+| **Move to Workspace** | `Shift+F13..F17` | AeroSpace `Alt-Shift-1..5` | GlazeWM `shift+f13..f17` |
+| **Directional Focus** | `Ctrl+F13..F16` | AeroSpace `Alt-H/J/K/L` | GlazeWM `ctrl+f13..f16` |
+| **Directional Move** | `Ctrl+Shift+F13..F16` | AeroSpace `Alt-Shift-H/J/K/L` | GlazeWM `ctrl+shift+f13..f16` |
+| **Previous Workspace** | `F18` | AeroSpace `Alt-Tab` | GlazeWM `f18` |
+| **Resize Mode** | `Shift+F18` | AeroSpace `Alt-R` | GlazeWM `shift+f18` |
+| **Service Mode** | `Alt+F18` | AeroSpace `Alt-Shift-;` | GlazeWM `alt+f18` |
+| **Fullscreen** | `F19` | AeroSpace `Alt-F` | GlazeWM `f19` |
+| **Float / Tile** | `F20` | AeroSpace `Alt-Shift-Space` | GlazeWM `f20` |
+| **System Launcher** | `Alt+F13` | Spotlight (`Cmd+Space`) | Windows Search (`Win+S`) |
+| **Quick Terminal** | `Alt+F14` | Ghostty dropdown (`Ctrl+```) | Windows Terminal Quake (`Ctrl+Alt+```) |
+| **New Terminal** | `Alt+F15` | Ghostty window (`Alt+Enter`) | Windows Terminal (`wt.exe`) |
+| **Previous Window** | `Alt+F16` | AeroSpace (`Alt+```) | Windows (`Alt+Tab`) |
+| **Copy / Paste / Cut** | `F21` / `F22` / `F23` | `Cmd+C` / `Cmd+V` / `Cmd+X` | `Ctrl+C` / `Ctrl+V` / `Ctrl+X` |
+| **Undo / Redo** | `F24` / `Shift+F24` | `Cmd+Z` / `Cmd+Shift+Z` | `Ctrl+Z` / `Ctrl+Y` |
+
+---
+
+## 4. Repository Structure
+
+```text
+keyboard-config/
+├── config/
+│   ├── corne.keymap          # Corne 42-key layout
+│   ├── corne.conf            # Corne Kconfig settings
+│   ├── sofle.keymap          # Sofle 60-key layout
+│   ├── sofle.conf            # Sofle Kconfig settings
+│   └── west.yml              # Pinned West dependencies
+├── hosts/
+│   ├── macos/
+│   │   ├── karabiner.json    # Complex modifications bridge
+│   │   ├── aerospace.toml    # Tiling window manager config
+│   │   └── ghostty.config    # Terminal & scratchpad config
+│   └── windows/
+│       ├── keyboard.ahk      # AutoHotkey v2 bridge
+│       ├── glazewm.yaml      # Tiling window manager config
+│       ├── windows-terminal-actions.jsonc
+│       └── README.md
+├── keymap-drawer/
+│   ├── corne.svg / corne.yaml
+│   └── sofle.svg / sofle.yaml
+├── scripts/
+│   ├── check_corne_keymap.py
+│   ├── check_sofle_keymap.py
+│   ├── check_host_protocol.py
+│   └── check_build_config.py
+└── docs/
+    ├── architecture.md
+    ├── host-protocol.md
+    ├── setup.md
+    ├── usage.md
+    ├── keyboards/
+    │   ├── corne.md
+    │   └── sofle.md
+    ├── hosts/
+    │   ├── macos.md
+    │   └── windows.md
+    └── migration/
+        └── sofle-baseline.md
+```
+
+---
+
+## 5. Documentation & Guides
+
+- **Architecture:** [docs/architecture.md](docs/architecture.md)
+- **Semantic Protocol:** [docs/host-protocol.md](docs/host-protocol.md)
+- **Setup & Flashing:** [docs/setup.md](docs/setup.md)
+- **Daily Usage & Workflow:** [docs/usage.md](docs/usage.md)
+- **Corne Reference:** [docs/keyboards/corne.md](docs/keyboards/corne.md)
+- **Sofle Reference:** [docs/keyboards/sofle.md](docs/keyboards/sofle.md)
+- **macOS Guide:** [docs/hosts/macos.md](docs/hosts/macos.md)
+- **Windows Guide:** [docs/hosts/windows.md](docs/hosts/windows.md)
+- **Sofle Migration Baseline:** [docs/migration/sofle-baseline.md](docs/migration/sofle-baseline.md)
+
+---
+
+## 6. Static Verification Suite
+
+Run all static invariant and protocol checks locally:
+
+```bash
+python3 scripts/check_corne_keymap.py
+python3 scripts/check_sofle_keymap.py
+python3 scripts/check_host_protocol.py
+python3 scripts/check_build_config.py
+```
