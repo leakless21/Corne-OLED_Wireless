@@ -4,8 +4,8 @@ End-to-end static validation for the Corne + Karabiner + AeroSpace host protocol
 
 Validates the three layers of the architecture:
   Layer A (Producer):   Semantic HID signals defined in config/corne.keymap
-  Layer B (Translator): Karabiner-Elements complex rules in dotfiles/karabiner-corne.json
-  Layer C (Consumer):   AeroSpace window manager bindings in dotfiles/aerospace.toml
+  Layer B (Translator): Karabiner-Elements complex rules in hosts/macos/karabiner.json
+  Layer C (Consumer):   AeroSpace window manager bindings in hosts/macos/aerospace.toml
 
 Enforces that every emitted firmware signal has a corresponding host translation,
 and that every generated AeroSpace chord has an active binding in the expected mode.
@@ -18,8 +18,8 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 KEYMAP_PATH = REPO_ROOT / "config" / "corne.keymap"
-KARABINER_PATH = REPO_ROOT / "dotfiles" / "karabiner-corne.json"
-AEROSPACE_PATH = REPO_ROOT / "dotfiles" / "aerospace.toml"
+KARABINER_PATH = REPO_ROOT / "hosts" / "macos" / "karabiner.json"
+AEROSPACE_PATH = REPO_ROOT / "hosts" / "macos" / "aerospace.toml"
 
 
 def fail(msg: str) -> None:
@@ -103,15 +103,14 @@ def validate_firmware_producer(content: str) -> dict:
 
 
 # -----------------------------------------------------------------------------
-# Layer B: Karabiner Translation (dotfiles/karabiner-corne.json)
+# Layer B: Karabiner Translation (hosts/macos/karabiner.json)
 # -----------------------------------------------------------------------------
 
 def validate_karabiner_translator(karabiner_data: dict) -> dict:
     """Verify that Karabiner maps all semantic signals to the intended macOS chords."""
     rules = karabiner_data.get("rules", [])
     if len(rules) < 2:
-        fail("Layer B (Karabiner): Expected at least 2 rules in karabiner-corne.json")
-
+        fail("Layer B (Karabiner): Expected at least 2 rules in karabiner.json")
     # Collect all manipulators across rules
     all_manipulators = []
     for r in rules:

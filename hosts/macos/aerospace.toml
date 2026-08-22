@@ -1,5 +1,5 @@
-# Canonical macOS AeroSpace configuration for the Corne HOST layer.
-# Install this file at ~/.config/aerospace/aerospace.toml; see docs/macos-aerospace.md.
+# Canonical macOS AeroSpace configuration for the HOST layer semantic protocol.
+# Install this file at ~/.config/aerospace/aerospace.toml; see docs/hosts/macos.md.
 
 config-version = 2
 start-at-login = true

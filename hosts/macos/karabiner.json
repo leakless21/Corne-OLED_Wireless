@@ -1,8 +1,8 @@
 {
-  "title": "Corne Semantic Host Bridge (F13-F20 Window Management & F21-F24 Editing)",
+  "title": "Keyboard Semantic Host Bridge (F13-F20 Window Management & F21-F24 Editing)",
   "rules": [
     {
-      "description": "Corne F13-F20 Semantic Window Management Bridge (F13-F20 -> AeroSpace / macOS chords)",
+      "description": "F13-F20 Semantic Window Management Bridge (F13-F20 -> AeroSpace / macOS chords)",
       "manipulators": [
         {
           "type": "basic",
@@ -1023,7 +1023,7 @@
       ]
     },
     {
-      "description": "Corne F21-F24 Semantic Editing (F21=Cmd+C, F22=Cmd+V, F23=Cmd+X, F24=Cmd+Z, Shift+F24=Cmd+Shift+Z)",
+      "description": "F21-F24 Semantic Editing (F21=Cmd+C, F22=Cmd+V, F23=Cmd+X, F24=Cmd+Z, Shift+F24=Cmd+Shift+Z)",
       "manipulators": [
         {
           "type": "basic",
