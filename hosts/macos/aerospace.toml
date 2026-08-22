@@ -7,20 +7,17 @@ persistent-workspaces = ["WEB", "DEV", "COMMS", "RUN", "AUX"]
 
 key-mapping.preset = "qwerty"
 # Hard-purpose applications are routed; contextual apps (e.g. Ghostty) stay where opened.
-on-window-detected = [
-    {
-        if = 'test %{app-bundle-id} = dev.zed.Zed',
-        run = ['move-node-to-workspace DEV'],
-    },
-    {
-        if = 'test %{app-bundle-id} = app.zen-browser.zen',
-        run = ['move-node-to-workspace WEB'],
-    },
-    {
-        if = 'test %{app-bundle-id} = dev.vencord.vesktop',
-        run = ['move-node-to-workspace COMMS'],
-    },
-]
+[[on-window-detected]]
+if.app-id = 'dev.zed.Zed'
+run = ['move-node-to-workspace DEV']
+
+[[on-window-detected]]
+if.app-id = 'app.zen-browser.zen'
+run = ['move-node-to-workspace WEB']
+
+[[on-window-detected]]
+if.app-id = 'dev.vencord.vesktop'
+run = ['move-node-to-workspace COMMS']
 
 [mode.main.binding]
 # Laptop keyboard: ordinary QWERTY macOS semantics remain unchanged.

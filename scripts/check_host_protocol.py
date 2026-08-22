@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-End-to-end static validation for the multi-keyboard semantic host protocol.
+End-to-end structural validation for the multi-keyboard semantic host protocol.
 
 Validates the full architecture:
   Producers:
@@ -16,23 +16,26 @@ Validates the full architecture:
 Enforces that every emitted firmware signal has a corresponding host translation on both OSes.
 """
 
-import json
+from __future__ import annotations
+
 import re
 import sys
 from pathlib import Path
+from typing import Any, Dict, List, Set, Tuple
 
+# Add scripts directory to sys.path for lib imports
 REPO_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO_ROOT / "scripts"))
+
+from lib.keymap_parser import parse_keymap_file
+from lib.validation import assert_eq, assert_in, assert_true, fail, load_json, load_toml, load_yaml
+
 CORNE_KEYMAP_PATH = REPO_ROOT / "config" / "corne.keymap"
 SOFLE_KEYMAP_PATH = REPO_ROOT / "config" / "sofle.keymap"
 KARABINER_PATH = REPO_ROOT / "hosts" / "macos" / "karabiner.json"
 AEROSPACE_PATH = REPO_ROOT / "hosts" / "macos" / "aerospace.toml"
 AHK_PATH = REPO_ROOT / "hosts" / "windows" / "keyboard.ahk"
 GLAZEWM_PATH = REPO_ROOT / "hosts" / "windows" / "glazewm.yaml"
-
-
-def fail(msg: str) -> None:
-    print(f"FAIL: {msg}", file=sys.stderr)
-    sys.exit(1)
 
 
 # -----------------------------------------------------------------------------
@@ -72,44 +75,25 @@ EXPECTED_EDITING_SIGNALS = [
 
 def validate_keymap_producer(path: Path, board_name: str) -> None:
     """Verify that all expected semantic signals exist on the HOST and NAV/MOUSE layers."""
-    if not path.exists():
-        fail(f"Keymap file not found for {board_name}: {path}")
+    cfg = parse_keymap_file(path, layout=board_name.lower())
+    assert_in("HOST", cfg.layers, f"{board_name}: Missing HOST layer")
+    assert_in("NAV", cfg.layers, f"{board_name}: Missing NAV layer")
+    assert_in("MOUSE", cfg.layers, f"{board_name}: Missing MOUSE layer")
 
-    content = path.read_text(encoding="utf-8")
-
-    # Find HOST layer bindings
-    host_match = re.search(
-        r"HOST\s*\{\s*label\s*=\s*\"HOST\";[\s\S]*?bindings\s*=\s*<([\s\S]*?)>;",
-        content,
-    )
-    if not host_match:
-        fail(f"{board_name}: HOST layer not found in {path}")
-
-    host_raw = host_match.group(1)
-
+    host_bindings = set(cfg.layer("HOST").bindings)
     for signal in EXPECTED_HOST_SIGNALS:
-        if signal not in host_raw:
-            fail(f"{board_name}: Missing signal '{signal}' in HOST layer")
+        assert_in(signal, host_bindings, f"{board_name}: Missing signal '{signal}' in HOST layer")
 
-    # Find NAV and MOUSE layer editing signals
-    nav_match = re.search(
-        r"NAV\s*\{\s*label\s*=\s*\"NAV\";[\s\S]*?bindings\s*=\s*<([\s\S]*?)>;",
-        content,
-    )
-    mouse_match = re.search(
-        r"MOUSE\s*\{\s*label\s*=\s*\"MOUSE\";[\s\S]*?bindings\s*=\s*<([\s\S]*?)>;",
-        content,
-    )
-    if not nav_match or not mouse_match:
-        fail(f"{board_name}: NAV or MOUSE layer not found in {path}")
-
+    nav_bindings = set(cfg.layer("NAV").bindings)
+    mouse_bindings = set(cfg.layer("MOUSE").bindings)
     for sig in EXPECTED_EDITING_SIGNALS:
-        if sig not in nav_match.group(1):
-            fail(f"{board_name}: Missing editing signal '{sig}' in NAV layer")
-        if sig not in mouse_match.group(1):
-            fail(f"{board_name}: Missing editing signal '{sig}' in MOUSE layer")
+        assert_in(sig, nav_bindings, f"{board_name}: Missing editing signal '{sig}' in NAV layer")
+        assert_in(sig, mouse_bindings, f"{board_name}: Missing editing signal '{sig}' in MOUSE layer")
 
-    print(f"PASS: Firmware Producer ({board_name}) validated ({len(EXPECTED_HOST_SIGNALS)} HOST signals + {len(EXPECTED_EDITING_SIGNALS)} editing signals).")
+    print(
+        f"PASS: Firmware Producer ({board_name}) validated "
+        f"({len(EXPECTED_HOST_SIGNALS)} HOST signals + {len(EXPECTED_EDITING_SIGNALS)} editing signals)."
+    )
 
 
 # -----------------------------------------------------------------------------
@@ -129,14 +113,29 @@ def validate_karabiner_translator(karabiner_data: dict) -> None:
             all_manipulators.append(m)
 
     # Check device scoping conditions
+    assert_eq(
+        len(all_manipulators),
+        32,
+        f"Layer B (Karabiner): Expected exactly 32 canonical manipulators (27 HOST + 5 editing), found {len(all_manipulators)}",
+    )
+
+    # Check device scoping conditions
     for idx, m in enumerate(all_manipulators):
         conditions = m.get("conditions", [])
-        has_device_if = any(c.get("type") == "device_if" for c in conditions)
+        has_device_if = False
+        for c in conditions:
+            if c.get("type") == "device_if":
+                identifiers = c.get("identifiers", [])
+                for ident in identifiers:
+                    if ident.get("is_built_in_keyboard") is False or "vendor_id" in ident:
+                        has_device_if = True
         if not has_device_if:
-            fail(f"Layer B (Karabiner): Manipulator #{idx} ({m.get('from')}) is missing 'device_if' condition scoping to keyboard")
-
+            fail(
+                f"Layer B (Karabiner): Manipulator #{idx} ({m.get('from')}) "
+                f"must be scoped with device_if excluding built-in keyboard (is_built_in_keyboard: false)"
+            )
     # Test matrix: (from_key, mandatory_mods_set, expected_to_key, expected_to_mods_set)
-    expected_translations = [
+    expected_translations: List[Tuple[str, Set[str], str, Set[str]]] = [
         # Directional move
         ("f13", {"control", "shift"}, "h", {"left_alt", "left_shift"}),
         ("f14", {"control", "shift"}, "j", {"left_alt", "left_shift"}),
@@ -196,37 +195,22 @@ def validate_karabiner_translator(karabiner_data: dict) -> None:
                         found = True
                         break
         if not found:
-            fail(f"Layer B (Karabiner): Missing translation for from=({from_key}, mods={from_mods}) -> to=({to_key}, mods={to_mods})")
+            fail(
+                f"Layer B (Karabiner): Missing translation for from=({from_key}, mods={from_mods}) "
+                f"-> to=({to_key}, mods={to_mods})"
+            )
 
-    print(f"PASS: macOS Karabiner Translation validated ({len(expected_translations)} mappings verified with device_if scoping).")
-
-
-def parse_toml_sections(content: str) -> dict:
-    """Simple TOML section parser for mode bindings and on-window-detected."""
-    sections = {}
-    current_section = None
-
-    for line in content.splitlines():
-        line = line.strip()
-        if not line or line.startswith("#"):
-            continue
-        if line.startswith("[") and line.endswith("]"):
-            current_section = line[1:-1].strip()
-            sections[current_section] = {}
-        elif current_section and "=" in line:
-            key, val = line.split("=", 1)
-            key = key.strip()
-            val = val.strip()
-            sections[current_section][key] = val
-
-    return sections
+    print(
+        f"PASS: macOS Karabiner Translation validated ({len(expected_translations)} mappings verified with device_if scoping)."
+    )
 
 
-def validate_aerospace_consumer(content: str) -> None:
+def validate_aerospace_consumer(data: dict) -> None:
     """Verify AeroSpace config consumes all chords produced by Karabiner / laptop."""
-    sections = parse_toml_sections(content)
+    mode = data.get("mode", {})
+    main_mode = mode.get("main", {})
+    main_bindings = main_mode.get("binding", {})
 
-    main_bindings = sections.get("mode.main.binding", {})
     required_main_bindings = [
         "alt-1", "alt-2", "alt-3", "alt-4", "alt-5",
         "alt-shift-1", "alt-shift-2", "alt-shift-3", "alt-shift-4", "alt-shift-5",
@@ -236,20 +220,20 @@ def validate_aerospace_consumer(content: str) -> None:
         "alt-tab", "alt-backtick", "alt-enter",
     ]
     for b in required_main_bindings:
-        if b not in main_bindings:
-            fail(f"Layer C (AeroSpace Consumer): Missing binding '{b}' in [mode.main.binding]")
+        assert_in(b, main_bindings, f"AeroSpace: Missing binding '{b}' in [mode.main.binding]")
 
-    resize_bindings = sections.get("mode.resize.binding", {})
+    resize_mode = mode.get("resize", {})
+    resize_bindings = resize_mode.get("binding", {})
     required_resize_bindings = [
         "alt-h", "alt-j", "alt-k", "alt-l",
         "h", "j", "k", "l",
         "enter", "esc",
     ]
     for b in required_resize_bindings:
-        if b not in resize_bindings:
-            fail(f"Layer C (AeroSpace Consumer): Missing binding '{b}' in [mode.resize.binding]")
+        assert_in(b, resize_bindings, f"AeroSpace: Missing binding '{b}' in [mode.resize.binding]")
 
-    service_bindings = sections.get("mode.service.binding", {})
+    service_mode = mode.get("service", {})
+    service_bindings = service_mode.get("binding", {})
     required_service_bindings = [
         "h", "j", "k", "l",
         "alt-h", "alt-j", "alt-k", "alt-l",
@@ -260,12 +244,15 @@ def validate_aerospace_consumer(content: str) -> None:
         "enter", "esc",
     ]
     for b in required_service_bindings:
-        if b not in service_bindings:
-            fail(f"Layer C (AeroSpace Consumer): Missing binding '{b}' in [mode.service.binding]")
+        assert_in(b, service_bindings, f"AeroSpace: Missing binding '{b}' in [mode.service.binding]")
 
-    if "com.mitchellh.ghostty" in content and "move-node-to-workspace" in content:
-        if re.search(r"com\.mitchellh\.ghostty[\s\S]*?move-node-to-workspace", content):
-            fail("Layer C (AeroSpace Consumer): Ghostty must NOT have automatic workspace routing in on-window-detected")
+    # Check on-window-detected list
+    on_window_detected = data.get("on-window-detected", [])
+    for rule in on_window_detected:
+        app_id = rule.get("check-further-callbacks", {}).get("app-id", "") if isinstance(rule, dict) else ""
+        run = rule.get("run", "") if isinstance(rule, dict) else ""
+        if "com.mitchellh.ghostty" in str(rule) and "move-node-to-workspace" in str(rule):
+            fail("AeroSpace: Ghostty must NOT have automatic workspace routing in on-window-detected")
 
     print("PASS: macOS AeroSpace Consumer validated (main, resize, service modes, and no Ghostty auto-routing).")
 
@@ -301,8 +288,21 @@ def validate_windows_ahk(content: str) -> None:
     print("PASS: Windows AutoHotkey Bridge validated (editing F21-F24, launchers Alt+F13-F16, and hotkey precedence).")
 
 
-def validate_glazewm_consumer(content: str) -> None:
+def validate_glazewm_consumer(data: dict) -> None:
     """Verify GlazeWM binds all semantic window management signals."""
+    assert_in("keybindings", data, "GlazeWM missing 'keybindings' array")
+    keybindings = data["keybindings"]
+
+    all_bindings = set()
+    for entry in keybindings:
+        for b in entry.get("bindings", []):
+            all_bindings.add(b.lower())
+
+    # Collect mode bindings
+    binding_modes = {mode["name"]: mode for mode in data.get("binding_modes", [])}
+    assert_in("resize", binding_modes, "GlazeWM missing 'resize' binding mode")
+    assert_in("service", binding_modes, "GlazeWM missing 'service' binding mode")
+
     required_glazewm_bindings = [
         # Workspaces 1-5
         "f13", "f14", "f15", "f16", "f17",
@@ -318,18 +318,25 @@ def validate_glazewm_consumer(content: str) -> None:
     ]
 
     for b in required_glazewm_bindings:
-        # Check if the binding exists in a bindings list (e.g. "f13" or 'f13')
-        pattern = rf'[\"\']{re.escape(b)}[\"\']'
-        if not re.search(pattern, content, re.IGNORECASE):
-            fail(f"Windows GlazeWM: Missing keybinding '{b}' in glazewm.yaml")
+        assert_in(b, all_bindings, f"Windows GlazeWM: Missing keybinding '{b}' in keybindings")
 
-    # Check resize binding mode
-    if 'name: "resize"' not in content and "name: resize" not in content:
-        fail("Windows GlazeWM: Missing 'resize' binding mode in glazewm.yaml")
+    # Check resize mode keybindings
+    resize_kb = {
+        b.lower()
+        for entry in binding_modes["resize"].get("keybindings", [])
+        for b in entry.get("bindings", [])
+    }
+    for b in ["ctrl+f13", "ctrl+f14", "ctrl+f15", "ctrl+f16", "escape", "enter"]:
+        assert_in(b, resize_kb, f"Windows GlazeWM resize mode missing binding '{b}'")
 
-    # Check service binding mode
-    if 'name: "service"' not in content and "name: service" not in content:
-        fail("Windows GlazeWM: Missing 'service' binding mode in glazewm.yaml")
+    # Check service mode keybindings
+    service_kb = {
+        b.lower()
+        for entry in binding_modes["service"].get("keybindings", [])
+        for b in entry.get("bindings", [])
+    }
+    for b in ["ctrl+f13", "ctrl+f16", "f19", "f20", "escape", "enter"]:
+        assert_in(b, service_kb, f"Windows GlazeWM service mode missing binding '{b}'")
 
     print("PASS: Windows GlazeWM Consumer validated (workspaces, navigation, resize mode, and service mode).")
 
@@ -348,26 +355,18 @@ def main() -> None:
     validate_keymap_producer(SOFLE_KEYMAP_PATH, "Sofle")
 
     # 2. macOS Host
-    if not KARABINER_PATH.exists():
-        fail(f"Karabiner file not found: {KARABINER_PATH}")
-    if not AEROSPACE_PATH.exists():
-        fail(f"AeroSpace file not found: {AEROSPACE_PATH}")
-
-    karabiner_data = json.loads(KARABINER_PATH.read_text(encoding="utf-8"))
-    aerospace_content = AEROSPACE_PATH.read_text(encoding="utf-8")
+    karabiner_data = load_json(KARABINER_PATH)
+    aerospace_data = load_toml(AEROSPACE_PATH)
     validate_karabiner_translator(karabiner_data)
-    validate_aerospace_consumer(aerospace_content)
+    validate_aerospace_consumer(aerospace_data)
 
     # 3. Windows Host
     if not AHK_PATH.exists():
         fail(f"AutoHotkey file not found: {AHK_PATH}")
-    if not GLAZEWM_PATH.exists():
-        fail(f"GlazeWM file not found: {GLAZEWM_PATH}")
-
     ahk_content = AHK_PATH.read_text(encoding="utf-8")
-    glazewm_content = GLAZEWM_PATH.read_text(encoding="utf-8")
+    glazewm_data = load_yaml(GLAZEWM_PATH)
     validate_windows_ahk(ahk_content)
-    validate_glazewm_consumer(glazewm_content)
+    validate_glazewm_consumer(glazewm_data)
 
     print("=" * 70)
     print("ALL MULTI-KEYBOARD & MULTI-HOST PROTOCOL CHECKS PASSED.")

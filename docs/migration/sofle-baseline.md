@@ -89,7 +89,7 @@ manifest:
 - **Canonical Thumb Architecture:** Six layer-taps on the 3 primary thumb keys per half (`MOUSE`, `NAV`, `HOST` on left; `SYM`, `NUM`, `FUN` on right), with dedicated outer thumb modifiers (`LGUI`/`LALT` on left; `RALT`/`RGUI` on right).
 - **Outer-Left Home Key:** `LM5` acts as momentary hold for `MEDIA` (`&mo L_MEDIA`).
 - **Unified Semantic Protocol:** Complete `F13`–`F24` protocol on HOST, NAV, and MOUSE identical to Corne.
-- **Single Complete GAME Layer:** Full QWERTY alpha + number row + gaming modifiers. Deliberate exit via right encoder press (`REC` → `&to L_BASE`). No `GAME_AUX` needed due to physical number row.
+- **Single Complete GAME Layer:** Full QWERTY alpha + number row + gaming modifiers. Deliberate exit via right encoder press (`REC` → `&to L_BASE`). No `GAME_FN` needed due to physical number row.
 - **Proper ADJUST Layer:** Activated via conditional layer `NAV + NUM → ADJUST`. Contains Bluetooth, power, reset, bootloader, Studio unlock, and GAME entry.
 - **Single Pinned Manifest:** Builds against the canonical pinned `config/west.yml` shared with Corne.
 

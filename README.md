@@ -32,7 +32,7 @@ Both keyboards share a single, OS-neutral design language:
 | **HOST Layer** | Yes (`F13`–`F20`) | Yes (`F13`–`F20`) |
 | **Number Row** | Virtual (`NUM` layer) | Dedicated physical row |
 | **Rotary Encoders** | No | 2× EC11 encoders + push switches |
-| **Gaming Model** | `GAME` + `GAME_AUX` | Single complete `GAME` layer |
+| **Gaming Model** | `GAME` + `GAME_FN` | Single complete `GAME` layer |
 | **ZMK Studio** | Enabled with locking | Enabled with locking |
 | **Primary Host** | macOS | Windows |
 | **Cross-Platform** | Yes | Yes |
@@ -71,9 +71,11 @@ keyboard-config/
 │   ├── sofle.keymap          # Sofle 60-key layout
 │   ├── sofle.conf            # Sofle Kconfig settings
 │   └── west.yml              # Pinned West dependencies
+├── protocol/
+│   └── semantic-v1.yaml      # Canonical semantic HID protocol specification
 ├── hosts/
 │   ├── macos/
-│   │   ├── karabiner.json    # Complex modifications bridge
+│   │   ├── karabiner.json    # Device-scoped complex modifications bridge
 │   │   ├── aerospace.toml    # Tiling window manager config
 │   │   └── ghostty.config    # Terminal & scratchpad config
 │   └── windows/
@@ -85,15 +87,24 @@ keyboard-config/
 │   ├── corne.svg / corne.yaml
 │   └── sofle.svg / sofle.yaml
 ├── scripts/
-│   ├── check_corne_keymap.py
-│   ├── check_sofle_keymap.py
-│   ├── check_host_protocol.py
-│   └── check_build_config.py
+│   ├── lib/
+│   │   ├── keymap_parser.py  # Structured ZMK DTS parser
+│   │   ├── protocol.py       # Protocol loader & signal helpers
+│   │   └── validation.py     # Real JSON/YAML/TOML loaders & assertions
+│   ├── check_corne_keymap.py # Positional invariant validator
+│   ├── check_sofle_keymap.py # Positional & encoder validator
+│   ├── check_host_protocol.py# End-to-end multi-host protocol validator
+│   ├── check_build_config.py # Target matrix & manifest validator
+│   ├── check_generated.py    # Freshness & undeclared signal validator
+│   └── generate_protocol_files.py
 └── docs/
     ├── architecture.md
     ├── host-protocol.md
     ├── setup.md
     ├── usage.md
+    ├── development.md
+    ├── troubleshooting.md
+    ├── compatibility.md
     ├── keyboards/
     │   ├── corne.md
     │   └── sofle.md
@@ -112,6 +123,9 @@ keyboard-config/
 - **Semantic Protocol:** [docs/host-protocol.md](docs/host-protocol.md)
 - **Setup & Flashing:** [docs/setup.md](docs/setup.md)
 - **Daily Usage & Workflow:** [docs/usage.md](docs/usage.md)
+- **Development & Studio Policy:** [docs/development.md](docs/development.md)
+- **Troubleshooting Decision Tree:** [docs/troubleshooting.md](docs/troubleshooting.md)
+- **Host & Dependency Compatibility:** [docs/compatibility.md](docs/compatibility.md)
 - **Corne Reference:** [docs/keyboards/corne.md](docs/keyboards/corne.md)
 - **Sofle Reference:** [docs/keyboards/sofle.md](docs/keyboards/sofle.md)
 - **macOS Guide:** [docs/hosts/macos.md](docs/hosts/macos.md)
@@ -125,8 +139,9 @@ keyboard-config/
 Run all static invariant and protocol checks locally:
 
 ```bash
-python3 scripts/check_corne_keymap.py
-python3 scripts/check_sofle_keymap.py
-python3 scripts/check_host_protocol.py
-python3 scripts/check_build_config.py
+uv run scripts/check_corne_keymap.py
+uv run scripts/check_sofle_keymap.py
+uv run scripts/check_host_protocol.py
+uv run scripts/check_build_config.py
+uv run scripts/check_generated.py
 ```

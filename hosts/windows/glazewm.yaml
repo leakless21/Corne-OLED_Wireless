@@ -26,7 +26,7 @@ workspaces:
 
 window_rules:
   # Auto-routing for hard-purpose applications
-  - command: "set-floating"
+  - commands: ["set-floating"]
     match:
       - window_class: "Taskmgr"
       - window_class: "ControlPanel"
@@ -35,70 +35,70 @@ keybindings:
   # ===========================================================================
   # Workspace Switching (F13-F17) & Window Movement (Shift+F13-F17)
   # ===========================================================================
-  - command: "focus --workspace 1"
+  - commands: ["focus --workspace 1"]
     bindings: ["f13", "alt+1"]
-  - command: "focus --workspace 2"
+  - commands: ["focus --workspace 2"]
     bindings: ["f14", "alt+2"]
-  - command: "focus --workspace 3"
+  - commands: ["focus --workspace 3"]
     bindings: ["f15", "alt+3"]
-  - command: "focus --workspace 4"
+  - commands: ["focus --workspace 4"]
     bindings: ["f16", "alt+4"]
-  - command: "focus --workspace 5"
+  - commands: ["focus --workspace 5"]
     bindings: ["f17", "alt+5"]
 
-  - command: "move --workspace 1; focus --workspace 1"
+  - commands: ["move --workspace 1", "focus --workspace 1"]
     bindings: ["shift+f13", "alt+shift+1"]
-  - command: "move --workspace 2; focus --workspace 2"
+  - commands: ["move --workspace 2", "focus --workspace 2"]
     bindings: ["shift+f14", "alt+shift+2"]
-  - command: "move --workspace 3; focus --workspace 3"
+  - commands: ["move --workspace 3", "focus --workspace 3"]
     bindings: ["shift+f15", "alt+shift+3"]
-  - command: "move --workspace 4; focus --workspace 4"
+  - commands: ["move --workspace 4", "focus --workspace 4"]
     bindings: ["shift+f16", "alt+shift+4"]
-  - command: "move --workspace 5; focus --workspace 5"
+  - commands: ["move --workspace 5", "focus --workspace 5"]
     bindings: ["shift+f17", "alt+shift+5"]
 
   # ===========================================================================
   # Directional Navigation & Window Moving
   # ===========================================================================
-  - command: "focus left"
+  - commands: ["focus --direction left"]
     bindings: ["ctrl+f13", "alt+h"]
-  - command: "focus down"
+  - commands: ["focus --direction down"]
     bindings: ["ctrl+f14", "alt+j"]
-  - command: "focus up"
+  - commands: ["focus --direction up"]
     bindings: ["ctrl+f15", "alt+k"]
-  - command: "focus right"
+  - commands: ["focus --direction right"]
     bindings: ["ctrl+f16", "alt+l"]
 
-  - command: "move left"
+  - commands: ["move --direction left"]
     bindings: ["ctrl+shift+f13", "alt+shift+h"]
-  - command: "move down"
+  - commands: ["move --direction down"]
     bindings: ["ctrl+shift+f14", "alt+shift+j"]
-  - command: "move up"
+  - commands: ["move --direction up"]
     bindings: ["ctrl+shift+f15", "alt+shift+k"]
-  - command: "move right"
+  - commands: ["move --direction right"]
     bindings: ["ctrl+shift+f16", "alt+shift+l"]
 
   # ===========================================================================
   # Context, Modals & Window Controls
   # ===========================================================================
   # Previous workspace
-  - command: "focus --recent-workspace"
+  - commands: ["focus --recent-workspace"]
     bindings: ["f18", "alt+tab"]
 
   # Fullscreen toggle
-  - command: "toggle-fullscreen"
+  - commands: ["toggle-fullscreen"]
     bindings: ["f19", "alt+f"]
 
   # Float / Tile toggle
-  - command: "toggle-floating --centered"
+  - commands: ["toggle-floating --centered"]
     bindings: ["f20", "alt+shift+space"]
 
   # Enter Resize Mode
-  - command: "enable-binding-mode --name resize"
+  - commands: ["wm-enable-binding-mode --name resize"]
     bindings: ["shift+f18", "alt+r"]
 
   # Enter Service Mode
-  - command: "enable-binding-mode --name service"
+  - commands: ["wm-enable-binding-mode --name service"]
     bindings: ["alt+f18", "alt+shift+semicolon"]
 
 binding_modes:
@@ -107,15 +107,15 @@ binding_modes:
   # ===========================================================================
   - name: "resize"
     keybindings:
-      - command: "resize width -50px"
-        bindings: ["ctrl+f13", "alt+h", "h"]
-      - command: "resize height +50px"
-        bindings: ["ctrl+f14", "alt+j", "j"]
-      - command: "resize height -50px"
-        bindings: ["ctrl+f15", "alt+k", "k"]
-      - command: "resize width +50px"
-        bindings: ["ctrl+f16", "alt+l", "l"]
-      - command: "disable-binding-mode --name resize"
+      - commands: ["resize --width -50px"]
+        bindings: ["ctrl+f13", "alt+h", "h", "left"]
+      - commands: ["resize --height +50px"]
+        bindings: ["ctrl+f14", "alt+j", "j", "down"]
+      - commands: ["resize --height -50px"]
+        bindings: ["ctrl+f15", "alt+k", "k", "up"]
+      - commands: ["resize --width +50px"]
+        bindings: ["ctrl+f16", "alt+l", "l", "right"]
+      - commands: ["wm-disable-binding-mode --name resize"]
         bindings: ["escape", "enter"]
 
   # ===========================================================================
@@ -123,13 +123,13 @@ binding_modes:
   # ===========================================================================
   - name: "service"
     keybindings:
-      - command: "move-workspace-to-monitor --next; disable-binding-mode --name service"
-        bindings: ["ctrl+f16", "alt+l", "l"]
-      - command: "move-workspace-to-monitor --prev; disable-binding-mode --name service"
-        bindings: ["ctrl+f13", "alt+h", "h"]
-      - command: "wm-reload-config; disable-binding-mode --name service"
+      - commands: ["move-workspace-to-monitor --direction prev", "wm-disable-binding-mode --name service"]
+        bindings: ["ctrl+f13", "alt+h", "h", "left"]
+      - commands: ["move-workspace-to-monitor --direction next", "wm-disable-binding-mode --name service"]
+        bindings: ["ctrl+f16", "alt+l", "l", "right"]
+      - commands: ["wm-reload-config", "wm-disable-binding-mode --name service"]
         bindings: ["f19", "r"]
-      - command: "wm-redraw; disable-binding-mode --name service"
+      - commands: ["wm-redraw", "wm-disable-binding-mode --name service"]
         bindings: ["f20", "b"]
-      - command: "disable-binding-mode --name service"
+      - commands: ["wm-disable-binding-mode --name service"]
         bindings: ["escape", "enter"]

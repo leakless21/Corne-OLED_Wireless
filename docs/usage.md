@@ -25,11 +25,11 @@ This guide covers daily keyboard usage, layer navigation, gaming, and the firmwa
 
 ## 2. Gaming Modes
 
-### Corne Gaming (`GAME` + `GAME_AUX`)
+### Corne Gaming (`GAME` + `GAME_FN`)
 1. Enter `GAME` from `ADJUST` (`NAV + NUM` $\rightarrow$ press `GAME`).
 2. Left-hand mouse gaming: Hold `Esc` (`LT5`) + `Q/W/E/R/T` for numbers `1`–`5`.
 3. Two-handed access: Hold `RH1` for numbers `1`–`0`, F1–F10, and symbols.
-4. Exit to BASE: Hold `Esc` or `RH1` to reach `GAME_AUX`, then tap `RH2` (`&to L_BASE`).
+4. Exit to BASE: Hold `Esc` or `RH1` to reach `GAME_FN`, then tap `RH2` (`&to L_BASE`).
 
 ### Sofle Gaming (Single Complete `GAME` Layer)
 1. Enter `GAME` from `ADJUST` (`NAV + NUM` $\rightarrow$ press `GAME`).
@@ -39,13 +39,18 @@ This guide covers daily keyboard usage, layer navigation, gaming, and the firmwa
 
 ---
 
-## 3. ZMK Studio Locking
+## 3. ZMK Studio Policy & Lifecycle
 
-ZMK Studio is enabled with locking (`CONFIG_ZMK_STUDIO_LOCKING=y`) to keep Git the single source of truth.
-- To unlock Studio for live edits: Hold `NAV + NUM` to reach `ADJUST`, then press `Unlock` (`RM0`).
-- To discard runtime overrides: In ZMK Studio, click **Restore Stock Settings**.
+ZMK Studio is enabled with hardware locking (`CONFIG_ZMK_STUDIO_LOCKING=y`) to ensure Git remains the canonical database.
 
----
+### Three Operational States:
+1. **Stock:** Active keymap exactly equals compiled Git firmware (recommended production state).
+2. **Studio Experiment:** Runtime overrides stored in flash memory; active keymap differs from Git.
+3. **Promoted:** Desired changes copied to Git $\rightarrow$ built $\rightarrow$ "Restore Stock Settings" in Studio $\rightarrow$ flash new `.uf2`.
+
+> ⚠️ **Warning:** Flashing a new `.keymap` does NOT replace Studio runtime overrides stored in flash memory. You must click **"Restore Stock Settings"** in ZMK Studio before verifying new Git builds.
+
+For complete rules on permitted vs forbidden Studio modifications, see [docs/development.md](development.md).
 
 ## 4. Smoke-Test Checklist
 

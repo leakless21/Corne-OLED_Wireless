@@ -98,5 +98,5 @@ We deliberately do **not** force artificial parity where hardware differs:
 | **Encoders** | None | Two rotary encoders with push switches | Left: Page navigation / Track; Right: Volume control. |
 | **Encoder Presses** | None | Left: Caps Word; Right: Mute / Game Exit | Immediate hardware utility. |
 | **Thumb Clusters** | 3 keys per side | 5 keys per side | Sofle adds dedicated outer `GUI`/`ALT` modifiers. |
-| **Gaming Architecture** | `GAME` + `GAME_AUX` | Single complete `GAME` layer | Corne needs `GAME_AUX` for 1–0/F-keys; Sofle has physical numbers. |
-| **Total Layers** | 11 layers (0–10) | 10 layers (0–9) | Sofle does not inherit Corne's `GAME_AUX` constraint. |
+| **Gaming Architecture** | `GAME` + `GAME_FN` | Single complete `GAME` layer | Corne needs `GAME_FN` for 1–0/F-keys; Sofle has physical numbers. |
+| **Total Layers** | 11 layers (0–10) | 10 layers (0–9) | Sofle does not inherit Corne's `GAME_FN` constraint. |

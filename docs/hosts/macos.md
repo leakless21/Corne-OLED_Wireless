@@ -65,3 +65,40 @@ AeroSpace operates with five persistent virtual workspaces:
 - **`main` Mode:** Standard workspace focus, window focus (`Alt-H/J/K/L`), and window moving (`Alt-Shift-H/J/K/L`).
 - **`resize` Mode (`Shift+F18` / `Alt-R`):** Directional window dimension adjustments ($\pm 50$ px). Exit with `Esc` or `Enter`.
 - **`service` Mode (`Alt+F18` / `Alt-Shift-;`):** Tree surgery, joining, swapping, and monitor movements. One-shot commands automatically return to `main`.
+
+---
+
+## 4. Device Scoping & Built-in Keyboard Isolation
+
+To prevent high-function keys (`F13`–`F24`) on the built-in laptop keyboard or other standard peripherals from being intercepted, every rule manipulator in `hosts/macos/karabiner.json` is scoped with a `device_if` condition:
+
+```json
+"conditions": [
+  {
+    "type": "device_if",
+    "identifiers": [
+      {
+        "is_keyboard": true,
+        "is_built_in_keyboard": false
+      }
+    ]
+  }
+]
+```
+
+### Matching Specific ZMK Hardware (Optional USB / BLE Targeting)
+If you wish to restrict translation to specific external ZMK controllers only:
+1. Open **Karabiner-EventViewer** $\rightarrow$ **Devices** tab.
+2. Locate your connected Corne / Sofle controller (USB VID/PID or BLE Device Address).
+3. Replace or supplement the `identifiers` array in `hosts/macos/karabiner.json` with your controller's exact `vendor_id` and `product_id`:
+   ```json
+   {
+     "type": "device_if",
+     "identifiers": [
+       {
+         "vendor_id": 12056,
+         "product_id": 1
+       }
+     ]
+   }
+   ```
